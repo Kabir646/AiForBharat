@@ -1,4 +1,4 @@
-﻿import { Header } from '@/components/Header'
+import { Header } from '@/components/Header'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { EnvironmentalImpact } from '@/components/EnvironmentalImpact'
@@ -157,7 +157,7 @@ export default function DocumentDetailPage() {
 
   // Updated to accept optional searchText for highlighting evidence
   function handlePageClick(page: number, searchText?: string) {
-    console.log('ðŸ”— handlePageClick called:', {
+    console.log('🔗 handlePageClick called:', {
       page,
       hasSearchText: !!searchText,
       searchTextPreview: searchText?.substring(0, 100),
@@ -167,7 +167,7 @@ export default function DocumentDetailPage() {
     setHighlightText(searchText || null)  // Set text to highlight (or clear if none)
     // Open PDF viewer if it's collapsed
     if (isPdfCollapsed) {
-      console.log('ðŸ”— Opening collapsed PDF viewer')
+      console.log('🔗 Opening collapsed PDF viewer')
       setIsPdfCollapsed(false)
     }
     // Note: Removed scrollIntoView to prevent page from jumping when clicking evidence links
@@ -452,7 +452,7 @@ export default function DocumentDetailPage() {
 
 
                 {activeTab === 'compliance' && (() => {
-                  console.log('ðŸ” Rendering ComplianceTab with projectId:', projectId, 'from location:', (location.state as any)?.projectId, 'from document:', document?.project_id)
+                  console.log('🔍 Rendering ComplianceTab with projectId:', projectId, 'from location:', (location.state as any)?.projectId, 'from document:', document?.project_id)
                   return <ComplianceTab data={data} onPageClick={handlePageClick} />
                 })()}
 
@@ -480,7 +480,7 @@ export default function DocumentDetailPage() {
               {!isPdfCollapsed ? (
                 <div id="pdf-viewer-container" className="relative animate-in fade-in slide-in-from-right duration-300">
                   <PDFViewer
-                    pdfUrl={`http://127.0.0.1:8000/dpr/${id}/pdf`}
+                    pdfUrl={`PLACEHOLDER_API_URL/dpr/${id}/pdf`}
                     initialPage={pdfPage}
                     onPageChange={(page) => setPdfPage(page)}
                     className="h-[550px]"
@@ -671,7 +671,7 @@ function OverviewTab({ data, onPageClick }: { data: any; onPageClick: (page: num
                 <ul className="space-y-2">
                   {data.technicalEvaluation.methodologyAndApproach.strengths.map((s: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                      <span className="text-green-600 dark:text-green-400 mt-1">â€¢</span>
+                      <span className="text-green-600 dark:text-green-400 mt-1">•</span>
                       <span>{s}</span>
                     </li>
                   ))}
@@ -688,7 +688,7 @@ function OverviewTab({ data, onPageClick }: { data: any; onPageClick: (page: num
                 <ul className="space-y-2">
                   {data.technicalEvaluation.methodologyAndApproach.weaknesses.map((w: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                      <span className="text-red-600 dark:text-red-400 mt-1">â€¢</span>
+                      <span className="text-red-600 dark:text-red-400 mt-1">•</span>
                       <span>{w}</span>
                     </li>
                   ))}
@@ -1059,7 +1059,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                           )}
                           {ev.pageLocation && (
                             <p className="text-sm text-muted-foreground pl-4">
-                              ðŸ“ Reference: {createEvidencePageLink(ev, onPageClick, evidx)}
+                              📍 Reference: {createEvidencePageLink(ev, onPageClick, evidx)}
                             </p>
                           )}
                         </div>
@@ -1245,7 +1245,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                           )}
                           {ev.pageLocation && (
                             <p className="text-sm text-muted-foreground pl-4">
-                              ðŸ“ Reference: {createEvidencePageLink(ev, onPageClick, evidx)}
+                              📍 Reference: {createEvidencePageLink(ev, onPageClick, evidx)}
                             </p>
                           )}
                         </div>

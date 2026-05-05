@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { API_ENDPOINTS } from '../config/api'
 import { X, RotateCcw, Save, AlertCircle, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -57,7 +58,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
         setError(null)
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/projects/${projectId}/compliance-weights`)
+            const response = await fetch(`PLACEHOLDER_API_URL/projects/${projectId}/compliance-weights`)
 
             if (!response.ok) {
                 throw new Error('Failed to load compliance weights')
@@ -110,7 +111,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
         setSuccessMessage(null)
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/projects/${projectId}/compliance-weights`, {
+            const response = await fetch(`PLACEHOLDER_API_URL/projects/${projectId}/compliance-weights`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ weights, recalculate })

@@ -57,7 +57,7 @@ export default function ClientDashboard() {
     const fetchProjects = async () => {
         try {
             setLoadingProjects(true)
-            const response = await fetch('http://127.0.0.1:8000/projects')
+            const response = await fetch('PLACEHOLDER_API_URL/projects')
             if (!response.ok) throw new Error('Failed to fetch projects')
             const data = await response.json()
             setProjects(data.projects)
@@ -74,7 +74,7 @@ export default function ClientDashboard() {
 
         try {
             setLoading(true)
-            const response = await fetch(`http://127.0.0.1:8000/api/client/dprs?client_id=${userInfo.id}`)
+            const response = await fetch(`PLACEHOLDER_API_URL/api/client/dprs?client_id=${userInfo.id}`)
             if (!response.ok) throw new Error('Failed to fetch DPRs')
             const data = await response.json()
             setDprs(data.dprs)
@@ -154,7 +154,7 @@ export default function ClientDashboard() {
             formData.append('project_name', selectedProject.name)
             formData.append('file', selectedFile)
 
-            const response = await fetch('http://127.0.0.1:8000/api/client/dprs/upload', {
+            const response = await fetch('PLACEHOLDER_API_URL/api/client/dprs/upload', {
                 method: 'POST',
                 body: formData,
             })
@@ -186,7 +186,7 @@ export default function ClientDashboard() {
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:8000/api/client/dprs/${dpr.id}/download?client_id=${userInfo.id}`
+                `PLACEHOLDER_API_URL/api/client/dprs/${dpr.id}/download?client_id=${userInfo.id}`
             )
 
             if (!response.ok) throw new Error('Failed to download file')
@@ -214,7 +214,7 @@ export default function ClientDashboard() {
         }
 
         try {
-            const url = `http://127.0.0.1:8000/api/client/dprs/${dpr.id}?client_id=${userInfo.id}`
+            const url = `PLACEHOLDER_API_URL/api/client/dprs/${dpr.id}?client_id=${userInfo.id}`
             const response = await fetch(url, { method: 'DELETE' })
 
             if (!response.ok) {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useRole } from '@/contexts/RoleContext'
 import { Card } from '@/components/ui/Card'
 import { Shield, User as UserIcon, Lock, Mail, AlertCircle, X, ArrowLeft, Eye, EyeOff } from 'lucide-react'
+import { API_ENDPOINTS } from '../config/api'
 
 type AuthStep = 'role-selection' | 'admin-login' | 'user-auth'
 type UserAuthTab = 'login' | 'signup'
@@ -74,7 +75,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setAdminLoading(true)
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/admin/login', {
+            const response = await fetch(API_ENDPOINTS.adminLogin(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ admin_id: adminId, password: adminPassword }),
@@ -111,7 +112,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             setUserLoading(true)
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/user/login', {
+                const response = await fetch(API_ENDPOINTS.userLogin(), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: userEmail, password: userPassword }),
@@ -164,7 +165,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             setUserLoading(true)
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/user/register', {
+                const response = await fetch(API_ENDPOINTS.userRegister(), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

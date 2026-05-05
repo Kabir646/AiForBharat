@@ -47,7 +47,7 @@ export default function UserAuth() {
         setIsLoading(true)
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/user/register', {
+            const response = await fetch('PLACEHOLDER_API_URL/api/user/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export default function UserAuth() {
         setIsLoading(true)
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/user/login', {
+            const response = await fetch('PLACEHOLDER_API_URL/api/user/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ import { useRole } from '@/contexts/RoleContext'
 import { Card } from '@/components/ui/Card'
 import { Shield, Lock, User, AlertCircle } from 'lucide-react'
 import { LanguageDropdown } from '@/components/LanguageDropdown'
+import { API_ENDPOINTS } from '../config/api'
 
 export default function AdminLogin() {
     const [adminId, setAdminId] = useState('')
@@ -33,7 +34,7 @@ export default function AdminLogin() {
         setIsLoading(true)
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/admin/login', {
+            const response = await fetch('PLACEHOLDER_API_URL/api/admin/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

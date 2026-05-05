@@ -82,7 +82,7 @@ export default function ProjectDetailPage() {
         setAnalyzingDpr(dprId)
         try {
             console.log(`Starting analysis for DPR ${dprId}...`)
-            const response = await fetch(`http://127.0.0.1:8000/dprs/${dprId}/analyze`, {
+            const response = await fetch(`PLACEHOLDER_API_URL/dprs/${dprId}/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -247,7 +247,7 @@ export default function ProjectDetailPage() {
                                         // If comparison already exists, fetch and show it
                                         if ((project as any).has_comparison) {
                                             try {
-                                                const response = await fetch(`http://127.0.0.1:8000/projects/${id}/comparison`)
+                                                const response = await fetch(`PLACEHOLDER_API_URL/projects/${id}/comparison`)
                                                 if (response.ok) {
                                                     const data = await response.json()
                                                     setComparisonResult(data.comparison)
