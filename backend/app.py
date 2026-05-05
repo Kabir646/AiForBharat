@@ -1722,8 +1722,36 @@ async def remove_dpr_from_comparison_endpoint(comparison_id: int, dpr_id: int):
 
 @app.get("/health")
 async def health_check():
-    """Simple health check endpoint."""
-    return {"status": "ok", "service": "dpr-analyzer"}
+    """
+    Health check endpoint for load balancer and container orchestration.
+    Checks database connectivity and returns service status.
+    """
+    try:
+        # Check database connection
+        conn = db_config.get_connection()
+        cursor = db_config.get_cursor(conn, dict_cursor=False)
+        cursor.execute("SELECT 1")
+        cursor.close()
+        db_config.release_connection(conn)
+        
+        return JSONResponse({
+            "status": "healthy",
+            "service": "tender-evaluator-backend",
+            "timestamp": datetime.now().isoformat(),
+            "database": "connected"
+        })
+    except Exception as e:
+        print(f"❌ Health check failed: {str(e)}")
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "unhealthy",
+                "service": "tender-evaluator-backend",
+                "timestamp": datetime.now().isoformat(),
+                "error": str(e),
+                "database": "disconnected"
+            }
+        )
 
 
 if __name__ == "__main__":

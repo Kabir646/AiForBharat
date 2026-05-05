@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # Backend API service
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: tender-evaluator-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Database configuration
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=dpr_analyzer
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      
+      # API Keys (load from .env file)
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_API_KEY=${GEMINI_API_KEY}
+      
+      # Cloudinary configuration
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      
+      # Admin credentials
+      - ADMIN_ID=${ADMIN_ID:-admin123}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      
+      # Server configuration
+      - HOST=0.0.0.0
+      - PORT=8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Mount data directory for local file storage
+      - ./data:/app/data
+      # Mount backend code for development (remove in production)
+      - ./backend:/app/backend
+    networks:
+      - tender-evaluator-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:14-alpine
+    container_name: tender-evaluator-db
+    environment:
+      - POSTGRES_DB=dpr_analyzer
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persist database data
+      - postgres_data:/var/lib/postgresql/data
+      # Optional: mount init scripts
+      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tender-evaluator-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tender-evaluator-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@tenderevaluator.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=80
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - tender-evaluator-network
+    restart: unless-stopped
+    profiles:
+      - dev  # Only start with: docker-compose --profile dev up
+
+networks:
+  tender-evaluator-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
