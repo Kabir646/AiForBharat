@@ -132,11 +132,12 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Deploy to Vercel
+        working-directory: ./frontend
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: vercel deploy --prod --token=$VERCEL_TOKEN --yes --cwd ./frontend
+        run: vercel deploy --prod --token=$VERCEL_TOKEN --yes
 
   # Deploy Backend to Render (only on main branch)
   deploy-backend:
