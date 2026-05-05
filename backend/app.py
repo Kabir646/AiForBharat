@@ -917,35 +917,52 @@ async def reset_compliance_weights(project_id: int, recalculate: bool = False):
 
 
 
-# ===== PAGE ROUTES =====
+# ===== ROOT ENDPOINT =====
 
-@app.get("/", response_class=HTMLResponse)
-async def home_page(request: Request):
-    """Serve the landing/home page."""
-    return templates.TemplateResponse("home.html", {"request": request})
-
-
-@app.get("/dprs/list", response_class=HTMLResponse)
-async def dprs_list_page(request: Request):
-    """Serve the DPR list page."""
-    return templates.TemplateResponse("list.html", {"request": request})
-
-
-@app.get("/dpr/{dpr_id}/detail", response_class=HTMLResponse)
-async def dpr_detail_page(request: Request, dpr_id: int):
-    """Serve the DPR detail/analysis page."""
-    return templates.TemplateResponse("detail.html", {"request": request})
-
-@app.get("/comparison-chat/{comparison_id}/detail", response_class=HTMLResponse)
-async def comparison_detail_page(request: Request, comparison_id: int):
-    """Serve the comparison chat page."""
-    return templates.TemplateResponse("comparison.html", {"request": request})
+@app.get("/")
+async def root():
+    """API root endpoint - returns API information."""
+    return {
+        "service": "Tender Evaluator API",
+        "version": "1.0.0",
+        "status": "running",
+        "docs": "/docs",
+        "health": "/health",
+        "frontend": "Deploy separately on Vercel"
+    }
 
 
-@app.get("/comparisons", response_class=HTMLResponse)
-async def comparisons_list_page(request: Request):
-    """Serve the comparisons list page."""
-    return templates.TemplateResponse("comparisons.html", {"request": request})
+# ===== LEGACY PAGE ROUTES (DEPRECATED - Use React Frontend) =====
+# These routes serve old HTML templates and should not be used
+# Deploy the React frontend separately on Vercel instead
+
+# @app.get("/", response_class=HTMLResponse)
+# async def home_page(request: Request):
+#     """Serve the landing/home page."""
+#     return templates.TemplateResponse("home.html", {"request": request})
+
+
+# @app.get("/dprs/list", response_class=HTMLResponse)
+# async def dprs_list_page(request: Request):
+#     """Serve the DPR list page."""
+#     return templates.TemplateResponse("list.html", {"request": request})
+
+
+# @app.get("/dpr/{dpr_id}/detail", response_class=HTMLResponse)
+# async def dpr_detail_page(request: Request, dpr_id: int):
+#     """Serve the DPR detail/analysis page."""
+#     return templates.TemplateResponse("detail.html", {"request": request})
+
+# @app.get("/comparison-chat/{comparison_id}/detail", response_class=HTMLResponse)
+# async def comparison_detail_page(request: Request, comparison_id: int):
+#     """Serve the comparison chat page."""
+#     return templates.TemplateResponse("comparison.html", {"request": request})
+
+
+# @app.get("/comparisons", response_class=HTMLResponse)
+# async def comparisons_list_page(request: Request):
+#     """Serve the comparisons list page."""
+#     return templates.TemplateResponse("comparisons.html", {"request": request})
 
 
 
