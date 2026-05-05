@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '../config/api'
 
-const API_URL = `${API_BASE_URL}/api`
+const API_URL = API_BASE_URL
 
 export interface DPR {
   id: number

@@ -132,14 +132,7 @@ app = FastAPI(title="DPR Analyzer", version="1.0.0", lifespan=lifespan)
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5000",
-        "http://127.0.0.1:5000",
-        "http://localhost:5001",
-        "http://127.0.0.1:5001",
-        "https://ai-for-bharat-blonj1usto-kabir646s-projects.vercel.app",  # Your Vercel domain
-        "https://*.vercel.app",  # All Vercel preview deployments
-    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -1080,78 +1073,6 @@ async def upload_dpr(
 
 
 @app.post("/upload-dpr")
-async def upload_dpr(file: UploadFile = File(...), language: str = Form("en")):
-    """
-    Upload a DPR PDF, process it with Gemini, and return structured JSON.
-    
-    If a PDF with the same filename already exists, return the existing analysis.
-    Otherwise, process the new PDF and store it.
-    
-    Args:
-        file: PDF file to upload
-        language: "en" for English, "hi" for Hindi (default: "en")
-    """
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
-    
-    try:
-        original_filename = file.filename
-        
-        # Check if this PDF already exists
-        existing_dpr = db.get_dpr_by_filename(original_filename)
-        if existing_dpr:
-            print(f"✓ PDF already exists: {original_filename} (ID: {existing_dpr['id']})")
-            return JSONResponse({
-                "id": existing_dpr["id"],
-                "dpr_id": existing_dpr["id"],
-                "summary": existing_dpr["summary_json"],
-                "existing": True
-            })
-        
-        # Generate unique filename for storage
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_id = str(uuid.uuid4())[:8]
-        filename = f"{timestamp}_{unique_id}_{original_filename}"
-        filepath = DATA_DIR / filename
-        
-        # Save the uploaded file
-        print(f"⏳ Saving uploaded file: {filename}")
-        with open(filepath, "wb") as f:
-            content = await file.read()
-            f.write(content)
-        print(f"✓ File saved: {filepath} ({len(content)} bytes)")
-        try:
-            # Single call to get both English and Hindi analysis (now async)
-            parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH))
-            
-            print(f"✓ Generated analysis successfully")
-            
-            # Update database with analysis results
-            db.update_dpr(dpr_id, parsed_json)
-            
-            return JSONResponse({
-                "id": dpr_id,
-                "dpr_id": dpr_id,
-                "summary": parsed_json,
-                "existing": False
-            })
-            
-        except Exception as e:
-            print(f"✗ Analysis failed: {str(e)}")
-            # Optional: db.delete_dpr(dpr_id)
-            raise e
-        
-    except ValueError as e:
-        # JSON validation or parsing error
-        print(f"✗ Validation error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to parse valid JSON: {str(e)}")
-    
-    except Exception as e:
-        print(f"✗ Unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to process DPR: {str(e)}")
-
-
-@app.get("/dpr/{dpr_id}")
 async def get_dpr(dpr_id: int):
     """
     Retrieve a stored DPR by ID.
@@ -1784,3 +1705,4 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     # Use 1 worker on Windows to avoid WinError 10022
     uvicorn.run(app, host=host, port=port)
+
