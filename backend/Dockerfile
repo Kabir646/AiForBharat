@@ -1,5 +1,5 @@
 # Multi-stage build for optimized production image
-FROM python:3.9-slim AS builder
+FROM python:3.11-slim AS builder
 
 # Install system dependencies for WeasyPrint and compilation
 RUN apt-get update && apt-get install -y \
@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # ============================================
 # Production stage - minimal runtime image
 # ============================================
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 # Install only runtime dependencies (no build tools)
 RUN apt-get update && apt-get install -y \
