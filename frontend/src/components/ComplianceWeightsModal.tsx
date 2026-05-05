@@ -137,8 +137,9 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
                 onClose()
             }, 2000)
 
-        } catch (err: any) {
-            setError(err.message || 'Failed to save weights')
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Failed to save weights'
+            setError(message)
             console.error('Save weights error:', err)
         } finally {
             setSaving(false)

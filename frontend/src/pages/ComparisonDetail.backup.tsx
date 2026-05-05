@@ -260,7 +260,7 @@ export default function ComparisonDetailPage() {
                 <p className="text-sm text-gray-700 dark:text-gray-300">
                   <strong>💡 Tips for comparison:</strong>
                   <br />
-                  Ask questions like "Which project has better ROI?" or "Compare the implementation timelines"
+                  Ask questions like &quot;Which project has better ROI?&quot; or &quot;Compare the implementation timelines&quot;
                 </p>
               </div>
             </Card>

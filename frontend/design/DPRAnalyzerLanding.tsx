@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
     Moon, Sun, FileText, ShieldAlert, CheckCircle2,
     WifiOff, MessageSquare, Globe, Map as MapIcon,
-    Download, Users, Layers, ArrowRight, BarChart3,
-    Search, Menu, X, ChevronRight, Send
+    Layers, BarChart3,
+    Menu, X, ChevronRight, Send
 } from 'lucide-react';
 
 // Assets
@@ -42,7 +42,6 @@ const DPRAnalyzerLanding: React.FC = () => {
     }, []);
 
     const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark for "Deep navy" preference
-    const [isOffline, setIsOffline] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [chatMessage, setChatMessage] = useState("");
@@ -60,7 +59,6 @@ const DPRAnalyzerLanding: React.FC = () => {
     }, [isDarkMode]);
 
     const toggleTheme = () => setIsDarkMode(!isDarkMode);
-    const toggleOffline = () => setIsOffline(!isOffline);
     const toggleChat = () => setIsChatOpen(!isChatOpen);
 
     const handleChatSubmit = (e: React.FormEvent) => {

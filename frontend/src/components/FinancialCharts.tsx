@@ -13,8 +13,28 @@ interface CostItem {
   quantity: number
 }
 
+interface RawCostItem {
+  itemDescription: string
+  totalCost: number | string
+  unitPrice?: number | string
+  quantity?: number | string
+}
+
+interface FinancialAnalysis {
+  bidAmount?: Record<string, number | string>
+  pricingStructure?: {
+    itemizedCostBreakdown?: RawCostItem[]
+    paymentTerms?: string
+  }
+  financialHealth?: Record<string, string | boolean>
+}
+
+interface FinancialChartsData {
+  financialAnalysis?: FinancialAnalysis
+}
+
 interface FinancialChartsProps {
-  data: any
+  data: FinancialChartsData
 }
 
 export function FinancialCharts({ data }: FinancialChartsProps) {
@@ -29,7 +49,7 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
   const financialHealth = financialAnalysis.financialHealth
   const itemizedCosts = pricingStructure?.itemizedCostBreakdown || []
 
-  const safeNumber = (val: any): number => {
+  const safeNumber = (val: unknown): number => {
     const num = Number(val)
     return isNaN(num) ? 0 : num
   }
@@ -46,9 +66,9 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
   }
 
   // Build itemized cost breakdown data for bar chart
-  const costBreakdownData: CostItem[] = itemizedCosts
-    .filter((item: any) => safeNumber(item.totalCost) > 0 && item.itemDescription)
-    .map((item: any): CostItem => ({
+  const costBreakdownData: CostItem[] = (itemizedCosts as RawCostItem[])
+    .filter((item) => safeNumber(item.totalCost) > 0 && item.itemDescription)
+    .map((item): CostItem => ({
       name: item.itemDescription?.length > 20 ? item.itemDescription.substring(0, 20) + '...' : item.itemDescription,
       fullName: item.itemDescription,
       value: safeNumber(item.totalCost),
@@ -56,7 +76,12 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
       quantity: safeNumber(item.quantity)
     }))
 
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  interface PieLabelProps {
+    cx: number; cy: number; midAngle: number
+    innerRadius: number; outerRadius: number; percent: number
+  }
+
+  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelProps) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5
     const x = cx + radius * Math.cos(-midAngle * Math.PI / 180)
     const y = cy + radius * Math.sin(-midAngle * Math.PI / 180)
@@ -77,7 +102,18 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
     )
   }
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface TooltipPayloadEntry {
+    value: number
+    name: string
+    payload: CostItem & { fullName?: string }
+  }
+
+  interface CustomTooltipProps {
+    active?: boolean
+    payload?: TooltipPayloadEntry[]
+  }
+
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length && payload[0]?.value !== undefined) {
       const value = safeNumber(payload[0].value)
       const item = payload[0].payload
