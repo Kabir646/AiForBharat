@@ -13,7 +13,8 @@ DB_CONFIG = {
     'port': os.getenv('DB_PORT', '5432'),
     'database': os.getenv('DB_NAME', 'dpr_analyzer'),
     'user': os.getenv('DB_USER', 'postgres'),
-    'password': os.getenv('DB_PASSWORD', '')
+    'password': os.getenv('DB_PASSWORD', ''),
+    'sslmode': os.getenv('DB_SSLMODE', 'require')
 }
 
 # Connection pool (for better performance in production)
