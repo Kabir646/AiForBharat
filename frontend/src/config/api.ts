@@ -3,8 +3,8 @@
  * Centralized API URL management for all backend calls
  */
 
-// Get API URL from environment variable or use production backend as fallback
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://tender-evaluation-backend.onrender.com'
+// Hardcoded production backend URL
+export const API_BASE_URL = 'https://tender-evaluation-backend.onrender.com'
 
 // Helper function to build full API URLs
 export const getApiUrl = (path: string): string => {
