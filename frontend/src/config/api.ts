@@ -3,7 +3,7 @@
  * Centralized API URL management for all backend calls
  */
 
-// Hardcoded production backend URL
+// Hardcoded production backend URL (env vars weren't working in Vercel)
 export const API_BASE_URL = 'https://tender-evaluation-backend.onrender.com'
 
 // Helper function to build full API URLs
