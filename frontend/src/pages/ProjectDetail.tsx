@@ -26,6 +26,7 @@ import {
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api, type DPR, type Project } from '@/lib/api'
+import { API_BASE_URL } from '@/config/api'
 import { useLanguage } from '@/contexts/LanguageContext'
 import ComplianceWeightsModal from '@/components/ComplianceWeightsModal'
 import FeedbackModal from '@/components/FeedbackModal'
@@ -82,7 +83,7 @@ export default function ProjectDetailPage() {
         setAnalyzingDpr(dprId)
         try {
             console.log(`Starting analysis for DPR ${dprId}...`)
-            const response = await fetch(`PLACEHOLDER_API_URL/dprs/${dprId}/analyze`, {
+            const response = await fetch(`${API_BASE_URL}/dprs/${dprId}/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -247,7 +248,7 @@ export default function ProjectDetailPage() {
                                         // If comparison already exists, fetch and show it
                                         if ((project as any).has_comparison) {
                                             try {
-                                                const response = await fetch(`PLACEHOLDER_API_URL/projects/${id}/comparison`)
+                                                const response = await fetch(`${API_BASE_URL}/projects/${id}/comparison`)
                                                 if (response.ok) {
                                                     const data = await response.json()
                                                     setComparisonResult(data.comparison)

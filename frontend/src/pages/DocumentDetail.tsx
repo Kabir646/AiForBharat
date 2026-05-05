@@ -6,6 +6,7 @@ import { FinancialCharts } from '@/components/FinancialCharts'
 import { ChatMessageFormatter } from '@/components/ChatMessageFormatter'
 import { PDFViewer } from '@/components/PDFViewer'
 import { createClickablePageLinks, createEvidencePageLink } from '@/utils/parsePageReferences'
+import { API_BASE_URL } from '@/config/api'
 import {
   ArrowLeft,
   Download,
@@ -479,7 +480,7 @@ export default function DocumentDetailPage() {
               {!isPdfCollapsed ? (
                 <div id="pdf-viewer-container" className="relative animate-in fade-in slide-in-from-right duration-300">
                   <PDFViewer
-                    pdfUrl={`PLACEHOLDER_API_URL/dpr/${id}/pdf`}
+                    pdfUrl={`${API_BASE_URL}/dpr/${id}/pdf`}
                     initialPage={pdfPage}
                     onPageChange={(page) => setPdfPage(page)}
                     className="h-[550px]"

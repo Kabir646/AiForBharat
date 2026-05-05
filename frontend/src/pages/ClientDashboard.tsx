@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Upload, FileText, Download, Clock, Trash2, MessageSquare, X, CheckCircle, XCircle, AlertCircle, Search, Filter, BarChart3, ArrowRight } from 'lucide-react'
 import { LanguageDropdown } from '@/components/LanguageDropdown'
+import { API_BASE_URL } from '@/config/api'
 
 interface ClientDPR {
     id: number
@@ -57,7 +58,7 @@ export default function ClientDashboard() {
     const fetchProjects = async () => {
         try {
             setLoadingProjects(true)
-            const response = await fetch('PLACEHOLDER_API_URL/projects')
+            const response = await fetch(`${API_BASE_URL}/projects`)
             if (!response.ok) throw new Error('Failed to fetch projects')
             const data = await response.json()
             setProjects(data.projects)
@@ -74,7 +75,7 @@ export default function ClientDashboard() {
 
         try {
             setLoading(true)
-            const response = await fetch(`PLACEHOLDER_API_URL/api/client/dprs?client_id=${userInfo.id}`)
+            const response = await fetch(`${API_BASE_URL}/api/client/dprs?client_id=${userInfo.id}`)
             if (!response.ok) throw new Error('Failed to fetch DPRs')
             const data = await response.json()
             setDprs(data.dprs)
@@ -154,7 +155,7 @@ export default function ClientDashboard() {
             formData.append('project_name', selectedProject.name)
             formData.append('file', selectedFile)
 
-            const response = await fetch('PLACEHOLDER_API_URL/api/client/dprs/upload', {
+            const response = await fetch(`${API_BASE_URL}/api/client/dprs/upload`, {
                 method: 'POST',
                 body: formData,
             })
@@ -186,7 +187,7 @@ export default function ClientDashboard() {
 
         try {
             const response = await fetch(
-                `PLACEHOLDER_API_URL/api/client/dprs/${dpr.id}/download?client_id=${userInfo.id}`
+                `${API_BASE_URL}/api/client/dprs/${dpr.id}/download?client_id=${userInfo.id}`
             )
 
             if (!response.ok) throw new Error('Failed to download file')
@@ -214,7 +215,7 @@ export default function ClientDashboard() {
         }
 
         try {
-            const url = `PLACEHOLDER_API_URL/api/client/dprs/${dpr.id}?client_id=${userInfo.id}`
+            const url = `${API_BASE_URL}/api/client/dprs/${dpr.id}?client_id=${userInfo.id}`
             const response = await fetch(url, { method: 'DELETE' })
 
             if (!response.ok) {

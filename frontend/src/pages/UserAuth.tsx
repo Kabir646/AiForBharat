@@ -4,6 +4,7 @@ import { useRole } from '@/contexts/RoleContext'
 import { Card } from '@/components/ui/Card'
 import { User, Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { LanguageDropdown } from '@/components/LanguageDropdown'
+import { API_ENDPOINTS } from '@/config/api'
 
 export default function UserAuth() {
     const [mode, setMode] = useState<'signup' | 'signin'>('signup')
@@ -47,7 +48,7 @@ export default function UserAuth() {
         setIsLoading(true)
 
         try {
-            const response = await fetch('PLACEHOLDER_API_URL/api/user/register', {
+            const response = await fetch(API_ENDPOINTS.userRegister(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ export default function UserAuth() {
         setIsLoading(true)
 
         try {
-            const response = await fetch('PLACEHOLDER_API_URL/api/user/login', {
+            const response = await fetch(API_ENDPOINTS.userLogin(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
