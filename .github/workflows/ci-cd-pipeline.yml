@@ -109,25 +109,24 @@ jobs:
           CLOUDINARY_API_KEY: test_key
           CLOUDINARY_API_SECRET: test_secret
         run: |
-          # Create a simple test if none exist
           if [ ! -f "test_app.py" ]; then
             echo "Creating basic health check test..."
-            cat > test_app.py << 'EOF'
-import pytest
-from fastapi.testclient import TestClient
-from app import app
-
-client = TestClient(app)
-
-def test_health_check():
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert "status" in response.json()
-
-def test_root_endpoint():
-    response = client.get("/")
-    assert response.status_code == 200
-EOF
+            cat > test_app.py << 'TESTEOF'
+          import pytest
+          from fastapi.testclient import TestClient
+          from app import app
+          
+          client = TestClient(app)
+          
+          def test_health_check():
+              response = client.get("/health")
+              assert response.status_code == 200
+              assert "status" in response.json()
+          
+          def test_root_endpoint():
+              response = client.get("/")
+              assert response.status_code == 200
+          TESTEOF
           fi
           pytest -v || echo "No tests found, skipping..."
 
