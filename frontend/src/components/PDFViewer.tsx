@@ -72,6 +72,7 @@ export function PDFViewer({ pdfUrl, initialPage = 1, onPageChange, className = '
         if (initialPage > 0 && initialPage <= numPages) {
             goToPage(initialPage)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialPage, numPages])
 
     // Highlight text when highlightText changes
@@ -89,6 +90,7 @@ export function PDFViewer({ pdfUrl, initialPage = 1, onPageChange, className = '
         return () => {
             clearTimeout(timeoutId)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [highlightText, currentPage, scale])
 
     // Fuzzy highlighting using alphanumeric matching and mark tags

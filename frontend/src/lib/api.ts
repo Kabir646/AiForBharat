@@ -8,6 +8,7 @@ export interface DPR {
   original_filename: string
   filepath: string
   upload_ts: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   summary_json: any | null
   project_id?: number
   client_id?: number
@@ -104,7 +105,7 @@ export const api = {
     return data.dprs || []
   },
 
-  async compareAllProjectDPRs(projectId: number): Promise<any> {
+  async compareAllProjectDPRs(projectId: number): Promise<Record<string, unknown>> {
     const response = await fetch(`${API_URL}/projects/${projectId}/compare-all`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }

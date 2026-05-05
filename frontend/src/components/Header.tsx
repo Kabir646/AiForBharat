@@ -1,7 +1,7 @@
-import { FileText, Moon, Sun, CheckCircle2, LogOut, Sparkles } from 'lucide-react'
+import { FileText, Moon, Sun, CheckCircle2, LogOut } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from './ui/Button'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useRole } from '../contexts/RoleContext'
 import { api } from '@/lib/api'
@@ -14,7 +14,7 @@ export function Header() {
   const location = useLocation()
   const navigate = useNavigate()
   const { logout } = useRole()
-  const fileInputRef = useRef<HTMLInputElement>(null)
+
 
   // Project Selection & Upload State
   const [pendingFile, setPendingFile] = useState<File | null>(null)
@@ -46,29 +46,6 @@ export function Header() {
   }
 
   const isActive = (path: string) => location.pathname === path
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
-      alert('Please upload a PDF file')
-      return
-    }
-
-    setPendingFile(file)
-    setIsProjectModalOpen(true)
-
-    // Reset input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
-
   const handleProjectSelect = async (projectId: number) => {
     if (!pendingFile) return
 

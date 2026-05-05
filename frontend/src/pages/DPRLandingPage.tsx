@@ -8,11 +8,7 @@ import {
 import { AuthModal } from '@/components/AuthModal';
 import { LanguageDropdown } from '@/components/LanguageDropdown';
 
-// Assets
-import whiteLogo from './assets/WhiteLogo.png';
-import blackLogo from './assets/BlackLogo.png';
-import videoPath from './assets/northeast-video.mp4';
-import state1 from './assets/state1.jpeg';
+
 
 const DPRAnalyzerLanding: React.FC = () => {
 

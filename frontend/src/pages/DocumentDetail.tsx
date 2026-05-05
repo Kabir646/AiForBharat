@@ -6,7 +6,6 @@ import { FinancialCharts } from '@/components/FinancialCharts'
 import { ChatMessageFormatter } from '@/components/ChatMessageFormatter'
 import { PDFViewer } from '@/components/PDFViewer'
 import { createClickablePageLinks, createEvidencePageLink } from '@/utils/parsePageReferences'
-import { formatIndianCurrency } from '@/lib/currency'
 import {
   ArrowLeft,
   Download,
@@ -524,7 +523,7 @@ export default function DocumentDetailPage() {
                     {chatHistory.length === 0 && (
                       <div className="p-3 rounded-lg bg-muted">
                         <p className="text-sm">
-                          Hello! I'm your DPR analysis assistant. Ask me anything about this document.
+                          Hello! I&apos;m your DPR analysis assistant. Ask me anything about this document.
                         </p>
                       </div>
                     )}
@@ -919,7 +918,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
                             <blockquote className="text-base italic text-gray-700 dark:text-gray-300 border-l-4 border-amber-400 pl-4 py-2">
-                              "{ev.quote}"
+                              &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
                           {ev.pageLocation && (
@@ -1054,7 +1053,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
                             <blockquote className="text-base italic text-gray-700 dark:text-gray-300 border-l-4 border-amber-400 pl-4 py-2">
-                              "{ev.quote}"
+                              &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
                           {ev.pageLocation && (
@@ -1240,7 +1239,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
                             <blockquote className="text-base italic text-gray-700 dark:text-gray-300 border-l-4 border-amber-400 pl-4 py-2">
-                              "{ev.quote}"
+                              &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
                           {ev.pageLocation && (

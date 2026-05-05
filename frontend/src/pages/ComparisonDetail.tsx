@@ -170,7 +170,7 @@ export default function ComparisonDetailPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <Card className="p-12 text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Comparison not found</h2>
-            <p className="text-gray-600 mb-6">The comparison you're looking for doesn't exist.</p>
+            <p className="text-gray-600 mb-6">The comparison you&apos;re looking for doesn&apos;t exist.</p>
             <Button onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Comparisons

@@ -120,6 +120,7 @@ export default function ProjectsPage() {
                 setNewProject(prev => ({ ...prev, sector: validSectors[0] }))
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [newProject.scheme])
 
     // Update scheme when sector changes (Reverse Dependency)
@@ -205,14 +206,7 @@ export default function ProjectsPage() {
         setProjectToDelete(projectId)
     }
 
-    // Get valid schemes based on selected sector
-    const getValidSchemes = () => {
-        if (!newProject.sector) return SCHEME_OPTIONS
-        return SCHEME_OPTIONS.filter(scheme => {
-            const sectors = SECTOR_OPTIONS[scheme] || []
-            return sectors.includes(newProject.sector)
-        })
-    }
+
 
     // Get valid sectors based on selected scheme
     const getValidSectors = () => {

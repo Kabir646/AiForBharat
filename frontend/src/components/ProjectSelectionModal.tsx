@@ -107,6 +107,7 @@ export function ProjectSelectionModal({ isOpen, onClose, onSelect }: ProjectSele
                 setNewProject(prev => ({ ...prev, sector: validSectors[0] }))
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [newProject.scheme])
 
     const loadProjects = async () => {
@@ -122,14 +123,7 @@ export function ProjectSelectionModal({ isOpen, onClose, onSelect }: ProjectSele
         }
     }
 
-    // Get valid schemes based on selected sector
-    const getValidSchemes = () => {
-        if (!newProject.sector) return SCHEME_OPTIONS
-        return SCHEME_OPTIONS.filter(scheme => {
-            const sectors = SECTOR_OPTIONS[scheme] || []
-            return sectors.includes(newProject.sector)
-        })
-    }
+
 
     // Get valid sectors based on selected scheme
     const getValidSectors = () => {

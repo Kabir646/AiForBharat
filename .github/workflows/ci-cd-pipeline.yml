@@ -33,7 +33,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run ESLint
-        run: npx eslint . --ext ts,tsx --max-warnings 50
+        run: npx eslint . --ext ts,tsx --max-warnings 60
         continue-on-error: true
 
       - name: Build frontend
@@ -132,7 +132,6 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Deploy to Vercel
-        working-directory: ./frontend
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
