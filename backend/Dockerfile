@@ -1,5 +1,5 @@
 # Multi-stage build for optimized production image
-FROM python:3.9-slim as builder
+FROM python:3.9-slim AS builder
 
 # Install system dependencies for WeasyPrint and compilation
 RUN apt-get update && apt-get install -y \
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
-    libgdk-pixbuf2.0-0 \
+    libgdk-pixbuf-2.0-0 \
     libffi-dev \
     shared-mime-info \
     && rm -rf /var/lib/apt/lists/*
@@ -30,7 +30,7 @@ FROM python:3.9-slim
 RUN apt-get update && apt-get install -y \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
-    libgdk-pixbuf2.0-0 \
+    libgdk-pixbuf-2.0-0 \
     shared-mime-info \
     curl \
     && rm -rf /var/lib/apt/lists/*
