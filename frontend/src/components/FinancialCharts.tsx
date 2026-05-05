@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps } from 'recharts'
 import { Card } from './ui/Card'
 import { DollarSign } from 'lucide-react'
 import { formatIndianCurrency } from '@/lib/currency'
@@ -76,28 +76,31 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
       quantity: safeNumber(item.quantity)
     }))
 
-  interface PieLabelProps {
-    cx: number; cy: number; midAngle: number
-    innerRadius: number; outerRadius: number; percent: number
-  }
+  const renderCustomLabel = (props: PieLabelRenderProps): JSX.Element | null => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props
+    if (!cx || !cy || !midAngle || !innerRadius || !outerRadius || percent === undefined) return null
+    const cxNum = Number(cx)
+    const cyNum = Number(cy)
+    const midAngleNum = Number(midAngle)
+    const innerRadiusNum = Number(innerRadius)
+    const outerRadiusNum = Number(outerRadius)
+    const percentNum = Number(percent)
+    const radius = innerRadiusNum + (outerRadiusNum - innerRadiusNum) * 0.5
+    const x = cxNum + radius * Math.cos(-midAngleNum * Math.PI / 180)
+    const y = cyNum + radius * Math.sin(-midAngleNum * Math.PI / 180)
 
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelProps) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180)
-    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180)
-
-    if (percent < 0.05) return null
+    if (percentNum < 0.05) return null
 
     return (
       <text
         x={x}
         y={y}
         fill="white"
-        textAnchor={x > cx ? 'start' : 'end'}
+        textAnchor={x > cxNum ? 'start' : 'end'}
         dominantBaseline="central"
         className="text-xs font-semibold"
       >
-        {`${(percent * 100).toFixed(0)}%`}
+        {`${(percentNum * 100).toFixed(0)}%`}
       </text>
     )
   }
