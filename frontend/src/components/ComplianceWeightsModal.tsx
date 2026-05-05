@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { API_ENDPOINTS } from '../config/api'
+import { useState, useEffect, useCallback } from 'react'
 import { X, RotateCcw, Save, AlertCircle, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -46,14 +45,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const [isCustom, setIsCustom] = useState(false)
 
-    // Load current weights
-    useEffect(() => {
-        if (isOpen && projectId) {
-            loadWeights()
-        }
-    }, [isOpen, projectId])
-
-    const loadWeights = async () => {
+    const loadWeights = useCallback(async () => {
         setLoading(true)
         setError(null)
 
@@ -67,13 +59,20 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
             const data = await response.json()
             setWeights(data.weights)
             setIsCustom(data.isCustom || false)
-        } catch (err: any) {
-            setError(err.message || 'Failed to load weights')
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Failed to load weights'
+            setError(message)
             console.error('Load weights error:', err)
         } finally {
             setLoading(false)
         }
-    }
+    }, [projectId])
+
+    useEffect(() => {
+        if (isOpen && projectId) {
+            loadWeights()
+        }
+    }, [isOpen, projectId, loadWeights])
 
     const getPercentageValue = (decimalValue: number) => Math.round(decimalValue * 100)
     const setPercentageValue = (key: keyof ComplianceWeights, percentage: number) => {

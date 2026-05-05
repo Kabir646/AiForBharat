@@ -299,7 +299,7 @@ export default function ClientDashboard() {
                     <h1 className="text-3xl md:text-4xl font-heading font-bold mb-2">
                         Welcome back, <span className="gradient-text">{userInfo?.name || 'User'}!</span>
                     </h1>
-                    <p className="text-muted-foreground">Here's an overview of your project submissions</p>
+                    <p className="text-muted-foreground">Here&apos;s an overview of your project submissions</p>
                 </div>
 
 

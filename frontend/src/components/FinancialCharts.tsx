@@ -5,6 +5,14 @@ import { formatIndianCurrency } from '@/lib/currency'
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658']
 
+interface CostItem {
+  name: string
+  fullName: string
+  value: number
+  unitPrice: number
+  quantity: number
+}
+
 interface FinancialChartsProps {
   data: any
 }
@@ -38,9 +46,9 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
   }
 
   // Build itemized cost breakdown data for bar chart
-  const costBreakdownData = itemizedCosts
+  const costBreakdownData: CostItem[] = itemizedCosts
     .filter((item: any) => safeNumber(item.totalCost) > 0 && item.itemDescription)
-    .map((item: any) => ({
+    .map((item: any): CostItem => ({
       name: item.itemDescription?.length > 20 ? item.itemDescription.substring(0, 20) + '...' : item.itemDescription,
       fullName: item.itemDescription,
       value: safeNumber(item.totalCost),
@@ -138,7 +146,7 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
                 </tr>
               </thead>
               <tbody>
-                {costBreakdownData.map((item: any, index: number) => (
+                {costBreakdownData.map((item: CostItem, index: number) => (
                   <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/50 transition-colors">
                     <td className="py-3 px-2">
                       <span className="font-medium text-gray-800 dark:text-gray-200">{item.fullName}</span>
@@ -159,7 +167,7 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
                 <tr className="border-t-2 border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950">
                   <td colSpan={3} className="py-3 px-2 font-bold text-gray-800 dark:text-gray-200">Total</td>
                   <td className="text-right py-3 px-2 font-bold text-gray-900 dark:text-gray-100">
-                    {formatIndianCurrency(costBreakdownData.reduce((sum: number, item: any) => sum + item.value, 0))}
+                    {formatIndianCurrency(costBreakdownData.reduce((sum: number, item: CostItem) => sum + item.value, 0))}
                   </td>
                 </tr>
               </tfoot>

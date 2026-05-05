@@ -21,7 +21,6 @@ const DPRAnalyzerLanding: React.FC = () => {
         const savedTheme = localStorage.getItem('theme')
         return savedTheme === 'dark' || savedTheme === null // Default to dark if no preference
     })
-    const [isOffline, setIsOffline] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -44,7 +43,6 @@ const DPRAnalyzerLanding: React.FC = () => {
         setIsDarkMode(newDarkMode)
         localStorage.setItem('theme', newDarkMode ? 'dark' : 'light')
     }
-    const toggleOffline = () => setIsOffline(!isOffline);
     const toggleChat = () => setIsChatOpen(!isChatOpen);
 
     const handleChatSubmit = (e: React.FormEvent) => {

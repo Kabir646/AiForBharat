@@ -131,9 +131,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 } else {
                     setUserError(data.detail || data.message || 'Invalid credentials')
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Login error:', err)
-                setUserError(err.message || 'Failed to connect to server. Please try again.')
+                const message = err instanceof Error ? err.message : 'Failed to connect to server. Please try again.'
+                setUserError(message)
             } finally {
                 setUserLoading(false)
             }
@@ -192,9 +193,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     setUserError(errorMessage)
                     console.error('Signup failed:', data)
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Signup error:', err)
-                const errorMessage = err.message || 'Failed to connect to server. Please try again.'
+                const errorMessage = err instanceof Error ? err.message : 'Failed to connect to server. Please try again.'
                 setUserError(errorMessage)
             } finally {
                 setUserLoading(false)

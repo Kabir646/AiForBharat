@@ -124,7 +124,7 @@ export function PDFViewer({ pdfUrl, initialPage = 1, onPageChange, className = '
 
         const textNodes: Text[] = []
         let node
-        while (node = walker.nextNode()) {
+        while ((node = walker.nextNode()) !== null) {
             if (node.textContent && node.textContent.trim()) {
                 textNodes.push(node as Text)
             }
