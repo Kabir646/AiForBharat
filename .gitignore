@@ -58,3 +58,14 @@ replit.nix
 # === MCP SERVER ===
 # Include the MCP server code, but exclude pycache
 mcp-server/mcp-server/mcp-server/__pycache__/
+
+# === DOCUMENTATION (LOCAL ONLY) ===
+DEPLOYMENT_STRATEGY.md
+DEPLOYMENT_QUICKSTART.md
+IMPLEMENTATION_SUMMARY.md
+VERCEL_SETUP.md
+CI_CD_SETUP.md
+QUICK_CI_CD_REFERENCE.md
+CI_CD_SUMMARY.md
+START_CI_CD_HERE.md
+COMMIT_CHANGES.md
