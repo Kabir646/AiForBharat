@@ -481,7 +481,10 @@ async def client_upload_dpr(
                 if project and project.get('custom_criteria'):
                     custom_criteria = project['custom_criteria']
                     
-            parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH), custom_criteria)
+            parsed_json = await gemini_client.generate_json_from_file(
+                file_ref, str(SCHEMA_PATH), custom_criteria,
+                fallback_url=cloudinary_result.get('secure_url')
+            )
             print(f"✓ Analysis complete for DPR {dpr_id}")
             
             # Validate DPR against project and populate validationFlags
@@ -1266,7 +1269,11 @@ async def analyze_dpr(dpr_id: int):
             if project and project.get('custom_criteria'):
                 custom_criteria = project['custom_criteria']
                 
-        parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH), custom_criteria)
+        cloudinary_url = dpr.get('cloudinary_url')
+        parsed_json = await gemini_client.generate_json_from_file(
+            file_ref, str(SCHEMA_PATH), custom_criteria,
+            fallback_url=cloudinary_url
+        )
         
         print(f"✓ Generated analysis successfully")
         

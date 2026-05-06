@@ -48,9 +48,11 @@ async def upload_file(file_path: str) -> str:
     return f"local:{file_path}"
 
 
-async def generate_json_from_file(file_ref: str, schema_path: str, custom_criteria: dict = None) -> Dict:
+async def generate_json_from_file(file_ref: str, schema_path: str, custom_criteria: dict = None, fallback_url: str = None) -> Dict:
     """
     Generate structured JSON from an uploaded file using Gemini in English only.
+    Supports local file paths (local:path) and legacy Files API refs (files/xxx).
+    If local file is missing, downloads from fallback_url (Cloudinary) automatically.
     """
     print(f"⏳ Generating JSON from file: {file_ref}")
     start_time = time.time()
@@ -281,10 +283,29 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
         if file_ref.startswith("local:"):
             # Inline bytes approach — no Files API needed
             actual_path = file_ref[len("local:"):]
-            if not os.path.exists(actual_path):
-                raise FileNotFoundError(f"Local file not found for inline analysis: {actual_path}")
-            with open(actual_path, "rb") as pdf_file:
-                pdf_bytes = pdf_file.read()
+            # If local file is missing, try to download from fallback_url (e.g. Cloudinary)
+            if not os.path.exists(actual_path) and fallback_url:
+                print(f"⚠ Local file missing, downloading from fallback URL...")
+                import httpx, tempfile
+                resp = httpx.get(fallback_url, timeout=60)
+                resp.raise_for_status()
+                tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+                try:
+                    with os.fdopen(tmp_fd, 'wb') as tmp_file:
+                        tmp_file.write(resp.content)
+                    with open(tmp_path, "rb") as pdf_file:
+                        pdf_bytes = pdf_file.read()
+                finally:
+                    if os.path.exists(tmp_path):
+                        os.remove(tmp_path)
+            elif not os.path.exists(actual_path):
+                raise FileNotFoundError(
+                    f"Local file not found for inline analysis: {actual_path}. "
+                    f"File may have been deleted. Provide a fallback_url to re-download."
+                )
+            else:
+                with open(actual_path, "rb") as pdf_file:
+                    pdf_bytes = pdf_file.read()
             pdf_part = genai.types.Part(
                 inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
             )
