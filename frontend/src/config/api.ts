@@ -4,7 +4,7 @@
  */
 
 // Hardcoded production backend URL (env vars weren't working in Vercel)
-export const API_BASE_URL = 'https://tender-evaluation-backend.onrender.com'
+export const API_BASE_URL = 'https://aiforbharat-kxus.onrender.com'
 
 // Helper function to build full API URLs
 export const getApiUrl = (path: string): string => {
@@ -19,19 +19,19 @@ export const API_ENDPOINTS = {
   adminLogin: () => getApiUrl('api/admin/login'),
   userLogin: () => getApiUrl('api/user/login'),
   userRegister: () => getApiUrl('api/user/register'),
-  
+
   // Projects
   projects: () => getApiUrl('projects'),
   project: (id: number) => getApiUrl(`projects/${id}`),
   projectComparison: (id: number) => getApiUrl(`projects/${id}/comparison`),
   projectComplianceWeights: (id: number) => getApiUrl(`projects/${id}/compliance-weights`),
-  
+
   // DPRs
   dprs: () => getApiUrl('api/dprs'),
   dpr: (id: number) => getApiUrl(`dpr/${id}`),
   dprPdf: (id: number) => getApiUrl(`dpr/${id}/pdf`),
   dprAnalyze: (id: number) => getApiUrl(`dprs/${id}/analyze`),
-  
+
   // Client DPRs
   clientDprs: (clientId: string) => getApiUrl(`api/client/dprs?client_id=${clientId}`),
   clientDprUpload: () => getApiUrl('api/client/dprs/upload'),
