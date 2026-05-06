@@ -30,48 +30,36 @@ const STATE_OPTIONS = [
 ]
 
 const SCHEME_OPTIONS = [
-    'PM Gati Shakti',
-    'National Infrastructure Pipeline',
-    'Industrial Cluster & SEZ',
-    'Digital & Communication',
-    'Water & Sanitation',
-    'Agriculture & Food Processing',
-    'Social & Healthcare',
-    'Green Energy & Transition',
-    'Heavy Industrial',
-    'Commercial Real Estate'
+    'Force Modernisation Plan',
+    'CAPF Infrastructure Development',
+    'Smart Camp Initiative',
+    'Make in India (Defence)',
+    'CAPF Welfare & Housing',
+    'Digital Police / e-Office',
+    'Swachh Bharat (Barracks)'
 ]
 
 const SECTOR_OPTIONS: Record<string, string[]> = {
-    'PM Gati Shakti': [
-        'Roads', 'Railways', 'Airports', 'Ports & Waterways', 'Logistics Infra', 'Pipelines'
+    'Force Modernisation Plan': [
+        'Weapons & Ammunition', 'Vehicles & Mobility', 'Surveillance & Security Systems', 'Training Equipment & Simulators', 'Uniform & Clothing & Gear'
     ],
-    'National Infrastructure Pipeline': [
-        'Power Generation', 'Power Transmission', 'Power Distribution', 'Urban Transit', 'Rural Infra', 'Large Water'
+    'CAPF Infrastructure Development': [
+        'Infrastructure & Construction', 'Barracks & Accommodation', 'Border Outposts', 'Road Connectivity', 'Helipads & Airstrips'
     ],
-    'Industrial Cluster & SEZ': [
-        'SEZs', 'Industrial Parks', 'Textile Parks', 'Electronics Hubs', 'Defense Corridors', 'Common Effluent'
+    'Smart Camp Initiative': [
+        'IT & Communication Equipment', 'Surveillance Systems', 'Access Control', 'Smart Lighting', 'CCTV & Monitoring'
     ],
-    'Digital & Communication': [
-        'Data Centers', 'Telecom Towers', 'Fixed Networks', 'Smart Systems', 'SATCOM'
+    'Make in India (Defence)': [
+        'Weapons & Ammunition', 'Vehicles & Mobility', 'IT & Communication Equipment', 'Uniform & Clothing & Gear', 'Training Equipment & Simulators'
     ],
-    'Water & Sanitation': [
-        'Water Supply', 'Sewage', 'Solid Waste', 'Desalination', 'Storm Water'
+    'CAPF Welfare & Housing': [
+        'Welfare & Sports Equipment', 'Medical & Healthcare Supplies', 'Canteen Stores', 'Recreation Facilities', 'Education & Schools'
     ],
-    'Agriculture & Food Processing': [
-        'Cold Chain', 'Cold Storage', 'Silos', 'Processing Units', 'Terminal Markets', 'Testing Labs'
+    'Digital Police / e-Office': [
+        'IT & Communication Equipment', 'Software & Licenses', 'Data Centers', 'e-Governance Systems', 'Networking'
     ],
-    'Social & Healthcare': [
-        'Healthcare', 'Education', 'Sports', 'Tourism', 'Exhibition'
-    ],
-    'Green Energy & Transition': [
-        'Solar', 'Wind', 'Green Hydrogen', 'EV Infra', 'Storage (ESS)', 'Bio-Energy'
-    ],
-    'Heavy Industrial': [
-        'Metals', 'Mining', 'Chemicals', 'Cement', 'Manufacturing'
-    ],
-    'Commercial Real Estate': [
-        'IT Parks', 'Retail', 'Hospitality', 'Residential', 'Co-working'
+    'Swachh Bharat (Barracks)': [
+        'Sanitation Equipment', 'Water Supply', 'Solid Waste Management', 'Hygiene Supplies', 'Green Infrastructure'
     ]
 }
 

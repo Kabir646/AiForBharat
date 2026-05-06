@@ -145,17 +145,13 @@ MANDATORY BEHAVIOR:
    
    **Sector Extraction (`extractedSector`):**
    - Identify the project sector/category/type from the PDF content
-   - Match it against these sectors (from all schemes):
-     Roads, Railways, Airports, Ports & Waterways, Logistics Infra, Pipelines,
-     Power Generation, Power Transmission, Power Distribution, Urban Transit, Rural Infra, Large Water,
-     SEZs, Industrial Parks, Textile Parks, Electronics Hubs, Defense Corridors, Common Effluent,
-     Data Centers, Telecom Towers, Fixed Networks, Smart Systems, SATCOM,
-     Water Supply, Sewage, Solid Waste, Desalination, Storm Water,
-     Cold Chain, Cold Storage, Silos, Processing Units, Terminal Markets, Testing Labs,
-     Healthcare, Education, Sports, Tourism, Exhibition,
-     Solar, Wind, Green Hydrogen, EV Infra, Storage (ESS), Bio-Energy,
-     Metals, Mining, Chemicals, Cement, Manufacturing,
-     IT Parks, Retail, Hospitality, Residential, Co-working
+   - Match it against these sectors (from all CRPF procurement schemes):
+     Weapons & Ammunition, Vehicles & Mobility, Surveillance & Security Systems, Training Equipment & Simulators, Uniform & Clothing & Gear,
+     Infrastructure & Construction, Barracks & Accommodation, Border Outposts, Road Connectivity, Helipads & Airstrips,
+     IT & Communication Equipment, Surveillance Systems, Access Control, Smart Lighting, CCTV & Monitoring,
+     Welfare & Sports Equipment, Medical & Healthcare Supplies, Canteen Stores, Recreation Facilities, Education & Schools,
+     Software & Licenses, Data Centers, e-Governance Systems, Networking,
+     Sanitation Equipment, Water Supply, Solid Waste Management, Hygiene Supplies, Green Infrastructure
    - Return the CLOSEST matching sector name from the list above
    - If sector is not clearly mentioned, infer from project description and return best match
    
