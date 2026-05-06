@@ -471,15 +471,7 @@ async def client_upload_dpr(
         cursor.close()
         db_config.release_connection(conn)
         
-        # Clean up local file after upload to cloud
-        try:
-            if os.path.exists(filepath):
-                os.remove(filepath)
-                print(f"✓ Cleaned up local file: {filepath}")
-        except Exception as e:
-            print(f"⚠ Could not delete local file: {e}")
-        
-        # Automatically analyze the DPR
+        # Automatically analyze the DPR (file must still exist for inline approach)
         try:
             print(f"⏳ Auto-analyzing client DPR {dpr_id}...")
             
@@ -505,6 +497,14 @@ async def client_upload_dpr(
             cursor.close()
             db_config.release_connection(conn)
             
+            # Clean up local file after successful analysis
+            try:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                    print(f"✓ Cleaned up local file after analysis: {filepath}")
+            except Exception as cleanup_err:
+                print(f"⚠ Could not delete local file: {cleanup_err}")
+            
             return JSONResponse({
                 "success": True,
                 "message": "DPR uploaded and analyzed successfully!",
@@ -522,6 +522,14 @@ async def client_upload_dpr(
             conn.commit()
             cursor.close()
             db_config.release_connection(conn)
+            
+            # Clean up local file even on failure
+            try:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                    print(f"✓ Cleaned up local file after failed analysis: {filepath}")
+            except Exception as cleanup_err:
+                print(f"⚠ Could not delete local file: {cleanup_err}")
             
             # Still return success for upload, but note analysis failed
             return JSONResponse({

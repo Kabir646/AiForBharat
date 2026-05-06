@@ -39,29 +39,13 @@ _chat_sessions = {}
 
 async def upload_file(file_path: str) -> str:
     """
-    Upload a file to Gemini Files API and wait for it to be processed.
-    Returns the file reference (name/uri) that can be used in generation requests.
+    'Upload' a file — returns the local file path as the reference.
+    We use inline base64 data instead of the Gemini Files API to avoid
+    regional availability issues (Files API may be blocked in some regions).
     """
-    print(f"⏳ Uploading file to Gemini: {file_path}")
-    start_time = time.time()
-    
-    # Upload the file (blocking call offloaded to thread)
-    uploaded_file = await asyncio.to_thread(genai.upload_file, file_path)
-    
-    # Poll until the file is processed
-    print(f"⏳ Waiting for file to be processed: {uploaded_file.name}")
-    while uploaded_file.state.name == "PROCESSING":
-        await asyncio.sleep(2)
-        uploaded_file = await asyncio.to_thread(genai.get_file, uploaded_file.name)
-    
-    if uploaded_file.state.name == "FAILED":
-        raise ValueError(f"File processing failed: {uploaded_file.name}")
-    
-    elapsed = time.time() - start_time
-    print(f"✓ File uploaded and processed in {elapsed:.2f}s: {uploaded_file.name}")
-    
-    # Return the file reference (name is stable across SDK versions)
-    return uploaded_file.name
+    print(f"✓ File registered for inline processing: {file_path}")
+    # Return the file path itself as the reference — used by generate_json_from_file
+    return f"local:{file_path}"
 
 
 async def generate_json_from_file(file_ref: str, schema_path: str, custom_criteria: dict = None) -> Dict:
@@ -292,9 +276,26 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
         system_instruction=system_instruction
     )
     
+    # Build content parts — inline base64 if local file, Files API if remote ref
     def _generate():
-        file_obj = genai.get_file(file_ref)
-        return model.generate_content([file_obj, user_prompt])
+        if file_ref.startswith("local:"):
+            # Inline base64 approach — no Files API needed
+            import base64
+            actual_path = file_ref[len("local:"):]
+            if not os.path.exists(actual_path):
+                raise FileNotFoundError(f"Local file not found for inline analysis: {actual_path}")
+            with open(actual_path, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
+            pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
+            content_parts = [
+                {"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}},
+                user_prompt
+            ]
+            return model.generate_content(content_parts)
+        else:
+            # Legacy Files API reference (files/xxxxx)
+            file_obj = genai.get_file(file_ref)
+            return model.generate_content([file_obj, user_prompt])
 
     response = await asyncio.to_thread(_generate)
     
