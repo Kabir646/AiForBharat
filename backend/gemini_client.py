@@ -33,6 +33,20 @@ class FileExpiredError(Exception):
     pass
 
 
+def _make_pdf_part(pdf_bytes: bytes):
+    """
+    Build a PDF content part compatible with all google-generativeai SDK versions.
+    Uses genai.types.Part if available, otherwise falls back to a proto-compatible dict.
+    """
+    try:
+        return genai.types.Part(
+            inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
+        )
+    except AttributeError:
+        # Older SDK versions: use dict format (bytes are accepted directly)
+        return {"inline_data": {"mime_type": "application/pdf", "data": pdf_bytes}}
+
+
 # In-memory chat sessions: {dpr_id: chat_object}
 _chat_sessions = {}
 
@@ -306,10 +320,7 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
             else:
                 with open(actual_path, "rb") as pdf_file:
                     pdf_bytes = pdf_file.read()
-            pdf_part = genai.types.Part(
-                inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
-            )
-            return model.generate_content([pdf_part, user_prompt])
+            return model.generate_content([_make_pdf_part(pdf_bytes), user_prompt])
         else:
             # Legacy Files API reference (files/xxxxx)
             file_obj = genai.get_file(file_ref)
@@ -394,9 +405,7 @@ async def create_chat_session(dpr_id: int, file_ref: str) -> None:
                 with open(actual_path, "rb") as pdf_file:
                     pdf_bytes = pdf_file.read()
                 # Store as a proper Part with raw bytes
-                file_content = genai.types.Part(
-                    inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
-                )
+                file_content = _make_pdf_part(pdf_bytes)
             else:
                 # Legacy Files API reference
                 file_obj = genai.get_file(file_ref)
@@ -527,9 +536,7 @@ async def create_comparison_chat_session(comparison_id: int, file_refs: list[str
                             raise FileExpiredError(f"Local file not found: {actual_path}")
                         with open(actual_path, "rb") as pdf_file:
                             pdf_bytes = pdf_file.read()
-                        file_contents.append(genai.types.Part(
-                            inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
-                        ))
+                        file_contents.append(_make_pdf_part(pdf_bytes))
                     else:
                         file_obj = genai.get_file(ref)
                         if file_obj.state.name == "FAILED":
@@ -820,10 +827,7 @@ CRITICAL INSTRUCTIONS:
                 raise FileNotFoundError(f"Local file not found: {actual_path}")
             with open(actual_path, "rb") as pdf_file:
                 pdf_bytes = pdf_file.read()
-            pdf_part = genai.types.Part(
-                inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
-            )
-            return model.generate_content([pdf_part, "Please extract the evaluation criteria into the requested JSON format."])
+            return model.generate_content([_make_pdf_part(pdf_bytes), "Please extract the evaluation criteria into the requested JSON format."])
         else:
             file_obj = genai.get_file(file_ref)
             return model.generate_content([file_obj, "Please extract the evaluation criteria into the requested JSON format."])
