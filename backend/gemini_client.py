@@ -369,16 +369,27 @@ async def create_chat_session(dpr_id: int, file_ref: str) -> None:
     
     def _create_session():
         try:
-            # Get the file object
-            file_obj = genai.get_file(file_ref)
-            
-            # Check if file is still valid
-            if file_obj.state.name == "FAILED":
-                raise ValueError(f"File has expired or is no longer available: {file_ref}")
+            if file_ref.startswith("local:"):
+                import base64
+                actual_path = file_ref[len("local:"):]
+                if not os.path.exists(actual_path):
+                    raise FileExpiredError(f"Local file not found: {actual_path}")
+                with open(actual_path, "rb") as pdf_file:
+                    pdf_bytes = pdf_file.read()
+                pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
+                # Store as inline data dict instead of file_obj
+                file_content = {"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}}
+            else:
+                # Legacy Files API reference
+                file_obj = genai.get_file(file_ref)
+                if file_obj.state.name == "FAILED":
+                    raise ValueError(f"File has expired or is no longer available: {file_ref}")
+                file_content = file_obj
+        except FileExpiredError:
+            raise
         except Exception as e:
             error_msg = str(e)
             if "403" in error_msg or "404" in error_msg or "permission" in error_msg.lower() or "not found" in error_msg.lower():
-                # Raise specific error for expiration so app.py can handle re-upload
                 raise FileExpiredError(f"File {file_ref} has expired or is inaccessible.")
             raise ValueError(f"Cannot access file {file_ref}: {error_msg}")
         
@@ -415,15 +426,15 @@ RESPONSE STYLE:
         # Start chat with the document
         chat = model.start_chat(history=[])
         
-        return chat, file_obj
+        return chat, file_content
 
     # Offload session creation to thread
-    chat, file_obj = await asyncio.to_thread(_create_session)
+    chat, file_content = await asyncio.to_thread(_create_session)
     
     # Store the chat session and file reference
     _chat_sessions[dpr_id] = {
         'chat': chat,
-        'file': file_obj
+        'file': file_content
     }
     
     print(f"✓ Chat session created for DPR {dpr_id}")
@@ -489,18 +500,26 @@ async def create_comparison_chat_session(comparison_id: int, file_refs: list[str
     def _create_session():
         try:
             # Get all file objects
-            file_objs = []
+            file_contents = []
             for ref in file_refs:
                 try:
-                    file_obj = genai.get_file(ref)
-                    # Check if file is still valid
-                    if file_obj.state.name == "FAILED":
-                        raise ValueError(f"File has expired or is no longer available: {ref}")
-                    file_objs.append(file_obj)
+                    if ref.startswith("local:"):
+                        import base64
+                        actual_path = ref[len("local:"):]
+                        if not os.path.exists(actual_path):
+                            raise FileExpiredError(f"Local file not found: {actual_path}")
+                        with open(actual_path, "rb") as pdf_file:
+                            pdf_bytes = pdf_file.read()
+                        pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
+                        file_contents.append({"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}})
+                    else:
+                        file_obj = genai.get_file(ref)
+                        if file_obj.state.name == "FAILED":
+                            raise ValueError(f"File has expired or is no longer available: {ref}")
+                        file_contents.append(file_obj)
                 except Exception as e:
                     error_msg = str(e)
                     if "403" in error_msg or "404" in error_msg or "permission" in error_msg.lower() or "not found" in error_msg.lower():
-                        # Raise specific error for expiration so app.py can handle re-upload
                         raise FileExpiredError(f"File {ref} has expired or is inaccessible.")
                     raise ValueError(f"Cannot access file {ref}: {error_msg}")
         except FileExpiredError:
@@ -548,15 +567,15 @@ Always maintain a professional, analytical tone and provide actionable insights 
         # Start chat with all documents
         chat = model.start_chat(history=[])
         
-        return chat, file_objs
+        return chat, file_contents
 
     # Offload to thread
-    chat, file_objs = await asyncio.to_thread(_create_session)
+    chat, file_contents = await asyncio.to_thread(_create_session)
     
     # Store the chat session and file references
     _comparison_chat_sessions[comparison_id] = {
         'chat': chat,
-        'files': file_objs
+        'files': file_contents
     }
     
     print(f"✓ Comparison chat session created for comparison {comparison_id}")
@@ -777,8 +796,22 @@ CRITICAL INSTRUCTIONS:
     )
     
     def _generate():
-        file_obj = genai.get_file(file_ref)
-        return model.generate_content([file_obj, "Please extract the evaluation criteria into the requested JSON format."])
+        if file_ref.startswith("local:"):
+            import base64
+            actual_path = file_ref[len("local:"):]
+            if not os.path.exists(actual_path):
+                raise FileNotFoundError(f"Local file not found: {actual_path}")
+            with open(actual_path, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
+            pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
+            content_parts = [
+                {"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}},
+                "Please extract the evaluation criteria into the requested JSON format."
+            ]
+            return model.generate_content(content_parts)
+        else:
+            file_obj = genai.get_file(file_ref)
+            return model.generate_content([file_obj, "Please extract the evaluation criteria into the requested JSON format."])
 
     try:
         response = await asyncio.to_thread(_generate)
