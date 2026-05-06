@@ -750,3 +750,70 @@ REMEMBER: Return ONLY the JSON object. No markdown, no explanation text."""
             'error': str(e)
         }
 
+
+async def extract_criteria_from_pdf(file_ref: str) -> list[dict]:
+    """
+    Extract evaluation criteria headings and descriptions from a PDF using Gemini.
+    """
+    print(f"⏳ Extracting criteria from file: {file_ref}")
+    start_time = time.time()
+    
+    system_instruction = """You are an expert Tender/Bid Proposal Analyst. Your task is to extract evaluation criteria from the attached document.
+Look for sections that describe how the proposal or project will be evaluated, graded, or scored.
+Extract each distinct evaluation criterion into a JSON array of objects, where each object has exactly two fields:
+- "heading": A short, clear name for the criterion (e.g., "Technical Feasibility", "Financial Health").
+- "description": A detailed explanation of what this criterion entails, based strictly on the document.
+
+CRITICAL INSTRUCTIONS:
+1. Return EXACTLY a valid JSON array of objects.
+2. NO markdown formatting, NO extra text.
+3. Example format: [{"heading": "Experience", "description": "The bidder must have at least 5 years of experience."}]
+"""
+    
+    model = genai.GenerativeModel(
+        model_name='gemini-2.5-flash-lite',
+        system_instruction=system_instruction
+    )
+    
+    def _generate():
+        file_obj = genai.get_file(file_ref)
+        return model.generate_content([file_obj, "Please extract the evaluation criteria into the requested JSON format."])
+
+    try:
+        response = await asyncio.to_thread(_generate)
+        
+        # Clean up response text
+        response_text = response.text.strip()
+        if response_text.startswith('```json'):
+            response_text = response_text[7:]
+        elif response_text.startswith('```'):
+            response_text = response_text[3:]
+        
+        if response_text.endswith('```'):
+            response_text = response_text[:-3]
+            
+        response_text = response_text.strip()
+        
+        # Try to parse JSON
+        try:
+            criteria = json.loads(response_text)
+        except json.JSONDecodeError:
+            import re
+            json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+            if json_match:
+                criteria = json.loads(json_match.group(0))
+            else:
+                raise ValueError("Could not parse JSON array from response.")
+        
+        if not isinstance(criteria, list):
+            raise ValueError("Expected a JSON array of criteria.")
+            
+        elapsed = time.time() - start_time
+        print(f"✓ Criteria extracted in {elapsed:.2f}s")
+        return criteria
+        
+    except Exception as e:
+        print(f"✗ Failed to extract criteria: {e}")
+        import traceback
+        traceback.print_exc()
+        raise ValueError(f"Failed to extract criteria from PDF: {str(e)}")

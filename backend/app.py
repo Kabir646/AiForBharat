@@ -763,6 +763,43 @@ async def get_project_dprs(project_id: int):
     return JSONResponse({"dprs": dprs, "count": len(dprs)})
 
 
+@app.post("/projects/extract-criteria-from-pdf")
+async def extract_criteria_from_pdf_endpoint(file: UploadFile = File(...)):
+    """Upload a PDF and extract evaluation criteria using Gemini."""
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+        
+    try:
+        # Save file temporarily
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        unique_id = str(uuid.uuid4())[:8]
+        filename = f"criteria_{timestamp}_{unique_id}.pdf"
+        filepath = DATA_DIR / filename
+        
+        with open(filepath, "wb") as f:
+            content = await file.read()
+            f.write(content)
+            
+        # Upload to Gemini
+        file_ref = await gemini_client.upload_file(str(filepath))
+        
+        # Extract criteria
+        criteria = await gemini_client.extract_criteria_from_pdf(file_ref)
+        
+        # Clean up local file
+        try:
+            if os.path.exists(filepath):
+                os.remove(filepath)
+        except Exception as e:
+            print(f"⚠ Could not delete temporary file {filepath}: {e}")
+            
+        return JSONResponse({"criteria": criteria})
+        
+    except Exception as e:
+        print(f"✗ Criteria extraction error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.put("/projects/{project_id}/custom-criteria")
 async def update_project_custom_criteria(project_id: int, request: UpdateCustomCriteriaRequest):
     """Set custom evaluation criteria for a project."""

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { X, Plus, Trash2, Loader2, Save, FileText, CheckCircle } from 'lucide-react'
+import React, { useState, useRef } from 'react'
+import { X, Plus, Trash2, Loader2, Save, FileText, CheckCircle, Upload } from 'lucide-react'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
 import { api } from '@/lib/api'
@@ -49,7 +49,9 @@ export default function SetCriteriaModal({
   })
 
   const [saving, setSaving] = useState(false)
+  const [isExtracting, setIsExtracting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   if (!isOpen) return null
 
@@ -90,6 +92,36 @@ export default function SetCriteriaModal({
     }
   }
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      setError('Please upload a valid PDF file.')
+      return
+    }
+
+    try {
+      setIsExtracting(true)
+      setError(null)
+      const extractedCriteria = await api.extractCriteriaFromPdf(file)
+      if (extractedCriteria && extractedCriteria.length > 0) {
+        // Replace current criteria with the extracted ones
+        setCriteria(extractedCriteria)
+      } else {
+        setError('No criteria could be extracted from the PDF.')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to extract criteria from PDF')
+    } finally {
+      setIsExtracting(false)
+      // Reset input so the same file can be selected again if needed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-2xl bg-background rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -118,8 +150,44 @@ export default function SetCriteriaModal({
           )}
 
           {!isReadOnly && (
-            <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-200">
-              <strong>Note:</strong> Once saved, these criteria are permanently attached to this project and cannot be changed.
+            <div className="mb-6 space-y-3">
+              <div className="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-200">
+                <strong>Note:</strong> Once saved, these criteria are permanently attached to this project and cannot be changed.
+              </div>
+              <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                <h3 className="font-medium flex items-center gap-2 mb-2 text-primary">
+                  <Upload className="h-4 w-4" />
+                  Auto-fill from PDF
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Upload a PDF containing your evaluation criteria. The document should clearly structure the criteria into headings and detailed descriptions.
+                </p>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                />
+                <Button 
+                  variant="secondary" 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isExtracting || saving}
+                  className="w-full sm:w-auto"
+                >
+                  {isExtracting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Extracting criteria...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Upload PDF to Extract Criteria
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           )}
 

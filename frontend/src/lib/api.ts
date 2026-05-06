@@ -136,6 +136,22 @@ export const api = {
     return response.json()
   },
 
+  async extractCriteriaFromPdf(file: File): Promise<{ heading: string, description: string }[]> {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await authenticatedFetch(`${API_URL}/projects/extract-criteria-from-pdf`, {
+      method: 'POST',
+      body: formData,
+    })
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to extract criteria from PDF' }))
+      throw new Error(error.detail || 'Failed to extract criteria from PDF')
+    }
+    const data = await response.json()
+    return data.criteria || []
+  },
+
   async compareAllProjectDPRs(projectId: number): Promise<Record<string, unknown>> {
     const response = await authenticatedFetch(`${API_URL}/projects/${projectId}/compare-all`, {
       method: 'POST',
