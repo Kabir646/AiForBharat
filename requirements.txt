@@ -21,9 +21,14 @@ psycopg2-binary
 google-generativeai
 
 # PDF / Report
+# weasyprint requires system libs (libcairo2, libpango) — install via apt on Linux
 weasyprint
 pillow
 fonttools
+
+# Charts / Report Generation
+plotly
+kaleido
 
 # Cloudinary
 cloudinary

@@ -16,7 +16,14 @@ from pydantic import BaseModel
 import httpx
 import backend.db_config as db_config
 from dotenv import load_dotenv
-from weasyprint import HTML
+# Lazy import weasyprint — system libs (libcairo, pango) may be missing on some hosts
+try:
+    from weasyprint import HTML as WeasyHTML
+    WEASYPRINT_AVAILABLE = True
+except (ImportError, OSError):
+    WeasyHTML = None
+    WEASYPRINT_AVAILABLE = False
+    print("⚠ weasyprint not available — PDF report generation will be disabled")
 import bcrypt
 
 import backend.db as db
@@ -45,8 +52,11 @@ SCHEMA_PATH = Path("backend/schema.json")
 # Create data directory if it doesn't exist
 DATA_DIR.mkdir(exist_ok=True)
 
-# Initialize database
-db.init_db()
+# Initialize database (wrapped so a bad DB connection doesn't prevent port binding)
+try:
+    db.init_db()
+except Exception as _db_init_err:
+    print(f"⚠ DB init failed at startup (will retry on first request): {_db_init_err}")
 
 
 @asynccontextmanager
@@ -186,9 +196,6 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
 app.add_middleware(TokenAuthMiddleware)
 
 DATA_DIR.mkdir(exist_ok=True)
-
-# Initialize database
-db.init_db()
 
 
 # Mount static files and templates
