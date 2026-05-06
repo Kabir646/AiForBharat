@@ -54,8 +54,8 @@ export default function IndexPage() {
   const workflowSteps = [
     {
       icon: Upload,
-      title: 'Upload DPR',
-      description: 'Clients submit their Detailed Project Reports through a secure portal',
+      title: 'Upload Bid Proposal',
+      description: 'Bidders submit their bid proposals and supporting certificates',
       color: 'from-blue-500 to-cyan-500'
     },
     {
@@ -99,12 +99,12 @@ export default function IndexPage() {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight animate-slide-up animate-delay-100">
-                Streamline DPR Analysis with{' '}
+                Streamline Tender Evaluation with{' '}
                 <span className="gradient-text">Intelligent Automation</span>
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto animate-slide-up animate-delay-200">
-                Transform how you evaluate Detailed Project Reports. Our AI-powered platform analyzes compliance,
+                Transform how you evaluate Tender Bid Proposals. Our AI-powered platform analyzes compliance,
                 financials, and feasibility in minutes—not days.
               </p>
 
@@ -122,21 +122,21 @@ export default function IndexPage() {
                   variant="outline"
                   className="hover:scale-105 transition-all duration-300"
                 >
-                  Compare DPRs
+                  Compare Bids
                 </Button>
               </div>
             </div>
 
             {/* Analytics Cards - Horizontal Layout */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto w-full">
-              {/* Total Projects */}
+              {/* Active Tenders */}
               <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-purple-50/50 dark:to-purple-950/20 hover:scale-105 animate-scale-in animate-delay-400">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                     <Layers className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Total Projects</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Active Tenders</p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
                       {stats.loading ? '--' : stats.totalProjects}
                     </h3>
@@ -144,14 +144,14 @@ export default function IndexPage() {
                 </div>
               </Card>
 
-              {/* DPRs Uploaded */}
+              {/* Bids Submitted */}
               <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-blue-50/50 dark:to-blue-950/20 hover:scale-105 animate-scale-in animate-delay-500">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                     <FileText className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">DPRs Uploaded</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Bids Submitted</p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
                       {stats.loading ? '--' : stats.totalDPRs}
                     </h3>
@@ -159,14 +159,14 @@ export default function IndexPage() {
                 </div>
               </Card>
 
-              {/* DPRs Pending */}
+              {/* Bids Pending Evaluation */}
               <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-orange-50/50 dark:to-orange-950/20 hover:scale-105 animate-scale-in animate-delay-600">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
                     <Clock className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">DPRs Pending</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Bids Pending Evaluation</p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
                       {stats.loading ? '--' : stats.pending}
                     </h3>
@@ -174,14 +174,14 @@ export default function IndexPage() {
                 </div>
               </Card>
 
-              {/* DPRs Approved */}
+              {/* Bids Approved */}
               <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-green-50/50 dark:to-green-950/20 hover:scale-105 animate-scale-in animate-delay-400">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
                     <CheckCircle className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">DPRs Approved</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Bids Approved</p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
                       {stats.loading ? '--' : stats.approved}
                     </h3>
@@ -252,9 +252,9 @@ export default function IndexPage() {
                     <FileText className="h-7 w-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-heading font-semibold mb-1.5">Manage Projects</h3>
+                    <h3 className="text-lg font-heading font-semibold mb-1.5">Manage Tenders</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      View, organize, and analyze all submitted DPRs by project
+                      View, organize, and evaluate all submitted bids by tender
                     </p>
                   </div>
                   <ArrowRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
@@ -270,9 +270,9 @@ export default function IndexPage() {
                     <Layers className="h-7 w-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-heading font-semibold mb-1.5">Compare DPRs</h3>
+                    <h3 className="text-lg font-heading font-semibold mb-1.5">Compare Bids</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Side-by-side analysis of multiple projects for better decisions
+                      Side-by-side analysis of multiple bids for better decisions
                     </p>
                   </div>
                   <ArrowRight className="h-4 w-4 text-accent group-hover:translate-x-1 transition-transform" />
