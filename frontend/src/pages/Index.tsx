@@ -73,7 +73,7 @@ export default function IndexPage() {
     {
       icon: BarChart3,
       title: 'Track Progress',
-      description: 'Monitor project status and compare multiple DPRs for better governance',
+      description: 'Monitor tender status and compare multiple bids for better evaluation',
       color: 'from-orange-500 to-red-500'
     }
   ]

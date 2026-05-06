@@ -325,7 +325,7 @@ export default function ProjectsPage() {
                         </p>
                         <Button onClick={() => setIsModalOpen(true)}>
                             <Plus className="h-4 w-4 mr-2" />
-                            Add Project
+                            Create Tender
                         </Button>
                     </Card>
                 )}
@@ -379,7 +379,7 @@ export default function ProjectsPage() {
                             </div>
 
                             <div className="mt-4 text-sm font-medium text-primary">
-                                {project.dpr_count || 0} Documents
+                                {project.dpr_count || 0} Bid Documents
                             </div>
                         </Card>
                     ))}
@@ -461,7 +461,7 @@ export default function ProjectsPage() {
                                 </Button>
                                 <Button type="submit" className="flex-1" disabled={creating}>
                                     {creating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                                    Create Project
+                                    Create Tender
                                 </Button>
                             </div>
                         </form>
@@ -481,7 +481,7 @@ export default function ProjectsPage() {
                         </div>
 
                         <p className="text-muted-foreground mb-6">
-                            Are you sure you want to delete this project? This action cannot be undone and all associated DPRs will be unlinked.
+                            Are you sure you want to delete this tender? This action cannot be undone and all associated bids will be unlinked.
                         </p>
 
                         <div className="flex gap-3">
@@ -489,7 +489,7 @@ export default function ProjectsPage() {
                                 Cancel
                             </Button>
                             <Button type="button" className="flex-1 bg-red-600 hover:bg-red-700" onClick={confirmDelete}>
-                                Delete Project
+                                Delete Tender
                             </Button>
                         </div>
                     </Card>

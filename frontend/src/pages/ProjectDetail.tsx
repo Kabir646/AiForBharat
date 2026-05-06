@@ -110,10 +110,10 @@ export default function ProjectDetailPage() {
                 await loadProjectData(parseInt(id))
             }
 
-            alert('DPR analyzed successfully!')
+            alert('Bid analyzed successfully!')
         } catch (err: any) {
             console.error('Analysis error:', err)
-            alert(`Failed to analyze DPR: ${err.message}. Check console for details.`)
+            alert(`Failed to analyze bid: ${err.message}. Check console for details.`)
         } finally {
             setAnalyzingDpr(null)
         }
@@ -192,7 +192,7 @@ export default function ProjectDetailPage() {
                         </p>
                         <Button onClick={() => navigate(-1)}>
                             <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Projects
+                            Back to Tenders
                         </Button>
                     </Card>
                 </main>
@@ -208,7 +208,7 @@ export default function ProjectDetailPage() {
                 <div className="mb-8">
                     <Button variant="ghost" className="mb-4 pl-0 hover:pl-2 transition-all" onClick={() => navigate(-1)}>
                         <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back to Projects
+                        Back to Tenders
                     </Button>
 
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -296,7 +296,7 @@ export default function ProjectDetailPage() {
                                     ) : (
                                         <>
                                             <Scale className="h-4 w-4 mr-2" />
-                                            Compare All DPRs
+                                            Compare All Bids
                                         </>
                                     )}
                                 </Button>
@@ -323,10 +323,10 @@ export default function ProjectDetailPage() {
                         <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <h3 className="text-lg font-semibold mb-2">{t('projectDetail.noDocuments')}</h3>
                         <p className="text-muted-foreground mb-4">
-                            {searchQuery ? t('projectDetail.differentSearchTerm') : 'Clients upload DPRs for this project. Once uploaded, they will appear here for analysis.'}
+                            {searchQuery ? t('projectDetail.differentSearchTerm') : 'Bidders upload bid proposals for this tender. Once uploaded, they will appear here for evaluation.'}
                         </p>
                         <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                            You can view and analyze submitted DPRs once they are uploaded.
+                            You can view and evaluate submitted bid proposals once they are uploaded.
                         </p>
                     </Card>
                 )}
@@ -488,7 +488,7 @@ export default function ProjectDetailPage() {
                                             ) : (
                                                 <>
                                                     <FileText className="h-4 w-4 mr-2" />
-                                                    Analyze DPR
+                                                    Analyze Bid
                                                 </>
                                             )}
                                         </Button>
@@ -518,7 +518,7 @@ export default function ProjectDetailPage() {
                                                         alert('Failed to accept DPR')
                                                     }
                                                 }}
-                                                title="Accept DPR"
+                                                title="Accept Bid"
                                             >
                                                 <Check className="h-4 w-4" />
                                             </Button>
@@ -535,7 +535,7 @@ export default function ProjectDetailPage() {
                                                         alert('Failed to reject DPR')
                                                     }
                                                 }}
-                                                title="Reject DPR"
+                                                title="Reject Bid"
                                             >
                                                 <XCircle className="h-4 w-4" />
                                             </Button>
@@ -567,7 +567,7 @@ export default function ProjectDetailPage() {
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold flex items-center gap-2">
                                 <Scale className="h-6 w-6 text-purple-600" />
-                                DPR Comparison Results
+                                Bid Comparison Results
                             </h2>
                             <button
                                 onClick={() => setShowComparisonModal(false)}
@@ -593,7 +593,7 @@ export default function ProjectDetailPage() {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-lg font-bold text-green-700 dark:text-green-400 mb-1">
-                                                🏆 Best DPR: {comparisonResult.bestDprName}
+                                                🏆 Best Bid Proposal: {comparisonResult.bestDprName}
                                             </h3>
                                             <p className="text-green-600 dark:text-green-300">
                                                 {comparisonResult.recommendation}
@@ -603,7 +603,7 @@ export default function ProjectDetailPage() {
                                                 onClick={() => navigate(`/admin/documents/${comparisonResult.bestDprId}`)}
                                             >
                                                 <Eye className="h-4 w-4 mr-2" />
-                                                View Best DPR
+                                                View Best Bid
                                             </Button>
                                         </div>
                                     </div>
@@ -635,10 +635,10 @@ export default function ProjectDetailPage() {
                                     </div>
                                 )}
 
-                                {/* Individual DPR Analysis */}
+                                {/* Individual Bid Analysis */}
                                 {comparisonResult.dprAnalysis && comparisonResult.dprAnalysis.length > 0 && (
                                     <div>
-                                        <h3 className="text-lg font-semibold mb-3">Individual DPR Analysis</h3>
+                                        <h3 className="text-lg font-semibold mb-3">Individual Bid Analysis</h3>
                                         <div className="grid gap-4">
                                             {comparisonResult.dprAnalysis.map((dpr: any) => (
                                                 <Card
@@ -689,7 +689,7 @@ export default function ProjectDetailPage() {
                                                         onClick={() => navigate(`/admin/documents/${dpr.dprId}`)}
                                                     >
                                                         <Eye className="h-4 w-4 mr-2" />
-                                                        View DPR
+                                                        View Bid
                                                     </Button>
                                                 </Card>
                                             ))}
@@ -702,7 +702,7 @@ export default function ProjectDetailPage() {
                         <div className="flex justify-between items-center mt-6 gap-3">
                             <div className="text-sm text-muted-foreground">
                                 {comparisonResult && !comparisonError && (
-                                    <span>Comparing {documents.filter(d => d.summary_json).length} analyzed DPRs</span>
+                                    <span>Comparing {documents.filter(d => d.summary_json).length} analyzed bids</span>
                                 )}
                             </div>
                             <div className="flex gap-2">

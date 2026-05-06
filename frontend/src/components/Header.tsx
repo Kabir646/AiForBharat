@@ -74,7 +74,7 @@ export function Header() {
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               )}
             >
-              Projects
+              Tenders
             </Link>
             <Link
               to="/admin/comparisons"
@@ -85,7 +85,7 @@ export function Header() {
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               )}
             >
-              Comparisons
+              Compare Bids
             </Link>
           </nav>
 
