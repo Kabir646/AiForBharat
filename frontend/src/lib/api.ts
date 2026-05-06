@@ -2,6 +2,18 @@ import { API_BASE_URL } from '../config/api'
 
 const API_URL = API_BASE_URL
 
+// Authenticated fetch wrapper to inject auth token
+const authenticatedFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const token = import.meta.env.VITE_HACKATHON_ACCESS_TOKEN;
+  const headers = new Headers(init?.headers);
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+  return window.fetch(input, { ...init, headers });
+};
+
+// Export for use in other components
+export { authenticatedFetch };
 export interface DPR {
   id: number
   filename: string
@@ -63,18 +75,22 @@ export interface Project {
   sector: string
   created_at: string
   dpr_count?: number
+  has_comparison?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  custom_criteria?: any
 }
+
 
 export const api = {
   async getProjects(): Promise<Project[]> {
-    const response = await fetch(`${API_URL}/projects`)
+    const response = await authenticatedFetch(`${API_URL}/projects`)
     if (!response.ok) throw new Error('Failed to fetch projects')
     const data = await response.json()
     return data.projects || []
   },
 
   async createProject(project: Omit<Project, 'id' | 'created_at' | 'dpr_count'>): Promise<Project> {
-    const response = await fetch(`${API_URL}/projects`, {
+    const response = await authenticatedFetch(`${API_URL}/projects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -86,27 +102,42 @@ export const api = {
   },
 
   async deleteProject(id: number): Promise<void> {
-    const response = await fetch(`${API_URL}/projects/${id}`, {
+    const response = await authenticatedFetch(`${API_URL}/projects/${id}`, {
       method: 'DELETE',
     })
     if (!response.ok) throw new Error('Failed to delete project')
   },
 
   async getProject(id: number): Promise<Project> {
-    const response = await fetch(`${API_URL}/projects/${id}`)
+    const response = await authenticatedFetch(`${API_URL}/projects/${id}`)
     if (!response.ok) throw new Error('Failed to fetch project')
     return response.json()
   },
 
   async getProjectDPRs(projectId: number): Promise<DPR[]> {
-    const response = await fetch(`${API_URL}/projects/${projectId}/dprs`)
+    const response = await authenticatedFetch(`${API_URL}/projects/${projectId}/dprs`)
     if (!response.ok) throw new Error('Failed to fetch project DPRs')
     const data = await response.json()
     return data.dprs || []
   },
 
+  async updateProjectCustomCriteria(projectId: number, criteria: Array<{ heading: string, description: string }>): Promise<any> {
+    const response = await authenticatedFetch(`${API_URL}/projects/${projectId}/custom-criteria`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ criteria }),
+    })
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to update custom criteria' }))
+      throw new Error(error.detail || 'Failed to update custom criteria')
+    }
+    return response.json()
+  },
+
   async compareAllProjectDPRs(projectId: number): Promise<Record<string, unknown>> {
-    const response = await fetch(`${API_URL}/projects/${projectId}/compare-all`, {
+    const response = await authenticatedFetch(`${API_URL}/projects/${projectId}/compare-all`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     })
@@ -118,51 +149,20 @@ export const api = {
   },
 
   async getDPRs(): Promise<DPR[]> {
-    const response = await fetch(`${API_URL}/dprs`)
+    const response = await authenticatedFetch(`${API_URL}/dprs`)
     if (!response.ok) throw new Error('Failed to fetch DPRs')
     const data = await response.json()
     return data.dprs || []
   },
 
   async getDPR(id: number): Promise<DPR> {
-    const response = await fetch(`${API_URL}/dpr/${id}`)
+    const response = await authenticatedFetch(`${API_URL}/dpr/${id}`)
     if (!response.ok) throw new Error('Failed to fetch DPR')
     return response.json()
   },
 
-  async uploadDPR(file: File, projectId?: number, onProgress?: (progress: number) => void): Promise<UploadResponse> {
-    const formData = new FormData()
-    formData.append('file', file)
-    if (projectId) {
-      formData.append('project_id', projectId.toString())
-    }
-
-    const xhr = new XMLHttpRequest()
-
-    return new Promise((resolve, reject) => {
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable && onProgress) {
-          const progress = (e.loaded / e.total) * 100
-          onProgress(progress)
-        }
-      })
-
-      xhr.addEventListener('load', () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(JSON.parse(xhr.responseText))
-        } else {
-          reject(new Error('Upload failed'))
-        }
-      })
-
-      xhr.addEventListener('error', () => reject(new Error('Upload failed')))
-      xhr.open('POST', `${API_URL}/upload-dpr`)
-      xhr.send(formData)
-    })
-  },
-
   async sendChatMessage(dprId: number, message: string): Promise<Message> {
-    const response = await fetch(`${API_URL}/dpr/${dprId}/chat`, {
+    const response = await authenticatedFetch(`${API_URL}/dpr/${dprId}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -181,21 +181,21 @@ export const api = {
   },
 
   async getChatHistory(dprId: number): Promise<Message[]> {
-    const response = await fetch(`${API_URL}/dpr/${dprId}/chat/history`)
+    const response = await authenticatedFetch(`${API_URL}/dpr/${dprId}/chat/history`)
     if (!response.ok) throw new Error('Failed to fetch chat history')
     const data = await response.json()
     return data.messages || []
   },
 
   async clearChatHistory(dprId: number): Promise<void> {
-    const response = await fetch(`${API_URL}/dpr/${dprId}/chat`, {
+    const response = await authenticatedFetch(`${API_URL}/dpr/${dprId}/chat`, {
       method: 'DELETE',
     })
     if (!response.ok) throw new Error('Failed to clear chat history')
   },
 
   async deleteDPR(id: number): Promise<void> {
-    const response = await fetch(`${API_URL}/dpr/${id}`, {
+    const response = await authenticatedFetch(`${API_URL}/dpr/${id}`, {
       method: 'DELETE',
     })
     if (!response.ok) throw new Error('Failed to delete DPR')
@@ -205,7 +205,7 @@ export const api = {
     const formData = new FormData()
     formData.append('feedback', feedback)
 
-    const response = await fetch(`${API_URL}/dprs/${dprId}/feedback`, {
+    const response = await authenticatedFetch(`${API_URL}/dprs/${dprId}/feedback`, {
       method: 'PUT',
       body: formData,
     })
@@ -216,7 +216,7 @@ export const api = {
     const formData = new FormData()
     formData.append('status', status)
 
-    const response = await fetch(`${API_URL}/dprs/${dprId}/status`, {
+    const response = await authenticatedFetch(`${API_URL}/dprs/${dprId}/status`, {
       method: 'PUT',
       body: formData,
     })
@@ -225,14 +225,14 @@ export const api = {
 
 
   async getComparisons(): Promise<Comparison[]> {
-    const response = await fetch(`${API_URL}/comparison-chats`)
+    const response = await authenticatedFetch(`${API_URL}/comparison-chats`)
     if (!response.ok) throw new Error('Failed to fetch comparisons')
     const data = await response.json()
     return data.comparisons || []
   },
 
   async createComparison(name: string, dprIds: number[]): Promise<{ comparison_id: number; name: string }> {
-    const response = await fetch(`${API_URL}/comparison-chats`, {
+    const response = await authenticatedFetch(`${API_URL}/comparison-chats`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -244,20 +244,20 @@ export const api = {
   },
 
   async getComparison(id: number): Promise<Comparison> {
-    const response = await fetch(`${API_URL}/comparison-chat/${id}`)
+    const response = await authenticatedFetch(`${API_URL}/comparison-chat/${id}`)
     if (!response.ok) throw new Error('Failed to fetch comparison')
     return response.json()
   },
 
   async deleteComparison(id: number): Promise<void> {
-    const response = await fetch(`${API_URL}/comparison-chat/${id}`, {
+    const response = await authenticatedFetch(`${API_URL}/comparison-chat/${id}`, {
       method: 'DELETE',
     })
     if (!response.ok) throw new Error('Failed to delete comparison')
   },
 
   async sendComparisonMessage(comparisonId: number, message: string): Promise<ComparisonMessage> {
-    const response = await fetch(`${API_URL}/comparison-chat/${comparisonId}/chat`, {
+    const response = await authenticatedFetch(`${API_URL}/comparison-chat/${comparisonId}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -276,21 +276,21 @@ export const api = {
   },
 
   async getComparisonChatHistory(comparisonId: number): Promise<ComparisonMessage[]> {
-    const response = await fetch(`${API_URL}/comparison-chat/${comparisonId}/chat/history`)
+    const response = await authenticatedFetch(`${API_URL}/comparison-chat/${comparisonId}/chat/history`)
     if (!response.ok) throw new Error('Failed to fetch comparison chat history')
     const data = await response.json()
     return data.messages || []
   },
 
   async clearComparisonChatHistory(comparisonId: number): Promise<void> {
-    const response = await fetch(`${API_URL}/comparison-chat/${comparisonId}/chat`, {
+    const response = await authenticatedFetch(`${API_URL}/comparison-chat/${comparisonId}/chat`, {
       method: 'DELETE',
     })
     if (!response.ok) throw new Error('Failed to clear comparison chat history')
   },
 
   async addDPRToComparison(comparisonId: number, dprId: number): Promise<Comparison> {
-    const response = await fetch(`${API_URL}/comparison-chat/${comparisonId}/add-dpr`, {
+    const response = await authenticatedFetch(`${API_URL}/comparison-chat/${comparisonId}/add-dpr`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -302,7 +302,7 @@ export const api = {
   },
 
   async removeDPRFromComparison(comparisonId: number, dprId: number): Promise<void> {
-    const response = await fetch(`${API_URL}/comparison-chat/${comparisonId}/remove-dpr/${dprId}`, {
+    const response = await authenticatedFetch(`${API_URL}/comparison-chat/${comparisonId}/remove-dpr/${dprId}`, {
       method: 'DELETE',
     })
     if (!response.ok) throw new Error('Failed to remove DPR from comparison')

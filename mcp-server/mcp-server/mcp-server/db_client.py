@@ -8,7 +8,17 @@ All operations go through the backend API for consistency.
 import httpx
 import sys
 from typing import List, Dict, Optional
-from config import get_backend_url
+from config import get_backend_url, get_auth_headers
+
+# Override httpx.Client locally to automatically inject headers
+class AuthenticatedClient(httpx.Client):
+    def __init__(self, *args, **kwargs):
+        headers = dict(kwargs.get('headers', {}))
+        headers.update(get_auth_headers())
+        kwargs['headers'] = headers
+        super().__init__(*args, **kwargs)
+
+httpx.Client = AuthenticatedClient
 
 
 def get_projects() -> List[Dict]:

@@ -25,11 +25,12 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { api, type DPR, type Project } from '@/lib/api'
+import { api, type DPR, type Project, authenticatedFetch } from '@/lib/api'
 import { API_BASE_URL } from '@/config/api'
 import { useLanguage } from '@/contexts/LanguageContext'
 import ComplianceWeightsModal from '@/components/ComplianceWeightsModal'
 import FeedbackModal from '@/components/FeedbackModal'
+import SetCriteriaModal from '@/components/SetCriteriaModal'
 
 export default function ProjectDetailPage() {
     const navigate = useNavigate()
@@ -55,6 +56,9 @@ export default function ProjectDetailPage() {
 
     // Feedback Modal state
     const [feedbackDpr, setFeedbackDpr] = useState<DPR | null>(null)
+
+    // Set Criteria Modal state
+    const [showCriteriaModal, setShowCriteriaModal] = useState(false)
 
     useEffect(() => {
         if (id) {
@@ -83,7 +87,7 @@ export default function ProjectDetailPage() {
         setAnalyzingDpr(dprId)
         try {
             console.log(`Starting analysis for DPR ${dprId}...`)
-            const response = await fetch(`${API_BASE_URL}/dprs/${dprId}/analyze`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/dprs/${dprId}/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -231,6 +235,16 @@ export default function ProjectDetailPage() {
                         </div>
 
                         <div className="flex gap-2">
+                            {/* Set Criteria Button */}
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowCriteriaModal(true)}
+                                title="Set Custom Criteria"
+                            >
+                                <FileText className="h-4 w-4 mr-2" />
+                                {project.custom_criteria ? 'View Criteria' : 'Set Criteria'}
+                            </Button>
+
                             {/* Compliance Weights Settings Button */}
                             <Button
                                 variant="outline"
@@ -248,7 +262,7 @@ export default function ProjectDetailPage() {
                                         // If comparison already exists, fetch and show it
                                         if ((project as any).has_comparison) {
                                             try {
-                                                const response = await fetch(`${API_BASE_URL}/projects/${id}/comparison`)
+                                                const response = await authenticatedFetch(`${API_BASE_URL}/projects/${id}/comparison`)
                                                 if (response.ok) {
                                                     const data = await response.json()
                                                     setComparisonResult(data.comparison)
@@ -726,10 +740,25 @@ export default function ProjectDetailPage() {
             {id && (
                 <ComplianceWeightsModal
                     projectId={parseInt(id)}
+                    customCriteria={project?.custom_criteria || null}
                     isOpen={showComplianceWeights}
                     onClose={() => setShowComplianceWeights(false)}
                     onSuccess={() => {
                         // Reload project data after weights are updated and scores recalculated
+                        loadProjectData(parseInt(id))
+                    }}
+                />
+            )}
+
+            {/* Set Criteria Modal */}
+            {id && (
+                <SetCriteriaModal
+                    projectId={parseInt(id)}
+                    existingCriteria={project?.custom_criteria || null}
+                    isOpen={showCriteriaModal}
+                    onClose={() => setShowCriteriaModal(false)}
+                    onSuccess={() => {
+                        setShowCriteriaModal(false)
                         loadProjectData(parseInt(id))
                     }}
                 />

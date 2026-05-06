@@ -22,7 +22,8 @@ def init_db():
                 created_at TIMESTAMP NOT NULL,
                 comparison_result TEXT,
                 comparison_generated_at TIMESTAMP,
-                compliance_weights JSONB
+                compliance_weights JSONB,
+                custom_criteria JSONB
             )
         """)
     
@@ -176,8 +177,24 @@ def insert_dpr(filename: str, original_filename: str, filepath: str, file_ref: s
 
 def update_dpr(dpr_id: int, summary_json: dict, validation_flags: dict = None):
     """Update an existing DPR record with analysis results and validation flags."""
+    import backend.compliance_calculator as compliance_calc
+    
     conn = db_config.get_connection()
     cursor = db_config.get_cursor(conn, dict_cursor=False)
+    
+    # Automatically recalculate the overall score from the AI's breakdown to ensure mathematical correctness
+    try:
+        cursor.execute("SELECT project_id FROM dprs WHERE id = %s", (dpr_id,))
+        project_id_row = cursor.fetchone()
+        
+        if project_id_row and project_id_row[0]:
+            project_weights = compliance_calc.get_project_weights(project_id_row[0])
+        else:
+            project_weights = compliance_calc.get_default_weights()
+            
+        summary_json = compliance_calc.recalculate_compliance_score(summary_json, project_weights)
+    except Exception as e:
+        print(f"⚠ Failed to auto-recalculate score before save: {e}")
     
     # DEBUG: Check cloudinary_url BEFORE update
     cursor.execute("SELECT cloudinary_url, cloudinary_public_id FROM dprs WHERE id = %s", (dpr_id,))
@@ -509,7 +526,7 @@ def get_processing_dprs() -> List[Dict]:
     cursor = db_config.get_cursor(conn, dict_cursor=True)
     
     cursor.execute("""
-        SELECT id, filename, original_filename, filepath, uploaded_file_ref, upload_ts
+        SELECT id, filename, original_filename, filepath, uploaded_file_ref, upload_ts, project_id
         FROM dprs
         WHERE summary_json IS NULL OR summary_json = ''
     """)
@@ -525,7 +542,8 @@ def get_processing_dprs() -> List[Dict]:
             "original_filename": row["original_filename"],
             "filepath": row["filepath"],
             "uploaded_file_ref": row["uploaded_file_ref"],
-            "upload_ts": row["upload_ts"]
+            "upload_ts": row["upload_ts"],
+            "project_id": row["project_id"]
         }
         for row in rows
     ]
@@ -998,8 +1016,34 @@ def get_project(project_id: int) -> Optional[Dict]:
         project = dict(row)
         # Add has_comparison flag
         project['has_comparison'] = project.get('comparison_result') is not None
+        
+        # Deserialize custom_criteria if it's a string
+        if project.get('custom_criteria') and isinstance(project['custom_criteria'], str):
+            try:
+                project['custom_criteria'] = json.loads(project['custom_criteria'])
+            except Exception as e:
+                print(f"Error parsing custom_criteria: {e}")
+                
         return project
     return None
+
+def update_project_custom_criteria(project_id: int, custom_criteria: dict) -> None:
+    """Save custom criteria for a project."""
+    conn = db_config.get_connection()
+    cursor = db_config.get_cursor(conn, dict_cursor=False)
+    
+    json_str = json.dumps(custom_criteria)
+    
+    cursor.execute("""
+        UPDATE projects 
+        SET custom_criteria = %s
+        WHERE id = %s
+    """, (json_str, project_id))
+    
+    conn.commit()
+    cursor.close()
+    db_config.release_connection(conn)
+    print(f"✓ Saved custom criteria for project {project_id}")
 
 
 def get_dprs_by_project(project_id: int) -> List[Dict]:

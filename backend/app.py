@@ -1,5 +1,6 @@
 import os
 import uuid
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -22,6 +23,7 @@ import backend.db as db
 import backend.gemini_client as gemini_client
 import backend.report_generator as report_generator
 import backend.cloudinary_service as cloudinary_service
+from starlette.middleware.base import BaseHTTPMiddleware
 
 # Load environment variables
 load_dotenv()
@@ -53,7 +55,6 @@ async def lifespan(app: FastAPI):
     Lifespan context manager for startup and shutdown events.
     On startup, check for interrupted DPRs and resume processing in background.
     """
-    import asyncio
     
     async def resume_processing():
         print("⏳ Checking for interrupted DPR processing...")
@@ -75,8 +76,15 @@ async def lifespan(app: FastAPI):
             print(f"▶ Resuming analysis for DPR {dpr_id} ({filename})...")
             
             try:
+                project_id = dpr.get('project_id')
+                custom_criteria = None
+                if project_id:
+                    project = await asyncio.to_thread(db.get_project, project_id)
+                    if project and project.get('custom_criteria'):
+                        custom_criteria = project['custom_criteria']
+                
                 # Generate analysis (now async)
-                parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH))
+                parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH), custom_criteria)
                 
                 # Update database (run in thread pool)
                 await asyncio.to_thread(db.update_dpr, dpr_id, parsed_json)
@@ -104,9 +112,16 @@ async def lifespan(app: FastAPI):
                         await asyncio.to_thread(db.update_dpr_file_ref, dpr_id, new_file_ref)
                         print(f"✓ Updated database with new file reference")
                         
+                        project_id = dpr.get('project_id')
+                        custom_criteria = None
+                        if project_id:
+                            project = await asyncio.to_thread(db.get_project, project_id)
+                            if project and project.get('custom_criteria'):
+                                custom_criteria = project['custom_criteria']
+                                
                         # Retry analysis with new file reference
                         print(f"↺ Retrying analysis for DPR {dpr_id}...")
-                        parsed_json = await gemini_client.generate_json_from_file(new_file_ref, str(SCHEMA_PATH))
+                        parsed_json = await gemini_client.generate_json_from_file(new_file_ref, str(SCHEMA_PATH), custom_criteria)
                         
                         # Update database with analysis results
                         await asyncio.to_thread(db.update_dpr, dpr_id, parsed_json)
@@ -132,12 +147,43 @@ app = FastAPI(title="DPR Analyzer", version="1.0.0", lifespan=lifespan)
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=["http://localhost:5000", "http://127.0.0.1:5000", "http://localhost:5173", "http://127.0.0.1:5173", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Content-Disposition", "Content-Type", "Content-Length"],
 )
+
+class TokenAuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        # Exclude paths that don't need auth or are accessed directly by the browser (iframes/downloads)
+        if (path.startswith("/static") or 
+            path.startswith("/data") or 
+            path in ["/docs", "/openapi.json", "/redoc", "/"] or
+            path in ["/api/admin/login", "/api/user/login", "/api/user/register"] or
+            path.endswith("/pdf") or
+            path.endswith("/report") or
+            path.endswith("/download")):
+            return await call_next(request)
+            
+        # Allow CORS preflight requests
+        if request.method == "OPTIONS":
+            return await call_next(request)
+            
+        auth_header = request.headers.get("Authorization")
+        expected_token = os.getenv("HACKATHON_ACCESS_TOKEN")
+        
+        if expected_token:
+            if not auth_header or not auth_header.startswith("Bearer "):
+                return JSONResponse(status_code=401, content={"detail": "Missing Authorization header"})
+            token = auth_header.split(" ")[1]
+            if token != expected_token:
+                return JSONResponse(status_code=401, content={"detail": "Invalid HACKATHON_ACCESS_TOKEN"})
+                
+        return await call_next(request)
+
+app.add_middleware(TokenAuthMiddleware)
 
 DATA_DIR.mkdir(exist_ok=True)
 
@@ -178,6 +224,13 @@ class CreateProjectRequest(BaseModel):
 class UpdateComplianceWeightsRequest(BaseModel):
     weights: dict
     recalculate: bool = False
+
+class CustomCriteriaItem(BaseModel):
+    heading: str
+    description: str
+
+class UpdateCustomCriteriaRequest(BaseModel):
+    criteria: list[CustomCriteriaItem]
 
 
 
@@ -429,7 +482,14 @@ async def client_upload_dpr(
         # Automatically analyze the DPR
         try:
             print(f"⏳ Auto-analyzing client DPR {dpr_id}...")
-            parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH))
+            
+            custom_criteria = None
+            if project_id:
+                project = await asyncio.to_thread(db.get_project, project_id)
+                if project and project.get('custom_criteria'):
+                    custom_criteria = project['custom_criteria']
+                    
+            parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH), custom_criteria)
             print(f"✓ Analysis complete for DPR {dpr_id}")
             
             # Validate DPR against project and populate validationFlags
@@ -703,6 +763,62 @@ async def get_project_dprs(project_id: int):
     return JSONResponse({"dprs": dprs, "count": len(dprs)})
 
 
+@app.put("/projects/{project_id}/custom-criteria")
+async def update_project_custom_criteria(project_id: int, request: UpdateCustomCriteriaRequest):
+    """Set custom evaluation criteria for a project."""
+    project = db.get_project(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+        
+    if project.get("custom_criteria"):
+        raise HTTPException(status_code=400, detail="Custom criteria are already set and cannot be changed.")
+        
+    criteria_count = len(request.criteria)
+    if criteria_count == 0:
+        raise HTTPException(status_code=400, detail="At least one criteria is required.")
+        
+    weight = round(1.0 / criteria_count, 2)
+    
+    criteria_breakdown = {}
+    for item in request.criteria:
+        import re
+        safe_key = re.sub(r'[^a-zA-Z0-9]', '', item.heading.title())
+        safe_key = safe_key[0].lower() + safe_key[1:] if safe_key else "criteria"
+        
+        # Ensure unique key if duplicates happen
+        base_key = safe_key
+        counter = 1
+        while safe_key in criteria_breakdown:
+            safe_key = f"{base_key}{counter}"
+            counter += 1
+            
+        criteria_breakdown[safe_key] = {
+            "score": "number (0-100)",
+            "weight": weight,
+            "findings": "string",
+            "detailedReasoning": f"string - {item.description}",
+            "evidence": [
+                {
+                    "quote": "string (VERBATIM quote from the proposal)",
+                    "pageLocation": "string"
+                }
+            ],
+            "met": "boolean"
+        }
+        
+    custom_criteria = {
+        "overallComplianceScore": "number (0-100)",
+        "criteriaBreakdown": criteria_breakdown
+    }
+    
+    try:
+        db.update_project_custom_criteria(project_id, custom_criteria)
+        return JSONResponse({"success": True, "message": "Custom criteria saved successfully", "custom_criteria": custom_criteria})
+    except Exception as e:
+        print(f"✗ Update custom criteria error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update custom criteria: {str(e)}")
+
+
 @app.post("/projects/{project_id}/compare-all")
 async def compare_all_project_dprs(project_id: int):
     """
@@ -818,7 +934,7 @@ async def update_compliance_weights(project_id: int, request: UpdateComplianceWe
             raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
         
         # Validate weights
-        is_valid, error_msg = compliance_calc.validate_weights(request.weights)
+        is_valid, error_msg = compliance_calc.validate_weights(request.weights, project_id)
         if not is_valid:
             raise HTTPException(status_code=400, detail=f"Invalid weights: {error_msg}")
         
@@ -977,102 +1093,10 @@ async def list_all_dprs():
 
 
 
-@app.post("/upload-dpr")
-async def upload_dpr(
-    file: UploadFile = File(...), 
-    language: str = Form("en"),
-    project_id: Optional[int] = Form(None)
-):
-    """
-    Upload a DPR PDF, process it with Gemini, and return structured JSON.
-    """
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
-    
-    try:
-        original_filename = file.filename
-        
-        # Check if this PDF already exists
-        existing_dpr = db.get_dpr_by_filename(original_filename)
-        if existing_dpr:
-            print(f"✓ PDF already exists: {original_filename} (ID: {existing_dpr['id']})")
-            
-            # Update project_id if provided and different
-            if project_id is not None and existing_dpr.get('project_id') != project_id:
-                print(f"⏳ Updating project association: DPR {existing_dpr['id']} → Project {project_id}")
-                conn = db_config.get_connection()
-                cursor = db_config.get_cursor(conn, dict_cursor=False)
-                cursor.execute("UPDATE dprs SET project_id = %s WHERE id = %s", (project_id, existing_dpr['id']))
-                conn.commit()
-                cursor.close()
-                db_config.release_connection(conn)
-                print(f"✓ Project association updated")
-            
-            return JSONResponse({
-                "id": existing_dpr["id"],
-                "dpr_id": existing_dpr["id"],
-                "summary": existing_dpr["summary_json"],
-                "existing": True
-            })
-        
-        # Generate unique filename for storage
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_id = str(uuid.uuid4())[:8]
-        filename = f"{timestamp}_{unique_id}_{original_filename}"
-        filepath = DATA_DIR / filename
-        
-        # Save the uploaded file
-        print(f"⏳ Saving uploaded file: {filename}")
-        with open(filepath, "wb") as f:
-            content = await file.read()
-            f.write(content)
-        print(f"✓ File saved: {filepath} ({len(content)} bytes)")
-        
-        # Upload to Gemini Files API
-        file_ref = await gemini_client.upload_file(str(filepath))
-        
-        # Insert initial record into database with project_id
-        print(f"⏳ Inserting initial DPR record for {filename}...")
-        dpr_id = db.insert_dpr(
-            filename=filename,
-            original_filename=original_filename,
-            filepath=str(filepath),
-            file_ref=file_ref,
-            summary_json=None,
-            project_id=project_id
-        )
-        
-        # Generate analysis in background
-        print("⏳ Generating analysis...")
-        try:
-            parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH))
-            print(f"✓ Generated analysis successfully")
-            
-            # Validate DPR against project if project_id is provided
-            validation_flags = None
-            if project_id is not None:
-                validation_flags = db.validate_dpr_against_project(dpr_id, project_id, parsed_json)
-                if validation_flags.get('hasFlags'):
-                    print(f"⚠ DPR {dpr_id} has validation flags: {len(validation_flags['flags'])} issue(s)")
-            
-            db.update_dpr(dpr_id, parsed_json, validation_flags)
-            
-            return JSONResponse({
-                "id": dpr_id,
-                "dpr_id": dpr_id,
-                "summary": parsed_json,
-                "existing": False
-            })
-        except Exception as e:
-            print(f"✗ Analysis failed: {str(e)}")
-            raise e
-        
-    except Exception as e:
-        print(f"✗ Unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to process DPR: {str(e)}")
 
 
-@app.post("/upload-dpr")
+
+@app.get("/dpr/{dpr_id}")
 async def get_dpr(dpr_id: int):
     """
     Retrieve a stored DPR by ID.
@@ -1189,8 +1213,15 @@ async def analyze_dpr(dpr_id: int):
         
         print(f"⏳ Analyzing DPR {dpr_id}...")
         
-        # Generate analysis in multiple languages
-        parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH))
+        # Generate analysis
+        custom_criteria = None
+        project_id = dpr.get('project_id')
+        if project_id:
+            project = await asyncio.to_thread(db.get_project, project_id)
+            if project and project.get('custom_criteria'):
+                custom_criteria = project['custom_criteria']
+                
+        parsed_json = await gemini_client.generate_json_from_file(file_ref, str(SCHEMA_PATH), custom_criteria)
         
         print(f"✓ Generated analysis successfully")
         

@@ -64,7 +64,7 @@ async def upload_file(file_path: str) -> str:
     return uploaded_file.name
 
 
-async def generate_json_from_file(file_ref: str, schema_path: str) -> Dict:
+async def generate_json_from_file(file_ref: str, schema_path: str, custom_criteria: dict = None) -> Dict:
     """
     Generate structured JSON from an uploaded file using Gemini in English only.
     """
@@ -73,7 +73,12 @@ async def generate_json_from_file(file_ref: str, schema_path: str) -> Dict:
     
     # Read the schema
     with open(schema_path, 'r') as f:
-        schema_content = f.read()
+        schema_dict = json.load(f)
+        
+    if custom_criteria:
+        schema_dict["evaluationCriteria"] = custom_criteria
+        
+    schema_content = json.dumps(schema_dict, indent=2)
     
     # Create a strict system prompt (English only) - TENDER EVALUATION
     system_instruction = f"""You are an expert Tender/Bid Proposal Analyst. Read the attached PDF (tender document or bid proposal) and produce EXACTLY one valid JSON object containing analysis in English.
@@ -215,66 +220,9 @@ MANDATORY BEHAVIOR:
 
 12) **EVALUATION CRITERIA SCORING** (CRITICAL - WITH EVIDENCE):
     
-    Calculate scores in `evaluationCriteria.criteriaBreakdown` based on these 6 pan-India tender evaluation parameters:
+    Give score to every evaluation criteria by checoing about that criteria in detail. 
     
-    - **technicalFeasibilityAndDesign (20%)**: 
-      * Does the proposed engineering solution or technology match the specific requirements of the tender?
-      * Are specifications of machinery, construction materials, or software stacks compatible and up-to-date?
-      * Will the project fail due to outdated or incompatible technology?
-      * Score 0-100
-    
-    - **implementationSchedule (15%)**:
-      * Is the total project duration realistic?
-      * Are phase-wise deadlines achievable?
-      * Analyze the Gantt chart or PERT/CPM network
-      * Identify the critical path
-      * Is there a risk of time overruns?
-      * Score 0-100
-    
-    - **costEstimateAndBOQ (25%)**:
-      * Analyze the Bill of Quantities (BOQ)
-      * Are unit rates for major line items accurate?
-      * Do they match current Market Rates or Schedule of Rates (SOR)?
-      * Is there evidence of cost loading (inflated prices)?
-      * Is the budget sufficient to complete the work?
-      * Score 0-100
-    
-    - **riskMitigationAndEnvironment (15%)**:
-      * Are risks identified (geological, legal, supply chain)?
-      * Are mitigation strategies adequate?
-      * Are environmental clearances obtained?
-      * Does it ensure regulatory compliance (pollution, land use, etc.)?
-      * Does it protect from future liabilities?
-      * Score 0-100
-    
-    - **financialViability (15%)**:
-      * Analyze the Financial Internal Rate of Return (FIRR)
-      * Evaluate Net Present Value (NPV) and payback period
-      * Are projected cash flows realistic?
-      * Is the break-even analysis sound?
-      * Is the project financially sustainable and does it offer good return on investment?
-      * Score 0-100
-    
-    - **resourceAllocationAndSite (10%)**:
-      * What is the land acquisition status?
-      * Is there availability of water/power/logistics?
-      * Is the manpower plan adequate?
-      * Can the project start immediately without Right of Way (ROW) or utility hurdles?
-      * Is the site suitable?
-      * Score 0-100
-    
-    For EACH criterion you MUST provide:
-    - `score`: 0-100
-    - `weight`: decimal (0.20, 0.15, 0.25, 0.15, 0.15, 0.10 respectively)
-    - `findings`: what was found
-    - `detailedReasoning`: why this score was given (answer the questions above)
-    - `evidence`: Array of 1-3 evidence objects with `quote` (VERBATIM - follow section 5 rules EXACTLY) and `pageLocation`
-      * CRITICAL: The `quote` field MUST contain EXACT text from the PDF - character-for-character, word-for-word
-      * Extract COMPLETE sentences only (no truncation)
-      * Do NOT paraphrase, summarize, or add headers
-      * The quote MUST be searchable with Ctrl+F in the original PDF
-    - `met`: boolean - whether minimum requirements are met
-
+    The details about the different evaluation criterias is are provided in the json scema itself. So look at the json scema and fill the scores, evidence, reasoning and everything accordingly
     
     Calculate `overallComplianceScore` = weighted sum of all 6 criteria scores.
 
@@ -290,12 +238,7 @@ MANDATORY BEHAVIOR:
 
 Scoring rubric (apply to compute overallScore 0-100):
 - Weighted components: 
-  * Technical Feasibility & Design: 20%
-  * Implementation Schedule: 15%
-  * Cost Estimate & BOQ: 25%
-  * Risk Mitigation & Environment: 15%
-  * Financial Viability (FIRR/NPV): 15%
-  * Resource Allocation & Site: 10%
+  all the different evaluation criteria are given in the sceme and the weight of them is also given, So score those evaluation criterias, and the total score should be the weighted sum of the different criterias, the weight of the evaluation cirteria is given in the json itself. 
 - Recommendation thresholds:
   - overallScore >= 80 → "Select"
   - 60 <= overallScore < 80 → "Shortlist"
@@ -316,13 +259,13 @@ SCHEMA:
 
 
 ADDITIONAL INSTRUCTIONS:
-- overallScore: compute a number 0-100 based on the 6 evaluation criteria (technical feasibility, schedule, cost/BOQ, risk/environment, financial viability, resources/site).
+- overallScore: compute a number 0-100, You may leave it empty, you may just score the evaluation criteria, and the overallScore will be the weighted sum of all the evaluation criterias that we will do ourselves, you just give the score for each criteria in the json. 
 - recommendation: one of ["Select", "Shortlist", "Review", "Reject"].
 - tenderDetails: extract tender name, reference number, issuing authority, bidder name, location, tender type, submission date.
 - financialAnalysis: extract bid amount, pricing structure, and bidder's financial health.
 - technicalEvaluation: score technical capability, assess methodology, evaluate timeline.
 - bidderQualifications: assess experience, past projects, and team composition.
-- evaluationCriteria: score each of the 6 criteria (technicalFeasibilityAndDesign, implementationSchedule, costEstimateAndBOQ, riskMitigationAndEnvironment, financialViability, resourceAllocationAndSite) with findings, reasoning, and evidence with quote and pageLocation.
+- evaluationCriteria: score each of the criteria (the description of it is provided in the json schema) with findings, reasoning, and evidence with quote and pageLocation.
 - riskAssessment: list top 3-6 risks; each risk must include evidence array with quote and pageLocation.
 - Always include page references for key citations where possible.
 

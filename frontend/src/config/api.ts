@@ -4,7 +4,7 @@
  */
 
 // Hardcoded production backend URL (env vars weren't working in Vercel)
-export const API_BASE_URL = 'https://tender-evaluation-backend.onrender.com'
+export const API_BASE_URL = 'http://localhost:8000'
 
 // Helper function to build full API URLs
 export const getApiUrl = (path: string): string => {

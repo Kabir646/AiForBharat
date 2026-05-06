@@ -3,6 +3,7 @@ import { X, RotateCcw, Save, AlertCircle, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { API_BASE_URL } from '@/config/api'
+import { authenticatedFetch } from '@/lib/api'
 
 interface ComplianceWeights {
     technicalFeasibilityAndDesign: number
@@ -15,29 +16,39 @@ interface ComplianceWeights {
 
 interface ComplianceWeightsModalProps {
     projectId: number
+    customCriteria?: any
     isOpen: boolean
     onClose: () => void
     onSuccess?: () => void
 }
 
-const CRITERIA_INFO = [
-    { key: 'technicalFeasibilityAndDesign', label: 'Technical Feasibility & Design', defaultWeight: 20 },
-    { key: 'implementationSchedule', label: 'Implementation Schedule', defaultWeight: 15 },
-    { key: 'costEstimateAndBOQ', label: 'Cost Estimate & BOQ', defaultWeight: 25 },
-    { key: 'riskMitigationAndEnvironment', label: 'Risk Mitigation & Environment', defaultWeight: 15 },
-    { key: 'financialViability', label: 'Financial Viability', defaultWeight: 15 },
-    { key: 'resourceAllocationAndSite', label: 'Resource Allocation & Site', defaultWeight: 10 },
-]
+export default function ComplianceWeightsModal({ projectId, customCriteria, isOpen, onClose, onSuccess }: ComplianceWeightsModalProps) {
+    const defaultCriteriaInfo = [
+        { key: 'technicalFeasibilityAndDesign', label: 'Technical Feasibility & Design', defaultWeight: 20 },
+        { key: 'implementationSchedule', label: 'Implementation Schedule', defaultWeight: 15 },
+        { key: 'costEstimateAndBOQ', label: 'Cost Estimate & BOQ', defaultWeight: 25 },
+        { key: 'riskMitigationAndEnvironment', label: 'Risk Mitigation & Environment', defaultWeight: 15 },
+        { key: 'financialViability', label: 'Financial Viability', defaultWeight: 15 },
+        { key: 'resourceAllocationAndSite', label: 'Resource Allocation & Site', defaultWeight: 10 },
+    ]
 
-export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onSuccess }: ComplianceWeightsModalProps) {
-    const [weights, setWeights] = useState<ComplianceWeights>({
-        technicalFeasibilityAndDesign: 0.20,
-        implementationSchedule: 0.15,
-        costEstimateAndBOQ: 0.25,
-        riskMitigationAndEnvironment: 0.15,
-        financialViability: 0.15,
-        resourceAllocationAndSite: 0.10,
-    })
+    const criteriaInfo = customCriteria?.criteriaBreakdown 
+        ? Object.entries(customCriteria.criteriaBreakdown).map(([key, data]: [string, any]) => ({
+            key,
+            label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+            defaultWeight: Math.round(data.weight * 100)
+        }))
+        : defaultCriteriaInfo
+
+    const getDefaultWeightsObj = () => {
+        const obj: Record<string, number> = {}
+        criteriaInfo.forEach(info => {
+            obj[info.key] = info.defaultWeight / 100
+        })
+        return obj
+    }
+
+    const [weights, setWeights] = useState<Record<string, number>>(getDefaultWeightsObj())
 
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -51,7 +62,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
         setError(null)
 
         try {
-            const response = await fetch(`${API_BASE_URL}/projects/${projectId}/compliance-weights`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/projects/${projectId}/compliance-weights`)
 
             if (!response.ok) {
                 throw new Error('Failed to load compliance weights')
@@ -75,8 +86,8 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
         }
     }, [isOpen, projectId, loadWeights])
 
-    const getPercentageValue = (decimalValue: number) => Math.round(decimalValue * 100)
-    const setPercentageValue = (key: keyof ComplianceWeights, percentage: number) => {
+    const getPercentageValue = (decimalValue: number) => Math.round((decimalValue || 0) * 100)
+    const setPercentageValue = (key: string, percentage: number) => {
         setWeights(prev => ({ ...prev, [key]: percentage / 100 }))
     }
 
@@ -84,15 +95,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
     const isValid = Math.abs(totalPercentage - 100) < 0.1
 
     const handleReset = () => {
-        const defaultWeights: ComplianceWeights = {
-            technicalFeasibilityAndDesign: 0.20,
-            implementationSchedule: 0.15,
-            costEstimateAndBOQ: 0.25,
-            riskMitigationAndEnvironment: 0.15,
-            financialViability: 0.15,
-            resourceAllocationAndSite: 0.10,
-        }
-        setWeights(defaultWeights)
+        setWeights(getDefaultWeightsObj())
     }
 
     const handleSave = async (recalculate: boolean) => {
@@ -111,7 +114,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
         setSuccessMessage(null)
 
         try {
-            const response = await fetch(`${API_BASE_URL}/projects/${projectId}/compliance-weights`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/projects/${projectId}/compliance-weights`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ weights, recalculate })
@@ -209,8 +212,8 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
 
                             {/* Weight Sliders */}
                             <div className="space-y-6 mb-6">
-                                {CRITERIA_INFO.map(({ key, label, defaultWeight }) => {
-                                    const value = getPercentageValue(weights[key as keyof ComplianceWeights])
+                                {criteriaInfo.map(({ key, label, defaultWeight }) => {
+                                    const value = getPercentageValue(weights[key])
                                     return (
                                         <div key={key} className="space-y-2">
                                             <div className="flex items-center justify-between">
@@ -221,7 +224,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
                                                         min="0"
                                                         max="100"
                                                         value={value}
-                                                        onChange={(e) => setPercentageValue(key as keyof ComplianceWeights, parseInt(e.target.value) || 0)}
+                                                        onChange={(e) => setPercentageValue(key, parseInt(e.target.value) || 0)}
                                                         className="w-16 px-2 py-1 text-sm border rounded text-center"
                                                     />
                                                     <span className="text-sm text-muted-foreground w-8">%</span>
@@ -234,7 +237,7 @@ export default function ComplianceWeightsModal({ projectId, isOpen, onClose, onS
                                                     max="100"
                                                     step="1"
                                                     value={value}
-                                                    onChange={(e) => setPercentageValue(key as keyof ComplianceWeights, parseInt(e.target.value))}
+                                                    onChange={(e) => setPercentageValue(key, parseInt(e.target.value))}
                                                     className="w-full h-2 rounded-lg appearance-none cursor-pointer"
                                                     style={{
                                                         background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${value}%, hsl(var(--muted)) ${value}%, hsl(var(--muted)) 100%)`

@@ -4,8 +4,6 @@ import { Button } from './ui/Button'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useRole } from '../contexts/RoleContext'
-import { api } from '@/lib/api'
-import { ProjectSelectionModal } from './ProjectSelectionModal'
 import { Card } from './ui/Card'
 import { LanguageDropdown } from './LanguageDropdown'
 
@@ -16,13 +14,6 @@ export function Header() {
   const { logout } = useRole()
 
 
-  // Project Selection & Upload State
-  const [pendingFile, setPendingFile] = useState<File | null>(null)
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [processing, setProcessing] = useState(false)
-  const [uploadSuccess, setUploadSuccess] = useState(false)
 
   useEffect(() => {
     // Check localStorage first, then check current state
@@ -46,38 +37,6 @@ export function Header() {
   }
 
   const isActive = (path: string) => location.pathname === path
-  const handleProjectSelect = async (projectId: number) => {
-    if (!pendingFile) return
-
-    setIsProjectModalOpen(false)
-    setUploading(true)
-    setProcessing(false)
-    setUploadSuccess(false)
-    setUploadProgress(0)
-
-    try {
-      const result = await api.uploadDPR(pendingFile, projectId, (progress) => {
-        setUploadProgress(progress)
-        if (progress === 100) {
-          setProcessing(true)
-        }
-      })
-
-      setUploadSuccess(true)
-      // Small delay to show success message before redirect
-      setTimeout(() => {
-        setUploading(false)
-        navigate(`/admin/documents/${result.id}`)
-      }, 1500)
-    } catch (err) {
-      console.error('Upload error:', err)
-      alert('Failed to upload file. Please try again.')
-      setUploading(false)
-    } finally {
-      setPendingFile(null)
-    }
-  }
-
   const handleLogout = () => {
     logout()
     navigate('/')
@@ -155,58 +114,7 @@ export function Header() {
         </div>
       </header>
 
-      <ProjectSelectionModal
-        isOpen={isProjectModalOpen}
-        onClose={() => {
-          setIsProjectModalOpen(false)
-          setPendingFile(null)
-        }}
-        onSelect={handleProjectSelect}
-      />
 
-      {/* Upload Progress Modal */}
-      {uploading && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
-          <Card className="w-full max-w-md p-8 shadow-2xl border-primary/20 animate-scale-in">
-            <div className="text-center">
-              {uploadSuccess ? (
-                <div className="animate-fade-up">
-                  <div className="mb-4 flex justify-center">
-                    <div className="h-16 w-16 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-glow animate-scale-in">
-                      <CheckCircle2 className="h-8 w-8 text-white" />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-heading font-semibold mb-2 text-green-600">Upload Complete!</h3>
-                  <p className="text-muted-foreground">Redirecting to analysis...</p>
-                </div>
-              ) : (
-                <>
-                  <div className="mb-4">
-                    <div className="w-16 h-16 mx-auto border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-                  </div>
-                  <h3 className="text-lg font-heading font-semibold mb-2">
-                    {processing ? 'Processing Document...' : 'Uploading...'}
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    {processing
-                      ? 'Analyzing content with AI. This may take a moment.'
-                      : 'Please wait while we process your document'}
-                  </p>
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div
-                      className="gradient-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2 font-medium">
-                    {processing ? '100%' : `${Math.round(uploadProgress)}%`}
-                  </p>
-                </>
-              )}
-            </div>
-          </Card>
-        </div>
-      )}
     </>
   )
 }

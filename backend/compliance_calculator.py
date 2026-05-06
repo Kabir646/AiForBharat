@@ -18,7 +18,7 @@ def get_default_weights() -> Dict[str, float]:
     }
 
 
-def validate_weights(weights: Dict[str, float]) -> Tuple[bool, Optional[str]]:
+def validate_weights(weights: Dict[str, float], project_id: Optional[int] = None) -> Tuple[bool, Optional[str]]:
     """
     Validate compliance weights.
     
@@ -28,7 +28,31 @@ def validate_weights(weights: Dict[str, float]) -> Tuple[bool, Optional[str]]:
     Returns:
         Tuple of (is_valid, error_message)
     """
-    default_keys = set(get_default_weights().keys())
+    if project_id:
+        import backend.db_config as db_config
+        conn = db_config.get_connection()
+        cursor = db_config.get_cursor(conn, dict_cursor=True)
+        cursor.execute("SELECT custom_criteria FROM projects WHERE id = %s", (project_id,))
+        row = cursor.fetchone()
+        cursor.close()
+        db_config.release_connection(conn)
+        
+        if row and row.get("custom_criteria"):
+            custom_criteria = row["custom_criteria"]
+            if isinstance(custom_criteria, str):
+                try:
+                    custom_criteria = json.loads(custom_criteria)
+                except Exception:
+                    custom_criteria = {}
+            if "criteriaBreakdown" in custom_criteria:
+                default_keys = set(custom_criteria["criteriaBreakdown"].keys())
+            else:
+                default_keys = set(get_default_weights().keys())
+        else:
+            default_keys = set(get_default_weights().keys())
+    else:
+        default_keys = set(get_default_weights().keys())
+
     provided_keys = set(weights.keys())
     
     # Check all required keys are present
@@ -188,17 +212,28 @@ def get_project_weights(project_id: int, db_path: str = "data/dpr.db") -> Dict[s
     conn = db_config.get_connection()
     cursor = db_config.get_cursor(conn, dict_cursor=True)
     
-    cursor.execute("SELECT compliance_weights FROM projects WHERE id = %s", (project_id,))
+    cursor.execute("SELECT compliance_weights, custom_criteria FROM projects WHERE id = %s", (project_id,))
     row = cursor.fetchone()
     cursor.close()
     db_config.release_connection(conn)
     
-    if row and row["compliance_weights"]:
-        try:
-            return json.loads(row["compliance_weights"])
-        except json.JSONDecodeError:
-            print(f"⚠ Invalid compliance_weights JSON for project {project_id}, using defaults")
-            return get_default_weights()
+    if row:
+        if row["compliance_weights"]:
+            try:
+                return json.loads(row["compliance_weights"])
+            except json.JSONDecodeError:
+                print(f"⚠ Invalid compliance_weights JSON for project {project_id}, checking custom_criteria")
+                
+        if row.get("custom_criteria"):
+            try:
+                custom_criteria = row["custom_criteria"]
+                if isinstance(custom_criteria, str):
+                    custom_criteria = json.loads(custom_criteria)
+                
+                if "criteriaBreakdown" in custom_criteria:
+                    return {k: v.get("weight", 0) for k, v in custom_criteria["criteriaBreakdown"].items()}
+            except Exception as e:
+                print(f"⚠ Invalid custom_criteria JSON for project {project_id}, using defaults: {e}")
     
     return get_default_weights()
 
@@ -218,21 +253,49 @@ def update_project_weights(project_id: int, weights: Dict[str, float], db_path: 
     import backend.db_config as db_config
     
     # Validate weights first
-    is_valid, error = validate_weights(weights)
+    is_valid, error = validate_weights(weights, project_id)
     if not is_valid:
         print(f"✗ Invalid weights: {error}")
         return False
     
     conn = db_config.get_connection()
-    cursor = db_config.get_cursor(conn, dict_cursor=False)
+    cursor = db_config.get_cursor(conn, dict_cursor=True)
     
     try:
-        cursor.execute("""
-            UPDATE projects 
-            SET compliance_weights = %s
-            WHERE id = %s
-        """, (json.dumps(weights), project_id))
+        # Fetch project to see if it has custom_criteria
+        cursor.execute("SELECT custom_criteria FROM projects WHERE id = %s", (project_id,))
+        row = cursor.fetchone()
         
+        update_cursor = db_config.get_cursor(conn, dict_cursor=False)
+        
+        if row and row.get("custom_criteria"):
+            custom_criteria = row["custom_criteria"]
+            if isinstance(custom_criteria, str):
+                custom_criteria = json.loads(custom_criteria)
+                
+            if "criteriaBreakdown" in custom_criteria:
+                for k, v in weights.items():
+                    if k in custom_criteria["criteriaBreakdown"]:
+                        custom_criteria["criteriaBreakdown"][k]["weight"] = v
+                
+                update_cursor.execute("""
+                    UPDATE projects 
+                    SET compliance_weights = %s, custom_criteria = %s
+                    WHERE id = %s
+                """, (json.dumps(weights), json.dumps(custom_criteria), project_id))
+            else:
+                update_cursor.execute("""
+                    UPDATE projects 
+                    SET compliance_weights = %s
+                    WHERE id = %s
+                """, (json.dumps(weights), project_id))
+        else:
+            update_cursor.execute("""
+                UPDATE projects 
+                SET compliance_weights = %s
+                WHERE id = %s
+            """, (json.dumps(weights), project_id))
+            
         conn.commit()
         print(f"✓ Updated compliance weights for project {project_id}")
         return True
