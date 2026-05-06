@@ -36,15 +36,11 @@ class FileExpiredError(Exception):
 def _make_pdf_part(pdf_bytes: bytes):
     """
     Build a PDF content part compatible with all google-generativeai SDK versions.
-    Uses genai.types.Part if available, otherwise falls back to a proto-compatible dict.
+    Uses the universal dict/proto format with raw bytes — no version-specific API.
     """
-    try:
-        return genai.types.Part(
-            inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
-        )
-    except AttributeError:
-        # Older SDK versions: use dict format (bytes are accepted directly)
-        return {"inline_data": {"mime_type": "application/pdf", "data": pdf_bytes}}
+    # Dict format works universally: raw bytes go directly in the 'data' field.
+    # The SDK (proto-plus) converts this to Blob internally.
+    return {"inline_data": {"mime_type": "application/pdf", "data": pdf_bytes}}
 
 
 # In-memory chat sessions: {dpr_id: chat_object}
