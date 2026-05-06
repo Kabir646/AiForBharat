@@ -76,7 +76,9 @@ async def generate_json_from_file(file_ref: str, schema_path: str, custom_criter
         schema_dict = json.load(f)
         
     if custom_criteria:
+        # Replace only the evaluationCriteria section, keeping all other fields intact
         schema_dict["evaluationCriteria"] = custom_criteria
+        print(f"✓ Using custom evaluation criteria with {len(custom_criteria.get('criteriaBreakdown', {}))} criteria")
         
     schema_content = json.dumps(schema_dict, indent=2)
     
@@ -220,20 +222,30 @@ MANDATORY BEHAVIOR:
 
 12) **EVALUATION CRITERIA SCORING** (CRITICAL - WITH EVIDENCE):
     
-    Give score to every evaluation criteria by checoing about that criteria in detail. 
+    Score every evaluation criteria by checking about that criteria in detail. 
     
-    The details about the different evaluation criterias is are provided in the json scema itself. So look at the json scema and fill the scores, evidence, reasoning and everything accordingly
+    The details about the different evaluation criterias are provided in the json schema itself. So look at the json schema and fill the scores, evidence, reasoning and everything accordingly.
     
-    Calculate `overallComplianceScore` = weighted sum of all 6 criteria scores.
+    Calculate `overallComplianceScore` = weighted sum of all criteria scores.
+    Calculate `overallScore` (root level field) = weighted sum of all criteria scores using the weights provided.
 
-13) **SMART RECOMMENDATIONS** (CRITICAL):
+13) **RECOMMENDATION FIELD** (CRITICAL - REQUIRED):
+    Based on the calculated overallScore, you MUST provide a recommendation field at the ROOT level of the JSON:
+    - If overallScore >= 80 → recommendation = "Select"
+    - If 60 <= overallScore < 80 → recommendation = "Shortlist"  
+    - If 40 <= overallScore < 60 → recommendation = "Review"
+    - If overallScore < 40 → recommendation = "Reject"
+    
+    This field is MANDATORY and must be included in every response.
+
+14) **SMART RECOMMENDATIONS** (CRITICAL):
     Generate actionable recommendations in `smartRecommendations`:
     - **Critical Actions**: Must-address items before selection
     - **Improvement Suggestions**: Areas where bidder could improve
     - **Negotiation Points**: Areas where the buyer can negotiate better terms
     - **Next Steps**: Prioritized actionable steps
 
-14) JSON ONLY: Your entire response must be parseable JSON ONLY. No extra lines or text.
+15) JSON ONLY: Your entire response must be parseable JSON ONLY. No extra lines or text.
 
 
 Scoring rubric (apply to compute overallScore 0-100):
@@ -259,8 +271,8 @@ SCHEMA:
 
 
 ADDITIONAL INSTRUCTIONS:
-- overallScore: compute a number 0-100, You may leave it empty, you may just score the evaluation criteria, and the overallScore will be the weighted sum of all the evaluation criterias that we will do ourselves, you just give the score for each criteria in the json. 
-- recommendation: one of ["Select", "Shortlist", "Review", "Reject"].
+- overallScore: REQUIRED - compute a weighted sum (0-100) based on the evaluation criteria scores. Use the weights provided in evaluationCriteria.criteriaBreakdown.
+- recommendation: REQUIRED - must be exactly one of ["Select", "Shortlist", "Review", "Reject"] based on the overallScore thresholds.
 - tenderDetails: extract tender name, reference number, issuing authority, bidder name, location, tender type, submission date.
 - financialAnalysis: extract bid amount, pricing structure, and bidder's financial health.
 - technicalEvaluation: score technical capability, assess methodology, evaluate timeline.
@@ -269,11 +281,14 @@ ADDITIONAL INSTRUCTIONS:
 - riskAssessment: list top 3-6 risks; each risk must include evidence array with quote and pageLocation.
 - Always include page references for key citations where possible.
 
+CRITICAL: You MUST include ALL required fields in your response, especially 'overallScore' and 'recommendation'. Do not omit any required fields.
+
 Now analyze the attached file and return EXACTLY the one JSON object described above. No extra text."""
     
     # Create the model with strict instructions
+    # Using gemini-2.5-flash-lite due to quota limits on gemini-2.5-flash
     model = genai.GenerativeModel(
-        model_name='gemini-2.5-flash',
+        model_name='gemini-2.5-flash-lite',
         system_instruction=system_instruction
     )
     
@@ -328,6 +343,9 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
         
         missing_keys = [key for key in required_keys if key not in parsed_json]
         if missing_keys:
+            print(f"⚠ Missing required keys: {missing_keys}")
+            print(f"⚠ Keys present in response: {list(parsed_json.keys())}")
+            print(f"⚠ First 1000 chars of response: {response.text[:1000]}")
             raise ValueError(f"Missing required keys: {missing_keys}")
         
         print(f"✓ JSON validated successfully")
@@ -364,8 +382,9 @@ async def create_chat_session(dpr_id: int, file_ref: str) -> None:
             raise ValueError(f"Cannot access file {file_ref}: {error_msg}")
         
         # Create model with system instructions for chat
+        # Using gemini-2.5-flash-lite due to quota limits on gemini-2.5-flash
         model = genai.GenerativeModel(
-            model_name='gemini-2.5-flash',
+            model_name='gemini-2.5-flash-lite',
             system_instruction="""You are a helpful assistant analyzing a Tender/Bid Proposal document.
 When answering questions, USE CREATIVE FORMATTING to make responses easy to read:
 
@@ -519,8 +538,9 @@ Your role is to help users analyze and compare multiple DPR documents simultaneo
 Always maintain a professional, analytical tone and provide actionable insights from your comparisons."""
         
         # Create model with system instructions for comparison
+        # Using gemini-2.5-flash-lite due to quota limits on gemini-2.5-flash
         model = genai.GenerativeModel(
-            model_name='gemini-2.5-flash',
+            model_name='gemini-2.5-flash-lite',
             system_instruction=system_instruction
         )
         
