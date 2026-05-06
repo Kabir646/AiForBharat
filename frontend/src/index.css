@@ -25,14 +25,14 @@
   }
 
   .dark {
-    /* Dark Mode - Rich Purple/Indigo Palette */
-    --background: 240 25% 8%;
-    --foreground: 240 5% 96%;
-    --card: 240 20% 12%;
-    --card-foreground: 240 5% 96%;
-    --muted: 240 18% 16%;
-    --muted-foreground: 240 5% 65%;
-    --border: 240 15% 20%;
+    /* Dark Mode - Pure Black Palette */
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 60%;
+    --border: 0 0% 18%;
     --accent: 280 65% 60%;
     --accent-foreground: 0 0% 100%;
 
@@ -94,8 +94,8 @@
 }
 
 .dark .glass {
-  background: rgba(20, 20, 40, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 15, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Smooth Hover Glow */

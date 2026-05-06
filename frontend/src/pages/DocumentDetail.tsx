@@ -317,8 +317,8 @@ export default function DocumentDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {/* Overall Score Card */}
             {data.overallScore && (
-              <div className="relative overflow-hidden rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-gray-900 shadow-sm group hover:shadow-md transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-blue-100/30 dark:from-blue-900/20 dark:to-blue-800/10 opacity-100" />
+              <div className="relative overflow-hidden rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-blue-100/30 dark:from-transparent dark:to-transparent opacity-100" />
                 <div className="relative p-5 flex flex-col h-full justify-between">
                   <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium text-sm mb-3">
                     <TrendingUp className="h-4 w-4" />
@@ -336,7 +336,7 @@ export default function DocumentDetailPage() {
 
             {/* Recommendation Card */}
             {data.recommendation && (
-              <div className="relative overflow-hidden rounded-xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-gray-900 shadow-sm group hover:shadow-md transition-all duration-300">
+              <div className="relative overflow-hidden rounded-xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-amber-100/30 dark:from-amber-900/20 dark:to-amber-800/10 opacity-100" />
                 <div className="relative p-5 flex flex-col h-full justify-between">
                   <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium text-sm mb-3">
@@ -358,8 +358,8 @@ export default function DocumentDetailPage() {
 
             {/* Issuing Authority Card */}
             {data.tenderDetails?.issuingAuthority && (
-              <div className="relative overflow-hidden rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-gray-900 shadow-sm group hover:shadow-md transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-transparent to-indigo-100/30 dark:from-indigo-900/20 dark:to-indigo-800/10 opacity-100" />
+              <div className="relative overflow-hidden rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-transparent to-indigo-100/30 dark:from-transparent dark:to-transparent opacity-100" />
                 <div className="relative p-5 flex flex-col h-full justify-between">
                   <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium text-sm mb-3">
                     <Users className="h-4 w-4" />
@@ -374,7 +374,7 @@ export default function DocumentDetailPage() {
 
             {/* Tender Type Card */}
             {data.tenderDetails?.tenderType && (
-              <div className="relative overflow-hidden rounded-xl border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-gray-900 shadow-sm group hover:shadow-md transition-all duration-300">
+              <div className="relative overflow-hidden rounded-xl border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-transparent to-cyan-100/30 dark:from-cyan-900/20 dark:to-cyan-800/10 opacity-100" />
                 <div className="relative p-5 flex flex-col h-full justify-between">
                   <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-medium text-sm mb-3">
@@ -909,7 +909,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Evidence Section */}
                 {risk.evidence && Array.isArray(risk.evidence) && risk.evidence.length > 0 && (
-                  <div className="mt-4 bg-white/50 dark:bg-gray-900/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
                     <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
                       Evidence
@@ -918,7 +918,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                       {risk.evidence.map((ev: any, evidx: number) => (
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
-                            <blockquote className="text-base italic text-gray-700 dark:text-gray-300 border-l-4 border-amber-400 pl-4 py-2">
+                            <blockquote className="text-base italic text-gray-700 dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
                               &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
@@ -1034,7 +1034,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Impact Section */}
                 {issue.impact && (
-                  <div className="mt-4 bg-white/50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-800">
                     <p className="text-sm font-semibold text-foreground mb-2">Impact Assessment</p>
                     <p className="text-base text-foreground italic leading-relaxed">
                       {createClickablePageLinks(issue.impact, onPageClick)}
@@ -1044,7 +1044,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Evidence Section */}
                 {issue.evidence && Array.isArray(issue.evidence) && issue.evidence.length > 0 && (
-                  <div className="mt-4 bg-white/50 dark:bg-gray-900/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
                     <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
                       Evidence
@@ -1053,7 +1053,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                       {issue.evidence.map((ev: any, evidx: number) => (
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
-                            <blockquote className="text-base italic text-gray-700 dark:text-gray-300 border-l-4 border-amber-400 pl-4 py-2">
+                            <blockquote className="text-base italic text-gray-700 dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
                               &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
@@ -1122,7 +1122,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
             Overall Evaluation Score
           </h3>
 
-          <div className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
+          <div className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
             {/* Subtle gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
 
@@ -1204,7 +1204,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                 </div>
 
                 {/* Progress Bar */}
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-3">
+                <div className="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-3 mb-3">
                   <div
                     className={`h-3 rounded-full transition-all ${item.score >= 80 ? 'bg-green-500' : item.score >= 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
                     style={{ width: `${item.score || 0}%` }}
@@ -1220,7 +1220,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Detailed Reasoning */}
                 {item.detailedReasoning && (
-                  <div className="mt-4 bg-white/50 dark:bg-gray-900/50 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
                     <p className="text-sm font-semibold text-foreground mb-2">Detailed Reasoning</p>
                     <p className="text-base text-foreground leading-relaxed">
                       {createClickablePageLinks(item.detailedReasoning, onPageClick)}
@@ -1230,7 +1230,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Evidence */}
                 {item.evidence && Array.isArray(item.evidence) && item.evidence.length > 0 && (
-                  <div className="mt-4 bg-white/50 dark:bg-gray-900/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
                     <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
                       Evidence
@@ -1239,7 +1239,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                       {item.evidence.map((ev: any, evidx: number) => (
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
-                            <blockquote className="text-base italic text-gray-700 dark:text-gray-300 border-l-4 border-amber-400 pl-4 py-2">
+                            <blockquote className="text-base italic text-gray-700 dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
                               &quot;{ev.quote}&quot;
                             </blockquote>
                           )}

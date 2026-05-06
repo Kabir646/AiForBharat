@@ -265,11 +265,11 @@ export default function ClientDashboard() {
     })
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-black dark:via-zinc-950 dark:to-black">
             {/* Animated Background Orbs */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute bottom-20 right-10 w-96 h-96 bg-transparent dark:bg-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
             </div>
 
             {/* Header */}
@@ -306,7 +306,7 @@ export default function ClientDashboard() {
 
 
                 {/* Upload New DPR Section */}
-                <Card className="p-8 mb-8 bg-gradient-to-br from-white to-blue-50/30 dark:from-slate-900 dark:to-blue-950/10 border-2 border-dashed border-primary/30 hover:border-primary/50 transition-all animate-slide-up animate-delay-100">
+                <Card className="p-8 mb-8 bg-gradient-to-br from-white to-blue-50/30 dark:from-slate-900 dark:to-zinc-950/80 border-2 border-dashed border-primary/30 hover:border-primary/50 transition-all animate-slide-up animate-delay-100">
                     <h2 className="text-2xl font-heading font-bold mb-6 flex items-center gap-3">
                         <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
                             <Upload className="h-5 w-5 text-white" />

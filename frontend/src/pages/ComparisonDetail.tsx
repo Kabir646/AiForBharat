@@ -182,7 +182,7 @@ export default function ComparisonDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 transition-colors">
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
@@ -199,7 +199,7 @@ export default function ComparisonDetailPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{comparison.name}</h1>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-zinc-400">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
                   <span>{comparison.dprs?.length || 0} documents</span>
@@ -245,7 +245,7 @@ export default function ComparisonDetailPage() {
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse min-w-[500px]">
                   <thead>
-                    <tr className="border-b-2 border-gray-200 dark:border-gray-700">
+                    <tr className="border-b-2 border-gray-200 dark:border-zinc-800">
                       <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">DPR Name</th>
                       <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Quality Score</th>
                       <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Compliance</th>
@@ -271,7 +271,7 @@ export default function ComparisonDetailPage() {
                       return (
                         <tr
                           key={dpr.id}
-                          className={`border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/50'
+                          className={`border-b border-gray-100 dark:border-zinc-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-zinc-950' : 'bg-gray-50/50 dark:bg-zinc-900/50'
                             }`}
                         >
                           <td className="p-3">
@@ -279,7 +279,7 @@ export default function ComparisonDetailPage() {
                               <p className="font-medium text-gray-900 dark:text-white text-sm">
                                 {data?.projectName || dpr.original_filename}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{dpr.original_filename}</p>
+                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{dpr.original_filename}</p>
                             </div>
                           </td>
                           <td className="p-3 text-center">
@@ -311,7 +311,7 @@ export default function ComparisonDetailPage() {
                 {(!comparison.dprs || comparison.dprs.length === 0) && (
                   <div className="text-center py-12">
                     <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-600 dark:text-gray-400">No DPRs in this comparison yet</p>
+                    <p className="text-gray-600 dark:text-zinc-400">No DPRs in this comparison yet</p>
                     <Button
                       variant="outline"
                       className="mt-4"
@@ -333,7 +333,7 @@ export default function ComparisonDetailPage() {
           {isChatOpen && (
             <div className="col-span-5 animate-in slide-in-from-right duration-300">
               <Card className="flex flex-col h-[calc(100vh-200px)] sticky top-6">
-                <div className="p-4 border-b dark:border-gray-700 flex items-center justify-between flex-shrink-0">
+                <div className="p-4 border-b dark:border-zinc-800 flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
                     <h3 className="font-semibold text-gray-900 dark:text-white">{t('comparisons.aiChat')}</h3>
@@ -369,7 +369,7 @@ export default function ComparisonDetailPage() {
                         <FileText className="w-8 h-8 text-cyan-600 dark:text-cyan-400" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Start comparing documents</h3>
-                      <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto text-sm">
+                      <p className="text-gray-600 dark:text-zinc-400 max-w-md mx-auto text-sm">
                         Ask questions to compare these documents, find differences, or get insights across all of them.
                       </p>
                     </div>
@@ -381,7 +381,7 @@ export default function ComparisonDetailPage() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                <div className="p-4 border-t dark:border-gray-700 flex-shrink-0">
+                <div className="p-4 border-t dark:border-zinc-800 flex-shrink-0">
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -390,7 +390,7 @@ export default function ComparisonDetailPage() {
                       onKeyPress={handleKeyPress}
                       placeholder={t('documentDetail.askQuestion')}
                       disabled={sending}
-                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 disabled:bg-gray-100 dark:disabled:bg-gray-800 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 disabled:bg-gray-100 dark:disabled:bg-gray-800 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     />
                     <Button onClick={handleSend} disabled={!inputMessage.trim() || sending}>
                       {sending ? (
@@ -472,7 +472,7 @@ export default function ComparisonDetailPage() {
 
               {/* Current Documents Section */}
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3 flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Documents in Comparison ({comparison.dprs?.length || 0})
                 </h3>
@@ -480,13 +480,13 @@ export default function ComparisonDetailPage() {
                   {comparison.dprs?.map((dpr) => (
                     <div
                       key={dpr.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800"
                     >
                       <div className="flex-1 min-w-0 mr-3">
                         <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
                           {dpr.summary_json?.projectName || dpr.original_filename}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{dpr.original_filename}</p>
+                        <p className="text-xs text-gray-500 dark:text-zinc-400 truncate">{dpr.original_filename}</p>
                       </div>
                       {comparison.dprs && comparison.dprs.length >= 3 && (
                         <button
@@ -500,7 +500,7 @@ export default function ComparisonDetailPage() {
                     </div>
                   ))}
                   {(!comparison.dprs || comparison.dprs.length === 0) && (
-                    <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                    <div className="text-center py-4 text-gray-500 dark:text-zinc-400 text-sm">
                       No documents in this comparison
                     </div>
                   )}
@@ -508,11 +508,11 @@ export default function ComparisonDetailPage() {
               </div>
 
               {/* Divider */}
-              <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+              <div className="border-t border-gray-200 dark:border-zinc-800 my-2"></div>
 
               {/* Add Documents Section */}
               <div className="flex-1 min-h-0 flex flex-col">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3 flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   Add Documents
                 </h3>
@@ -524,7 +524,7 @@ export default function ComparisonDetailPage() {
                     placeholder="Search available PDFs..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500/50 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
+                    className="w-full pl-9 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500/50 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
                   />
                 </div>
 
@@ -538,16 +538,16 @@ export default function ComparisonDetailPage() {
                       <div
                         key={dpr.id}
                         onClick={() => handleAddDPR(dpr.id)}
-                        className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all"
+                        className="p-3 rounded-lg border border-gray-200 dark:border-zinc-800 cursor-pointer hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all"
                       >
                         <p className="font-medium text-sm text-gray-900 dark:text-white truncate">
                           {dpr.summary_json?.projectName || dpr.original_filename}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{dpr.original_filename}</p>
+                        <p className="text-xs text-gray-500 dark:text-zinc-400 truncate">{dpr.original_filename}</p>
                       </div>
                     ))}
                   {availableDPRs.length === 0 && (
-                    <div className="text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
+                    <div className="text-center py-6 text-gray-500 dark:text-zinc-400 text-sm">
                       No more PDFs available to add
                     </div>
                   )}
@@ -555,7 +555,7 @@ export default function ComparisonDetailPage() {
                     dpr.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     dpr.summary_json?.projectName?.toLowerCase().includes(searchQuery.toLowerCase())
                   ).length === 0 && (
-                      <div className="text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
+                      <div className="text-center py-6 text-gray-500 dark:text-zinc-400 text-sm">
                         No PDFs match your search
                       </div>
                     )}

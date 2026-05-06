@@ -54,14 +54,14 @@ export default function ComparisonsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 transition-colors">
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('comparisons.title')}</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">{t('comparisons.subtitle')}</p>
+            <p className="text-gray-600 dark:text-zinc-400 mt-2">{t('comparisons.subtitle')}</p>
           </div>
           <Button
             onClick={() => setShowCreateModal(true)}
@@ -83,7 +83,7 @@ export default function ComparisonsPage() {
                 <Search className="w-8 h-8 text-cyan-600 dark:text-cyan-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No comparisons yet</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-600 dark:text-zinc-400 mb-6">
                 Create your first comparison to analyze multiple DPRs together and get comparative insights
               </p>
               <Button onClick={() => setShowCreateModal(true)}>
@@ -105,7 +105,7 @@ export default function ComparisonsPage() {
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                       {comparison.name}
                     </h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-zinc-400">
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4" />
                         <span>{comparison.dpr_count || 0} documents</span>
@@ -198,14 +198,14 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col border dark:border-gray-700">
-        <div className="p-6 border-b dark:border-gray-700">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col border dark:border-zinc-800">
+        <div className="p-6 border-b dark:border-zinc-800">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Comparison</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Select at least 2 documents to compare</p>
+          <p className="text-gray-600 dark:text-zinc-400 mt-1">Select at least 2 documents to compare</p>
         </div>
 
-        <div className="p-6 border-b dark:border-gray-700">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="p-6 border-b dark:border-zinc-800">
+          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">
             Comparison Name
           </label>
           <input
@@ -213,12 +213,12 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g., Q1 2024 Projects Comparison"
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
           />
         </div>
 
-        <div className="p-6 border-b dark:border-gray-700">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="p-6 border-b dark:border-zinc-800">
+          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">
             Search Documents
           </label>
           <div className="relative">
@@ -228,13 +228,13 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by filename or project name..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-3">
             Select Documents ({selectedIds.length} selected)
           </label>
           {loading ? (
@@ -242,7 +242,7 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
               <Loader2 className="w-6 h-6 animate-spin text-cyan-500" />
             </div>
           ) : filteredDprs.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-gray-400 py-8">No documents found</p>
+            <p className="text-center text-gray-500 dark:text-zinc-400 py-8">No documents found</p>
           ) : (
             <div className="space-y-2">
               {filteredDprs.map((dpr) => (
@@ -250,20 +250,20 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
                   key={dpr.id}
                   className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${selectedIds.includes(dpr.id)
                     ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-cyan-300 dark:hover:border-cyan-700'
+                    : 'border-gray-200 dark:border-zinc-800 hover:border-cyan-300 dark:hover:border-cyan-700'
                     }`}
                 >
                   <input
                     type="checkbox"
                     checked={selectedIds.includes(dpr.id)}
                     onChange={() => toggleSelection(dpr.id)}
-                    className="w-4 h-4 text-cyan-600 focus:ring-cyan-500 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
+                    className="w-4 h-4 text-cyan-600 focus:ring-cyan-500 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800"
                   />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 dark:text-white truncate">
                       {dpr.summary_json?.projectName || dpr.original_filename}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{dpr.original_filename}</p>
+                    <p className="text-sm text-gray-500 dark:text-zinc-400 truncate">{dpr.original_filename}</p>
                   </div>
                 </label>
               ))}
@@ -271,7 +271,7 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
           )}
         </div>
 
-        <div className="p-6 border-t dark:border-gray-700 flex justify-end gap-3">
+        <div className="p-6 border-t dark:border-zinc-800 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose} disabled={creating}>
             Cancel
           </Button>

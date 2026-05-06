@@ -586,7 +586,7 @@ export default function ProjectDetailPage() {
                         ) : comparisonResult && (
                             <div className="space-y-6">
                                 {/* Best DPR Recommendation */}
-                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800 rounded-xl p-6">
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-zinc-950/80 dark:to-zinc-950/80 border border-green-200 dark:border-green-800 rounded-xl p-6">
                                     <div className="flex items-start gap-4">
                                         <div className="bg-green-500 p-3 rounded-full">
                                             <Trophy className="h-6 w-6 text-white" />

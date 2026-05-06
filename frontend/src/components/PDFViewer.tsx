@@ -316,7 +316,7 @@ export function PDFViewer({ pdfUrl, initialPage = 1, onPageChange, className = '
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900">
+            <div className="flex-1 overflow-auto bg-gray-100 dark:bg-zinc-950">
                 <div className="min-h-full flex items-center justify-center p-4">
                     {error ? (
                         <div className="flex flex-col items-center gap-3 text-center max-w-md">
@@ -327,7 +327,7 @@ export function PDFViewer({ pdfUrl, initialPage = 1, onPageChange, className = '
                             </div>
                         </div>
                     ) : (
-                        <div ref={pageContainerRef} className="bg-white dark:bg-gray-800 shadow-lg relative">
+                        <div ref={pageContainerRef} className="bg-white dark:bg-zinc-900 shadow-lg relative">
                             <Document
                                 file={pdfUrl}
                                 onLoadSuccess={onDocumentLoadSuccess}

@@ -87,15 +87,15 @@ export default function IndexPage() {
         <section className="relative container mx-auto px-4 py-8 md:py-12 lg:py-16 overflow-hidden min-h-[calc(100vh-4rem)]">
           {/* Subtle background */}
           <div className="absolute inset-0 -z-10 bg-gradient-to-b from-muted/30 to-transparent"></div>
-          <div className="absolute top-20 right-10 w-96 h-96 bg-purple/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 left-10 w-[500px] h-[500px] bg-indigo/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 right-10 w-96 h-96 bg-purple/10 dark:bg-purple-700/15 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-[500px] h-[500px] bg-indigo/10 dark:bg-violet-800/10 rounded-full blur-3xl"></div>
 
           <div className="max-w-6xl mx-auto flex flex-col justify-center min-h-[calc(100vh-8rem)] space-y-12">
             {/* Text Content */}
             <div className="text-center space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20 animate-fade-in">
                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
-                AI-Powered Project Governance
+                AI-Powered Tender Evaluation
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight animate-slide-up animate-delay-100">
@@ -114,7 +114,7 @@ export default function IndexPage() {
                   onClick={() => navigate('/admin/projects')}
                   className="gradient-primary hover:shadow-glow transition-all duration-300 text-white border-0 hover:scale-105"
                 >
-                  View Projects
+                  View Tenders
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
                 <Button
@@ -130,7 +130,7 @@ export default function IndexPage() {
             {/* Analytics Cards - Horizontal Layout */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto w-full">
               {/* Active Tenders */}
-              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-purple-50/50 dark:to-purple-950/20 hover:scale-105 animate-scale-in animate-delay-400">
+              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-purple-50/50 dark:to-zinc-900/60 hover:scale-105 animate-scale-in animate-delay-400">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                     <Layers className="h-5 w-5 text-white" />
@@ -145,7 +145,7 @@ export default function IndexPage() {
               </Card>
 
               {/* Bids Submitted */}
-              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-blue-50/50 dark:to-blue-950/20 hover:scale-105 animate-scale-in animate-delay-500">
+              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-blue-50/50 dark:to-zinc-900/60 hover:scale-105 animate-scale-in animate-delay-500">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                     <FileText className="h-5 w-5 text-white" />
@@ -160,7 +160,7 @@ export default function IndexPage() {
               </Card>
 
               {/* Bids Pending Evaluation */}
-              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-orange-50/50 dark:to-orange-950/20 hover:scale-105 animate-scale-in animate-delay-600">
+              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-orange-50/50 dark:to-zinc-900/60 hover:scale-105 animate-scale-in animate-delay-600">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
                     <Clock className="h-5 w-5 text-white" />
@@ -175,7 +175,7 @@ export default function IndexPage() {
               </Card>
 
               {/* Bids Approved */}
-              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-green-50/50 dark:to-green-950/20 hover:scale-105 animate-scale-in animate-delay-400">
+              <Card className="p-5 border-border/50 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-green-50/50 dark:to-zinc-900/60 hover:scale-105 animate-scale-in animate-delay-400">
                 <div className="flex flex-col h-full justify-between space-y-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
                     <CheckCircle className="h-5 w-5 text-white" />

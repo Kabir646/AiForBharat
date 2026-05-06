@@ -52,12 +52,12 @@ const DPRAnalyzerLanding: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen font-sans transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-900'}`}>
+        <div className={`min-h-screen font-sans transition-colors duration-300 ${isDarkMode ? 'bg-zinc-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
 
             {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
           1. HEADER
       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-            <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isDarkMode ? 'bg-slate-900/70 border-b border-slate-800' : 'bg-white/60 border-b border-slate-200'} backdrop-blur-md`}>
+            <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isDarkMode ? 'bg-zinc-950/80 border-b border-zinc-800' : 'bg-white/60 border-b border-slate-200'} backdrop-blur-md`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         {/* Logo Area */}
@@ -107,7 +107,7 @@ const DPRAnalyzerLanding: React.FC = () => {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className={`md:hidden absolute w-full border-b ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                    <div className={`md:hidden absolute w-full border-b ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-slate-200'}`}>
                         <div className="px-4 pt-2 pb-6 space-y-4">
                             <a href="#features" className="block py-2 font-medium">Features</a>
                             <a href="#comparison" className="block py-2 font-medium">Compare</a>
@@ -133,14 +133,14 @@ const DPRAnalyzerLanding: React.FC = () => {
                 <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
                     {/* Background Gradient */}
                     <div className="absolute inset-0 z-0">
-                        {/* Base light background */}
-                        <div className={`absolute inset-0 ${isDarkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'}`}></div>
-                        {/* Large blurred purple blob - top right */}
-                        <div className={`absolute top-0 right-0 w-[600px] h-[600px] ${isDarkMode ? 'bg-purple-900/40' : 'bg-purple-400/30'} rounded-full blur-3xl`}></div>
-                        {/* Large blurred blue blob - bottom left */}
-                        <div className={`absolute bottom-0 left-0 w-[700px] h-[700px] ${isDarkMode ? 'bg-blue-900/40' : 'bg-blue-400/30'} rounded-full blur-3xl`}></div>
-                        {/* Medium blurred pink blob - center */}
-                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] ${isDarkMode ? 'bg-indigo-900/30' : 'bg-pink-300/20'} rounded-full blur-3xl`}></div>
+                        {/* Base background */}
+                        <div className={`absolute inset-0 ${isDarkMode ? 'bg-zinc-950' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'}`}></div>
+                        {/* Purple glow - top right */}
+                        <div className={`absolute top-0 right-0 w-[600px] h-[600px] ${isDarkMode ? 'bg-purple-700/20' : 'bg-purple-400/30'} rounded-full blur-3xl`}></div>
+                        {/* Violet glow - bottom left */}
+                        <div className={`absolute bottom-0 left-0 w-[700px] h-[700px] ${isDarkMode ? 'bg-violet-800/15' : 'bg-blue-400/20'} rounded-full blur-3xl`}></div>
+                        {/* Faint center glow */}
+                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] ${isDarkMode ? 'bg-purple-900/20' : 'bg-pink-300/20'} rounded-full blur-3xl`}></div>
                     </div>
 
                     <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -246,12 +246,12 @@ const DPRAnalyzerLanding: React.FC = () => {
                 {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
             4 & 5. DEMO SECTION (Comparison + Map)
         ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-                <section id="comparison" className={`py-24 ${isDarkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                <section id="comparison" className={`py-24 ${isDarkMode ? 'bg-zinc-900' : 'bg-white'}`}>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                             {/* DPR Comparison Mini-Demo */}
-                            <div className={`p-8 rounded-3xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'} shadow-2xl`}>
+                            <div className={`p-8 rounded-3xl border ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-slate-50 border-slate-200'} shadow-2xl`}>
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="text-xl font-bold flex items-center gap-2">
                                         <Layers size={20} className="text-indigo-500" /> DPR Comparison
@@ -288,9 +288,9 @@ const DPRAnalyzerLanding: React.FC = () => {
                             </div>
 
                             {/* Map Preview Card */}
-                            <div className={`p-8 rounded-3xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'} shadow-2xl relative overflow-hidden group`}>
+                            <div className={`p-8 rounded-3xl border ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-slate-50 border-slate-200'} shadow-2xl relative overflow-hidden group`}>
                                 <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/92.9376,26.2006,6,0/600x400?access_token=PLACEHOLDER')] bg-cover bg-center opacity-50 group-hover:scale-105 transition-transform duration-700"></div>
-                                <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-slate-900 via-slate-900/50' : 'from-white via-white/50'} to-transparent`}></div>
+                                <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-zinc-950 via-zinc-950/50' : 'from-white via-white/50'} to-transparent`}></div>
 
                                 <div className="relative z-10">
                                     <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
@@ -309,7 +309,7 @@ const DPRAnalyzerLanding: React.FC = () => {
                                 </div>
 
                                 {/* Mock Marker Popup */}
-                                <div className={`absolute bottom-8 right-8 p-4 rounded-xl ${isDarkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-md shadow-lg border border-slate-500/20 max-w-[200px] transform translate-y-2 group-hover:translate-y-0 transition-transform`}>
+                                <div className={`absolute bottom-8 right-8 p-4 rounded-xl ${isDarkMode ? 'bg-zinc-900/90' : 'bg-white/90'} backdrop-blur-md shadow-lg border border-zinc-700/20 max-w-[200px] transform translate-y-2 group-hover:translate-y-0 transition-transform`}>
                                     <div className="text-xs font-bold mb-1">Assam Highway Project</div>
                                     <div className="text-[10px] opacity-70 mb-2">Risk Score: Low</div>
                                     <div className="h-1 w-full bg-slate-500/20 rounded-full overflow-hidden">
@@ -325,7 +325,7 @@ const DPRAnalyzerLanding: React.FC = () => {
                 {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
             6. PLATFORM BENEFITS
         ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-                <section id="states" className={`py-24 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
+                <section id="states" className={`py-24 ${isDarkMode ? 'bg-zinc-950' : 'bg-slate-50'}`}>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl md:text-4xl font-bold mb-3">
@@ -338,7 +338,7 @@ const DPRAnalyzerLanding: React.FC = () => {
 
                         <div className="grid md:grid-cols-3 gap-6">
                             {/* Benefit Card 1 */}
-                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-slate-800/50 border-slate-700 hover:bg-slate-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up`}>
+                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up`}>
                                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4 animate-bounce-slow">
                                     <BarChart3 className="text-white" size={24} />
                                 </div>
@@ -349,7 +349,7 @@ const DPRAnalyzerLanding: React.FC = () => {
                             </div>
 
                             {/* Benefit Card 2 */}
-                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-slate-800/50 border-slate-700 hover:bg-slate-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up animate-delay-100`}>
+                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up animate-delay-100`}>
                                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 animate-bounce-slow">
                                     <Clock className="text-white" size={24} />
                                 </div>
@@ -360,7 +360,7 @@ const DPRAnalyzerLanding: React.FC = () => {
                             </div>
 
                             {/* Benefit Card 3 */}
-                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-slate-800/50 border-slate-700 hover:bg-slate-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up animate-delay-200`}>
+                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up animate-delay-200`}>
                                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-4 animate-bounce-slow">
                                     <FileText className="text-white" size={24} />
                                 </div>
@@ -378,7 +378,7 @@ const DPRAnalyzerLanding: React.FC = () => {
             {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
           9. FOOTER
       ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-            <footer className={`py-16 border-t ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'}`}>
+            <footer className={`py-16 border-t ${isDarkMode ? 'bg-black border-zinc-800' : 'bg-slate-100 border-slate-200'}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
 
@@ -442,7 +442,7 @@ const DPRAnalyzerLanding: React.FC = () => {
             </div>
 
             {/* Chat Panel */}
-            <div className={`fixed top-0 right-0 h-full w-full sm:w-96 z-30 transform transition-transform duration-300 ease-in-out ${isChatOpen ? 'translate-x-0' : 'translate-x-full'} ${isDarkMode ? 'bg-slate-900 border-l border-slate-800' : 'bg-white border-l border-slate-200'} shadow-2xl`}>
+            <div className={`fixed top-0 right-0 h-full w-full sm:w-96 z-30 transform transition-transform duration-300 ease-in-out ${isChatOpen ? 'translate-x-0' : 'translate-x-full'} ${isDarkMode ? 'bg-zinc-950 border-l border-zinc-800' : 'bg-white border-l border-slate-200'} shadow-2xl`}>
                 <div className="flex flex-col h-full">
                     <div className={`p-4 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-100'} flex justify-between items-center`}>
                         <h3 className="font-bold flex items-center gap-2"><MessageSquare size={18} className="text-blue-500" /> AI Chat</h3>
@@ -491,8 +491,8 @@ const DPRAnalyzerLanding: React.FC = () => {
 
 // Helper Component for Features
 const FeatureCard = ({ icon, title, desc, isDarkMode }: { icon: React.ReactNode, title: string, desc: string, isDarkMode: boolean }) => (
-    <div className={`p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? 'bg-slate-800/50 border-slate-700 hover:bg-slate-800 hover:shadow-blue-500/10' : 'bg-gradient-to-br from-white to-slate-50 border-blue-100/50 shadow-sm hover:shadow-blue-200/40 hover:border-blue-200'}`}>
-        <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
+    <div className={`p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800 hover:shadow-black/30' : 'bg-gradient-to-br from-white to-slate-50 border-blue-100/50 shadow-sm hover:shadow-blue-200/40 hover:border-blue-200'}`}>
+        <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-zinc-950' : 'bg-slate-50'}`}>
             {icon}
         </div>
         <h3 className="text-lg font-bold mb-2">{title}</h3>

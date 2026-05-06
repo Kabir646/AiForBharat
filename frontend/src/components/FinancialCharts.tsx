@@ -121,8 +121,8 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
       const value = safeNumber(payload[0].value)
       const item = payload[0].payload
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded shadow-lg">
-          <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">{item.fullName || payload[0].name}</p>
+        <div className="bg-white dark:bg-zinc-900 p-3 border border-gray-200 dark:border-zinc-800 rounded shadow-lg">
+          <p className="font-semibold text-sm text-gray-900 dark:text-zinc-100">{item.fullName || payload[0].name}</p>
           <p className="text-primary font-bold">{formatIndianCurrency(value)}</p>
           {item.unitPrice !== undefined && item.quantity !== undefined && (
             <p className="text-xs text-muted-foreground">
@@ -141,7 +141,7 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
       {bidAmount && (
         <div className="grid md:grid-cols-3 gap-4">
           {bidAmount.totalBidValue && (
-            <Card className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+            <Card className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-zinc-900 dark:to-zinc-900">
               <div className="text-sm text-muted-foreground mb-1">Total Bid Value</div>
               <div className="text-xl font-bold text-primary">
                 {formatIndianCurrency(safeNumber(bidAmount.totalBidValue))}
@@ -157,7 +157,7 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
             </Card>
           )}
           {bidAmount.totalPriceWithTax && (
-            <Card className="p-3 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950 dark:to-violet-950">
+            <Card className="p-3 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-zinc-900 dark:to-zinc-900">
               <div className="text-sm text-muted-foreground mb-1">Total with Tax</div>
               <div className="text-xl font-bold text-purple-600">
                 {formatIndianCurrency(safeNumber(bidAmount.totalPriceWithTax))}
@@ -177,35 +177,35 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b-2 border-indigo-200 dark:border-indigo-800">
-                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">Item Description</th>
-                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">Unit Price</th>
-                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">Quantity</th>
-                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">Total Cost</th>
+                <tr className="border-b-2 border-indigo-200 dark:border-zinc-700">
+                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-zinc-300">Item Description</th>
+                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-zinc-300">Unit Price</th>
+                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-zinc-300">Quantity</th>
+                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-zinc-300">Total Cost</th>
                 </tr>
               </thead>
               <tbody>
                 {costBreakdownData.map((item: CostItem, index: number) => (
-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/50 transition-colors">
+                  <tr key={index} className="border-b border-gray-100 dark:border-zinc-900 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/50 transition-colors">
                     <td className="py-3 px-2">
-                      <span className="font-medium text-gray-800 dark:text-gray-200">{item.fullName}</span>
+                      <span className="font-medium text-gray-800 dark:text-zinc-200">{item.fullName}</span>
                     </td>
-                    <td className="text-right py-3 px-2 text-gray-600 dark:text-gray-400">
+                    <td className="text-right py-3 px-2 text-gray-600 dark:text-zinc-400">
                       {item.unitPrice > 0 ? formatIndianCurrency(item.unitPrice) : '—'}
                     </td>
-                    <td className="text-right py-3 px-2 text-gray-600 dark:text-gray-400">
+                    <td className="text-right py-3 px-2 text-gray-600 dark:text-zinc-400">
                       {item.quantity > 0 ? item.quantity : '—'}
                     </td>
-                    <td className="text-right py-3 px-2 font-semibold text-gray-900 dark:text-gray-100">
+                    <td className="text-right py-3 px-2 font-semibold text-gray-900 dark:text-zinc-100">
                       {formatIndianCurrency(item.value)}
                     </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950">
-                  <td colSpan={3} className="py-3 px-2 font-bold text-gray-800 dark:text-gray-200">Total</td>
-                  <td className="text-right py-3 px-2 font-bold text-gray-900 dark:text-gray-100">
+                <tr className="border-t-2 border-indigo-200 dark:border-zinc-700 bg-indigo-50 dark:bg-indigo-950">
+                  <td colSpan={3} className="py-3 px-2 font-bold text-gray-800 dark:text-zinc-200">Total</td>
+                  <td className="text-right py-3 px-2 font-bold text-gray-900 dark:text-zinc-100">
                     {formatIndianCurrency(costBreakdownData.reduce((sum: number, item: CostItem) => sum + item.value, 0))}
                   </td>
                 </tr>
@@ -253,24 +253,24 @@ export function FinancialCharts({ data }: FinancialChartsProps) {
               <h4 className="text-base font-semibold mb-3 text-center">Bidder Financial Health</h4>
               <div className="space-y-3.5">
                 {financialHealth.annualTurnover && (
-                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-zinc-950 rounded">
                     <span className="text-sm text-muted-foreground">Annual Turnover</span>
                     <span className="text-base font-semibold">{financialHealth.annualTurnover}</span>
                   </div>
                 )}
                 {financialHealth.netWorth && (
-                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-zinc-950 rounded">
                     <span className="text-sm text-muted-foreground">Net Worth</span>
                     <span className="text-base font-semibold">{financialHealth.netWorth}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded">
+                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-zinc-950 rounded">
                   <span className="text-sm text-muted-foreground">Solvency Certificate</span>
                   <span className={`text-base font-semibold ${financialHealth.solvencyCertificate ? 'text-green-600' : 'text-red-600'}`}>
                     {financialHealth.solvencyCertificate ? 'Provided' : 'Not Provided'}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded">
+                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-zinc-950 rounded">
                   <span className="text-sm text-muted-foreground">Audited Financials</span>
                   <span className={`text-base font-semibold ${financialHealth.auditedFinancialsProvided ? 'text-green-600' : 'text-red-600'}`}>
                     {financialHealth.auditedFinancialsProvided ? 'Provided' : 'Not Provided'}
