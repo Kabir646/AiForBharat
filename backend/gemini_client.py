@@ -276,22 +276,19 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
         system_instruction=system_instruction
     )
     
-    # Build content parts — inline base64 if local file, Files API if remote ref
+    # Build content parts — inline bytes if local file, Files API if remote ref
     def _generate():
         if file_ref.startswith("local:"):
-            # Inline base64 approach — no Files API needed
-            import base64
+            # Inline bytes approach — no Files API needed
             actual_path = file_ref[len("local:"):]
             if not os.path.exists(actual_path):
                 raise FileNotFoundError(f"Local file not found for inline analysis: {actual_path}")
             with open(actual_path, "rb") as pdf_file:
                 pdf_bytes = pdf_file.read()
-            pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
-            content_parts = [
-                {"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}},
-                user_prompt
-            ]
-            return model.generate_content(content_parts)
+            pdf_part = genai.types.Part(
+                inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
+            )
+            return model.generate_content([pdf_part, user_prompt])
         else:
             # Legacy Files API reference (files/xxxxx)
             file_obj = genai.get_file(file_ref)
@@ -370,15 +367,15 @@ async def create_chat_session(dpr_id: int, file_ref: str) -> None:
     def _create_session():
         try:
             if file_ref.startswith("local:"):
-                import base64
                 actual_path = file_ref[len("local:"):]
                 if not os.path.exists(actual_path):
                     raise FileExpiredError(f"Local file not found: {actual_path}")
                 with open(actual_path, "rb") as pdf_file:
                     pdf_bytes = pdf_file.read()
-                pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
-                # Store as inline data dict instead of file_obj
-                file_content = {"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}}
+                # Store as a proper Part with raw bytes
+                file_content = genai.types.Part(
+                    inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
+                )
             else:
                 # Legacy Files API reference
                 file_obj = genai.get_file(file_ref)
@@ -504,14 +501,14 @@ async def create_comparison_chat_session(comparison_id: int, file_refs: list[str
             for ref in file_refs:
                 try:
                     if ref.startswith("local:"):
-                        import base64
                         actual_path = ref[len("local:"):]
                         if not os.path.exists(actual_path):
                             raise FileExpiredError(f"Local file not found: {actual_path}")
                         with open(actual_path, "rb") as pdf_file:
                             pdf_bytes = pdf_file.read()
-                        pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
-                        file_contents.append({"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}})
+                        file_contents.append(genai.types.Part(
+                            inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
+                        ))
                     else:
                         file_obj = genai.get_file(ref)
                         if file_obj.state.name == "FAILED":
@@ -797,18 +794,15 @@ CRITICAL INSTRUCTIONS:
     
     def _generate():
         if file_ref.startswith("local:"):
-            import base64
             actual_path = file_ref[len("local:"):]
             if not os.path.exists(actual_path):
                 raise FileNotFoundError(f"Local file not found: {actual_path}")
             with open(actual_path, "rb") as pdf_file:
                 pdf_bytes = pdf_file.read()
-            pdf_b64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
-            content_parts = [
-                {"inline_data": {"mime_type": "application/pdf", "data": pdf_b64}},
-                "Please extract the evaluation criteria into the requested JSON format."
-            ]
-            return model.generate_content(content_parts)
+            pdf_part = genai.types.Part(
+                inline_data=genai.types.Blob(mime_type="application/pdf", data=pdf_bytes)
+            )
+            return model.generate_content([pdf_part, "Please extract the evaluation criteria into the requested JSON format."])
         else:
             file_obj = genai.get_file(file_ref)
             return model.generate_content([file_obj, "Please extract the evaluation criteria into the requested JSON format."])
