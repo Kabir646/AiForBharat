@@ -113,8 +113,8 @@ export default function SetCriteriaModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.toLowerCase().endsWith(".pdf")) {
-      setError("Please upload a valid PDF file.");
+    if (!file.name.toLowerCase().match(/\.(pdf|docx|doc|xlsx|xls|jpg|jpeg|png|gif|bmp|tiff|txt)$/)) {
+      setError("Please upload a valid file (PDF, Word, Excel, Image, or Text file).");
       return;
     }
 
@@ -187,7 +187,7 @@ export default function SetCriteriaModal({
                 </p>
                 <input
                   type="file"
-                  accept="application/pdf"
+                  accept=".pdf,.docx,.doc,.xlsx,.xls,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.txt"
                   className="hidden"
                   ref={fileInputRef}
                   onChange={handleFileUpload}

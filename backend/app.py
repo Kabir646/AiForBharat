@@ -409,8 +409,15 @@ async def client_upload_dpr(
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file selected")
     
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    # Allow multiple file types: PDF, DOCX, XLSX, XLS, JPG, PNG, etc.
+    allowed_extensions = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.txt']
+    file_extension = file.filename.lower()
+    
+    if not any(file_extension.endswith(ext) for ext in allowed_extensions):
+        raise HTTPException(
+            status_code=400, 
+            detail=f"File type not supported. Allowed types: {', '.join(allowed_extensions)}"
+        )
     
     try:
         # Check if client already has a DPR for this project
@@ -783,15 +790,24 @@ async def get_project_dprs(project_id: int):
 
 @app.post("/projects/extract-criteria-from-pdf")
 async def extract_criteria_from_pdf_endpoint(file: UploadFile = File(...)):
-    """Upload a PDF and extract evaluation criteria using Gemini."""
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    """Upload a file and extract evaluation criteria using Gemini."""
+    # Allow multiple file types: PDF, DOCX, XLSX, XLS, JPG, PNG, etc.
+    allowed_extensions = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.txt']
+    file_extension = file.filename.lower()
+    
+    if not any(file_extension.endswith(ext) for ext in allowed_extensions):
+        raise HTTPException(
+            status_code=400, 
+            detail=f"File type not supported. Allowed types: {', '.join(allowed_extensions)}"
+        )
         
     try:
         # Save file temporarily
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         unique_id = str(uuid.uuid4())[:8]
-        filename = f"criteria_{timestamp}_{unique_id}.pdf"
+        # Get file extension from original filename
+        file_ext = os.path.splitext(file.filename)[1] or '.pdf'
+        filename = f"criteria_{timestamp}_{unique_id}{file_ext}"
         filepath = DATA_DIR / filename
         
         with open(filepath, "wb") as f:

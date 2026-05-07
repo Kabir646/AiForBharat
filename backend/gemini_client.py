@@ -33,6 +33,41 @@ class FileExpiredError(Exception):
     pass
 
 
+def _make_file_part(file_bytes: bytes, file_path: str):
+    """
+    Build a file content part compatible with all google-generativeai SDK versions.
+    Automatically detects MIME type based on file extension.
+    """
+    import mimetypes
+    
+    # Get MIME type from file extension
+    mime_type, _ = mimetypes.guess_type(file_path)
+    
+    # Fallback MIME types for common extensions
+    if not mime_type:
+        ext = file_path.lower().split('.')[-1]
+        mime_type_map = {
+            'pdf': 'application/pdf',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'doc': 'application/msword',
+            'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xls': 'application/vnd.ms-excel',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'bmp': 'image/bmp',
+            'tiff': 'image/tiff',
+            'txt': 'text/plain'
+        }
+        mime_type = mime_type_map.get(ext, 'application/octet-stream')
+    
+    print(f"✓ Detected MIME type: {mime_type} for file: {file_path}")
+    
+    # Dict format works universally: raw bytes go directly in the 'data' field.
+    return {"inline_data": {"mime_type": mime_type, "data": file_bytes}}
+
+
 def _make_pdf_part(pdf_bytes: bytes):
     """
     Build a PDF content part compatible with all google-generativeai SDK versions.
@@ -302,7 +337,7 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
             else:
                 with open(actual_path, "rb") as pdf_file:
                     pdf_bytes = pdf_file.read()
-            return model.generate_content([_make_pdf_part(pdf_bytes), user_prompt])
+            return model.generate_content([_make_file_part(pdf_bytes, actual_path), user_prompt])
         else:
             # Legacy Files API reference (files/xxxxx)
             file_obj = genai.get_file(file_ref)
@@ -387,7 +422,7 @@ async def create_chat_session(dpr_id: int, file_ref: str) -> None:
                 with open(actual_path, "rb") as pdf_file:
                     pdf_bytes = pdf_file.read()
                 # Store as a proper Part with raw bytes
-                file_content = _make_pdf_part(pdf_bytes)
+                file_content = _make_file_part(pdf_bytes, actual_path)
             else:
                 # Legacy Files API reference
                 file_obj = genai.get_file(file_ref)
@@ -528,7 +563,7 @@ async def create_comparison_chat_session(comparison_id: int, file_refs: list[str
                             raise FileExpiredError(f"Local file not found: {actual_path}")
                         with open(actual_path, "rb") as pdf_file:
                             pdf_bytes = pdf_file.read()
-                        file_contents.append(_make_pdf_part(pdf_bytes))
+                        file_contents.append(_make_file_part(pdf_bytes, actual_path))
                     else:
                         file_obj = genai.get_file(ref)
                         if file_obj.state.name == "FAILED":
@@ -819,7 +854,7 @@ CRITICAL INSTRUCTIONS:
                 raise FileNotFoundError(f"Local file not found: {actual_path}")
             with open(actual_path, "rb") as pdf_file:
                 pdf_bytes = pdf_file.read()
-            return model.generate_content([_make_pdf_part(pdf_bytes), "Please extract the evaluation criteria into the requested JSON format."])
+            return model.generate_content([_make_file_part(pdf_bytes, actual_path), "Please extract the evaluation criteria into the requested JSON format."])
         else:
             file_obj = genai.get_file(file_ref)
             return model.generate_content([file_obj, "Please extract the evaluation criteria into the requested JSON format."])

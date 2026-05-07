@@ -145,8 +145,12 @@ export default function ClientDashboard() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.name.toLowerCase().endsWith(".pdf")) {
-        setError("Only PDF files are allowed.");
+      // Allow multiple file types
+      const allowedExtensions = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.txt'];
+      const fileName = file.name.toLowerCase();
+      
+      if (!allowedExtensions.some(ext => fileName.endsWith(ext))) {
+        setError(`File type not supported. Allowed types: ${allowedExtensions.join(', ')}`);
         return;
       }
       setSelectedFile(file);
@@ -168,11 +172,17 @@ export default function ClientDashboard() {
     setIsDragging(false);
 
     const file = e.dataTransfer.files[0];
-    if (file && file.name.toLowerCase().endsWith(".pdf")) {
-      setSelectedFile(file);
-      setError(null);
-    } else {
-      setError("Only PDF files are allowed.");
+    if (file) {
+      // Allow multiple file types
+      const allowedExtensions = ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.txt'];
+      const fileName = file.name.toLowerCase();
+      
+      if (allowedExtensions.some(ext => fileName.endsWith(ext))) {
+        setSelectedFile(file);
+        setError(null);
+      } else {
+        setError(`File type not supported. Allowed types: ${allowedExtensions.join(', ')}`);
+      }
     }
   };
 
@@ -634,7 +644,7 @@ export default function ClientDashboard() {
                   >
                     <input
                       type="file"
-                      accept=".pdf"
+                      accept=".pdf,.docx,.doc,.xlsx,.xls,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.txt"
                       onChange={handleFileChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       disabled={uploading}

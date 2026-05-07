@@ -35,10 +35,30 @@ export function UploadZone({ onUpload }: UploadZoneProps) {
       setIsDragging(false);
 
       const files = Array.from(e.dataTransfer.files);
-      const pdfFile = files.find((file) => file.type === "application/pdf");
+      // Allow multiple file types
+      const allowedTypes = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel', // .xls
+        'image/jpeg',
+        'image/jpg', 
+        'image/png',
+        'image/gif',
+        'image/bmp',
+        'image/tiff',
+        'text/plain'
+      ];
+      
+      const validFile = files.find((file) => 
+        allowedTypes.includes(file.type) || 
+        ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.txt']
+          .some(ext => file.name.toLowerCase().endsWith(ext))
+      );
 
-      if (pdfFile && onUpload) {
-        onUpload(pdfFile);
+      if (validFile && onUpload) {
+        onUpload(validFile);
       }
     },
     [onUpload],
@@ -84,7 +104,7 @@ export function UploadZone({ onUpload }: UploadZoneProps) {
         </div>
         <input
           type="file"
-          accept=".pdf"
+          accept=".pdf,.docx,.doc,.xlsx,.xls,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.txt"
           onChange={handleFileInput}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
