@@ -343,28 +343,75 @@ export default function DocumentDetailPage() {
               </div>
             )}
 
-            {/* Recommendation Card */}
-            {data.recommendation && (
-              <div className="relative overflow-hidden rounded-xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-amber-100/30 dark:from-amber-900/20 dark:to-amber-800/10 opacity-100" />
-                <div className="relative p-5 flex flex-col h-full justify-between">
-                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium text-sm mb-3">
-                    {data.recommendation.toLowerCase().includes("select") ||
-                    data.recommendation.toLowerCase().includes("shortlist") ? (
-                      <CheckCircle className="h-4 w-4" />
-                    ) : data.recommendation.toLowerCase().includes("reject") ? (
-                      <XCircle className="h-4 w-4" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4" />
-                    )}
-                    Recommendation
-                  </div>
-                  <div className="text-xl font-heading font-bold text-foreground leading-tight">
-                    {data.recommendation}
+            {/* Eligibility Card — computed from compliance verdict values */}
+            {(() => {
+              const breakdown = data.evaluationCriteria?.criteriaBreakdown;
+              if (!breakdown) return null;
+
+              const verdicts: string[] = Object.values(breakdown)
+                .map((item: any) => (item.verdict || "").toLowerCase().trim())
+                .filter(Boolean);
+
+              let label: string;
+              let icon: React.ReactNode;
+              let borderColor: string;
+              let gradientClass: string;
+              let textColor: string;
+              let labelColor: string;
+
+              if (verdicts.some((v) => v === "fail")) {
+                label = "Not Eligible";
+                icon = <XCircle className="h-4 w-4" />;
+                borderColor =
+                  "border-red-200 dark:border-red-800";
+                gradientClass =
+                  "from-red-50/50 via-transparent to-red-100/30 dark:from-red-900/20 dark:to-red-800/10";
+                textColor = "text-red-600 dark:text-red-400";
+                labelColor = "text-red-700 dark:text-red-300";
+              } else if (verdicts.every((v) => v === "pass")) {
+                label = "Eligible";
+                icon = <CheckCircle className="h-4 w-4" />;
+                borderColor =
+                  "border-green-200 dark:border-green-800";
+                gradientClass =
+                  "from-green-50/50 via-transparent to-green-100/30 dark:from-green-900/20 dark:to-green-800/10";
+                textColor = "text-green-600 dark:text-green-400";
+                labelColor = "text-green-700 dark:text-green-300";
+              } else {
+                label = "Needs Review";
+                icon = <AlertCircle className="h-4 w-4" />;
+                borderColor =
+                  "border-amber-200 dark:border-amber-800";
+                gradientClass =
+                  "from-amber-50/50 via-transparent to-amber-100/30 dark:from-amber-900/20 dark:to-amber-800/10";
+                textColor = "text-amber-600 dark:text-amber-400";
+                labelColor = "text-amber-700 dark:text-amber-300";
+              }
+
+              return (
+                <div
+                  className={`relative overflow-hidden rounded-xl border ${borderColor} bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300`}
+                >
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-100`}
+                  />
+                  <div className="relative p-5 flex flex-col h-full justify-between">
+                    <div
+                      className={`flex items-center gap-2 ${textColor} font-medium text-sm mb-3`}
+                    >
+                      {icon}
+                      Eligibility
+                    </div>
+                    <div
+                      className={`text-xl font-heading font-bold ${labelColor} leading-tight`}
+                    >
+                      {label}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
+
 
             {/* Issuing Authority Card */}
             {data.tenderDetails?.issuingAuthority && (
@@ -1348,7 +1395,7 @@ function ComplianceTab({
                 <h4 className="text-lg font-heading font-bold text-foreground flex-1">
                   {label}
                 </h4>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap justify-end">
                   <span className="text-sm text-muted-foreground">
                     Weight: {Math.round(item.weight * 100)}%
                   </span>
@@ -1372,6 +1419,33 @@ function ComplianceTab({
                   style={{ width: `${item.score || 0}%` }}
                 />
               </div>
+
+              {/* Verdict Badge */}
+              {item.verdict && (
+                <div className="mb-4">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold",
+                      item.verdict.toLowerCase() === "pass"
+                        ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700"
+                        : item.verdict.toLowerCase() === "fail"
+                          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700"
+                          : "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-700",
+                    )}
+                  >
+                    {item.verdict.toLowerCase() === "pass" ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : item.verdict.toLowerCase() === "fail" ? (
+                      <XCircle className="h-4 w-4" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4" />
+                    )}
+                    Verdict:{" "}
+                    {item.verdict.charAt(0).toUpperCase() +
+                      item.verdict.slice(1)}
+                  </span>
+                </div>
+              )}
 
               {/* Findings */}
               {item.findings && (

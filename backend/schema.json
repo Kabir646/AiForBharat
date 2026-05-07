@@ -22,7 +22,6 @@
   },
   "executiveSummary": "string (3-5 sentences summarizing the proposal/bid)",
   "overallScore": "number (0-100)",
-  "recommendation": "string (e.g., 'Shortlist', 'Select', 'Reject', 'Review')",
   "financialAnalysis": {
     "bidAmount": {
       "totalBidValue": "number",
@@ -163,6 +162,7 @@
         "score": "number (0-100)",
         "weight": 0.20,
         "findings": "string",
+        "verdict": "string (pass, fail or needs review)",
         "detailedReasoning": "string - Does the proposed engineering solution or technology match the specific requirements of the tender? Are specifications of machinery, construction materials, or software stacks compatible and up-to-date? Will the project fail due to outdated or incompatible technology?",
         "evidence": [
           {
@@ -176,6 +176,7 @@
         "score": "number (0-100)",
         "weight": 0.15,
         "findings": "string",
+        "verdict": "string (pass, fail or needs review)",
         "detailedReasoning": "string - Is the total project duration realistic? Are phase-wise deadlines achievable? Analyze the Gantt chart or PERT/CPM network. Identify the critical path. Is there a risk of time overruns?",
         "evidence": [
           {
@@ -189,6 +190,7 @@
         "score": "number (0-100)",
         "weight": 0.25,
         "findings": "string",
+        "verdict": "string (pass, fail or needs review)",
         "detailedReasoning": "string - Analyze the Bill of Quantities (BOQ). Are unit rates for major line items accurate? Do they match current Market Rates or Schedule of Rates (SOR)? Is there evidence of cost loading (inflated prices)? Is the budget sufficient to complete the work?",
         "evidence": [
           {
@@ -202,6 +204,7 @@
         "score": "number (0-100)",
         "weight": 0.15,
         "findings": "string",
+        "verdict": "string (pass, fail or needs review)",
         "detailedReasoning": "string - Are risks identified (geological, legal, supply chain)? Are mitigation strategies adequate? Are environmental clearances obtained? Does it ensure regulatory compliance (pollution, land use, etc.)? Does it protect from future liabilities?",
         "evidence": [
           {
@@ -215,6 +218,7 @@
         "score": "number (0-100)",
         "weight": 0.15,
         "findings": "string",
+        "verdict": "string (pass, fail or needs review)",
         "detailedReasoning": "string - Analyze the Financial Internal Rate of Return (FIRR), Net Present Value (NPV), and payback period. Are projected cash flows realistic? Is the break-even analysis sound? Is the project financially sustainable and does it offer good return on investment?",
         "evidence": [
           {
@@ -228,6 +232,7 @@
         "score": "number (0-100)",
         "weight": 0.10,
         "findings": "string",
+        "verdict": "string (pass, fail or needs review)",
         "detailedReasoning": "string - What is the land acquisition status? Is there availability of water/power/logistics? Is the manpower plan adequate? Can the project start immediately without Right of Way (ROW) or utility hurdles? Is the site suitable?",
         "evidence": [
           {

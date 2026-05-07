@@ -851,6 +851,7 @@ async def update_project_custom_criteria(project_id: int, request: UpdateCustomC
             "score": "number (0-100)",
             "weight": weight,
             "findings": "string",
+            "verdict": "string (pass, fail or needs review)",
             "detailedReasoning": f"string - {item.description}",
             "evidence": [
                 {
@@ -1457,25 +1458,57 @@ async def chat_with_dpr(dpr_id: int, chat_message: ChatMessage):
         except gemini_client.FileExpiredError:
             print(f"⚠ File for DPR {dpr_id} expired. Re-uploading...")
             
-            # Re-upload the file
-            if not os.path.exists(dpr["filepath"]):
-                raise HTTPException(status_code=404, detail="Original file not found on server, cannot re-upload.")
+            local_path = dpr.get("filepath", "")
+            cloudinary_url = dpr.get("cloudinary_url")
             
-            new_file_ref = await gemini_client.upload_file(dpr["filepath"])
+            tmp_path = None
             
-            # Update database with new file reference
-            db.update_dpr_file_ref(dpr_id, new_file_ref)
-            
-            # Clear old chat session to force recreation with new file
-            gemini_client.clear_chat_session(dpr_id)
-            
-            # Retry sending message
-            print(f"↺ Retrying chat message for DPR {dpr_id} with new file ref...")
-            response = await gemini_client.send_chat_message(
-                dpr_id=dpr_id,
-                message=chat_message.message,
-                file_ref=new_file_ref
-            )
+            try:
+                if local_path and os.path.exists(local_path):
+                    upload_path = local_path
+                    new_file_ref = await gemini_client.upload_file(upload_path)
+                    # Update DB + clear old session
+                    db.update_dpr_file_ref(dpr_id, new_file_ref)
+                    gemini_client.clear_chat_session(dpr_id)
+                    print(f"↺ Retrying chat message for DPR {dpr_id} with new file ref...")
+                    response = await gemini_client.send_chat_message(
+                        dpr_id=dpr_id,
+                        message=chat_message.message,
+                        file_ref=new_file_ref
+                    )
+                elif cloudinary_url:
+                    # Local file was deleted after analysis — download from Cloudinary
+                    print(f"⏳ Local file gone, downloading from Cloudinary for re-upload...")
+                    import tempfile, httpx as _httpx
+                    resp = _httpx.get(cloudinary_url, timeout=60)
+                    resp.raise_for_status()
+                    tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+                    with os.fdopen(tmp_fd, 'wb') as tmp_file:
+                        tmp_file.write(resp.content)
+                    print(f"  Downloaded {len(resp.content)} bytes from Cloudinary to {tmp_path}")
+                    
+                    # Register the temp file as the new ref
+                    new_file_ref = await gemini_client.upload_file(tmp_path)
+                    db.update_dpr_file_ref(dpr_id, new_file_ref)
+                    gemini_client.clear_chat_session(dpr_id)
+                    
+                    print(f"↺ Retrying chat message for DPR {dpr_id} with new file ref...")
+                    # NOTE: temp file MUST still exist here — don't delete until after this returns
+                    response = await gemini_client.send_chat_message(
+                        dpr_id=dpr_id,
+                        message=chat_message.message,
+                        file_ref=new_file_ref
+                    )
+                else:
+                    raise HTTPException(
+                        status_code=404,
+                        detail="Original file not found on server and no Cloudinary backup available."
+                    )
+            finally:
+                # Clean up temp file AFTER the chat session has loaded it into memory
+                if tmp_path and os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+                    print(f"  Cleaned up temp file: {tmp_path}")
         
         # Store assistant message
         db.insert_message(dpr_id, "assistant", response['reply'])
@@ -1490,8 +1523,13 @@ async def chat_with_dpr(dpr_id: int, chat_message: ChatMessage):
             "message_id": message_id
         })
         
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"✗ Chat error: {str(e)}")
+        import traceback
+        print(f"✗ Chat error for DPR {dpr_id}: {type(e).__name__}: {str(e)}")
+        print("Full traceback:")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Chat failed: {str(e)}")
 
 
@@ -1621,10 +1659,32 @@ async def chat_with_comparison(comparison_id: int, chat_message: ChatMessage):
             new_file_refs = []
             for dpr in comparison["dprs"]:
                 print(f"↺ Re-uploading {dpr['filename']}...")
-                if not os.path.exists(dpr["filepath"]):
-                    raise HTTPException(status_code=404, detail=f"Original file {dpr['filename']} not found on server.")
+                local_path = dpr.get("filepath", "")
+                cloudinary_url = dpr.get("cloudinary_url")
                 
-                new_ref = await gemini_client.upload_file(dpr["filepath"])
+                tmp_path = None
+                upload_path = None
+                
+                if local_path and os.path.exists(local_path):
+                    upload_path = local_path
+                elif cloudinary_url:
+                    print(f"⏳ Local file gone for {dpr['filename']}, downloading from Cloudinary...")
+                    import tempfile, httpx as _httpx
+                    resp = _httpx.get(cloudinary_url, timeout=60)
+                    resp.raise_for_status()
+                    tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+                    with os.fdopen(tmp_fd, 'wb') as tmp_file:
+                        tmp_file.write(resp.content)
+                    upload_path = tmp_path
+                else:
+                    raise HTTPException(status_code=404, detail=f"Original file {dpr['filename']} not found on server and no Cloudinary backup available.")
+                
+                try:
+                    new_ref = await gemini_client.upload_file(upload_path)
+                finally:
+                    if tmp_path and os.path.exists(tmp_path):
+                        os.remove(tmp_path)
+                
                 db.update_dpr_file_ref(dpr["id"], new_ref)
                 new_file_refs.append(new_ref)
             

@@ -89,7 +89,7 @@ MANDATORY BEHAVIOR:
    - financialAnalysis: populate bidAmount and pricingStructure fields.
    - riskAssessment: identify top risks, severity and evidence (these are analytical outputs).
 3) REQUIRED NON-NULL FIELDS: The following fields MUST NOT be null (fill them or infer if missing): 
-   `"tenderDetails.tenderName"`, `"tenderDetails.bidderName"`, `"executiveSummary"`, `"overallScore"`, `"recommendation"`, and the entire `"financialAnalysis"` object.
+   `"tenderDetails.tenderName"`, `"tenderDetails.bidderName"`, `"executiveSummary"`, `"overallScore"`, and the entire `"financialAnalysis"` object.
 
 4) TRACEABILITY: If you infer or compute any field (overallScore, recommendation, any financial number, or risk severity), include an explanation in the findings field.
 
@@ -215,22 +215,12 @@ MANDATORY BEHAVIOR:
 12) **EVALUATION CRITERIA SCORING** (CRITICAL - WITH EVIDENCE):
     
     Score every evaluation criteria by checking about that criteria in detail. 
-    
+    For verdict give either "Pass" , "Fail" or "Needs Review". make sure to have and provide supporting evidence for your verdict. 
     The details about the different evaluation criterias are provided in the json schema itself. So look at the json schema and fill the scores, evidence, reasoning and everything accordingly.
     
-    Calculate `overallComplianceScore` = weighted sum of all criteria scores.
     Calculate `overallScore` (root level field) = weighted sum of all criteria scores using the weights provided.
 
-13) **RECOMMENDATION FIELD** (CRITICAL - REQUIRED):
-    Based on the calculated overallScore, you MUST provide a recommendation field at the ROOT level of the JSON:
-    - If overallScore >= 80 → recommendation = "Select"
-    - If 60 <= overallScore < 80 → recommendation = "Shortlist"  
-    - If 40 <= overallScore < 60 → recommendation = "Review"
-    - If overallScore < 40 → recommendation = "Reject"
-    
-    This field is MANDATORY and must be included in every response.
-
-14) **SMART RECOMMENDATIONS** (CRITICAL):
+13) **SMART RECOMMENDATIONS** (CRITICAL):
     Generate actionable recommendations in `smartRecommendations`:
     - **Critical Actions**: Must-address items before selection
     - **Improvement Suggestions**: Areas where bidder could improve
@@ -273,7 +263,7 @@ ADDITIONAL INSTRUCTIONS:
 - riskAssessment: list top 3-6 risks; each risk must include evidence array with quote and pageLocation.
 - Always include page references for key citations where possible.
 
-CRITICAL: You MUST include ALL required fields in your response, especially 'overallScore' and 'recommendation'. Do not omit any required fields.
+CRITICAL: You MUST include ALL required fields in your response, especially 'overallScore'. Do not omit any required fields.
 
 Now analyze the attached file and return EXACTLY the one JSON object described above. No extra text."""
     
@@ -358,7 +348,7 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
         
         # Validate required keys (new tender schema)
         required_keys = [
-            "tenderDetails", "executiveSummary", "overallScore", "recommendation",
+            "tenderDetails", "executiveSummary", "overallScore",
             "financialAnalysis", "technicalEvaluation", "bidderQualifications",
             "riskAssessment", "inconsistencyDetection", "evaluationCriteria", "smartRecommendations"
         ]
@@ -475,7 +465,17 @@ async def send_chat_message(dpr_id: int, message: str, file_ref: str) -> Dict:
     file_obj = session['file']
     
     # Send message with file context (blocking call offloaded)
-    response = await asyncio.to_thread(chat.send_message, [file_obj, message])
+    try:
+        response = await asyncio.to_thread(chat.send_message, [file_obj, message])
+    except Exception as e:
+        import traceback
+        print(f"✗ Gemini send_message failed for DPR {dpr_id}")
+        print(f"  Error type : {type(e).__name__}")
+        print(f"  Error msg  : {str(e)}")
+        print("  Full traceback:")
+        traceback.print_exc()
+        # Re-raise so callers (FileExpiredError handler, etc.) can handle it
+        raise
     
     elapsed = time.time() - start_time
     print(f"✓ Chat response generated in {elapsed:.2f}s (length: {len(response.text)} chars)")
