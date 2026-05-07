@@ -171,10 +171,10 @@ export default function ProjectDetailPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col bg-black text-[#e5e2e1] font-body antialiased selection:bg-white/20 selection:text-white">
                 <Header />
                 <main className="flex-1 flex items-center justify-center">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                    <Loader2 className="h-12 w-12 animate-spin text-[#ffffff]" />
                 </main>
             </div>
         )
@@ -182,7 +182,7 @@ export default function ProjectDetailPage() {
 
     if (error || !project) {
         return (
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col bg-black text-[#e5e2e1] font-body antialiased selection:bg-white/20 selection:text-white">
                 <Header />
                 <main className="flex-1 container mx-auto px-4 py-8">
                     <Card className="p-12 text-center">
@@ -201,7 +201,7 @@ export default function ProjectDetailPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-black text-[#e5e2e1] font-body antialiased selection:bg-white/20 selection:text-white">
             <Header />
 
             <main className="flex-1 container mx-auto px-4 py-8">
@@ -378,11 +378,11 @@ export default function ProjectDetailPage() {
                                 key={doc.id}
                                 className={`p-4 transition-all flex flex-col md:flex-row items-start md:items-center gap-4 ${hasFlags
                                     ? 'border-red-500 dark:border-red-600 border-2 bg-red-50 dark:bg-red-950/20'
-                                    : 'hover:border-primary/40'
+                                    : 'hover:border-[#ffffff]/40'
                                     }`}
                             >
-                                <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                                    <FileText className="h-5 w-5 text-primary" />
+                                <div className="p-2 rounded-lg bg-[#353434] shrink-0">
+                                    <FileText className="h-5 w-5 text-[#ffffff]" />
                                 </div>
 
                                 <div className="flex-1 min-w-0 w-full">
@@ -424,16 +424,16 @@ export default function ProjectDetailPage() {
 
                                     {/* Validation Flags Details */}
                                     {hasFlags && validationFlags && (
-                                        <div className="mt-2 p-2 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+                                        <div className="mt-2 p-2 rounded-lg bg-red-100 dark:bg-red-900/30 border border-[rgba(255,255,255,0.05)]">
                                             <div className="space-y-1">
                                                 {validationFlags.stateMismatch && (
-                                                    <div className="flex items-start gap-2 text-xs text-red-700 dark:text-red-300">
+                                                    <div className="flex items-start gap-2 text-xs text-[#ffffff]">
                                                         <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
                                                         <span>{validationFlags.stateMismatchDetails}</span>
                                                     </div>
                                                 )}
                                                 {validationFlags.sectorMismatch && (
-                                                    <div className="flex items-start gap-2 text-xs text-red-700 dark:text-red-300">
+                                                    <div className="flex items-start gap-2 text-xs text-[#ffffff]">
                                                         <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
                                                         <span>{validationFlags.sectorMismatchDetails}</span>
                                                     </div>
@@ -586,7 +586,7 @@ export default function ProjectDetailPage() {
                         ) : comparisonResult && (
                             <div className="space-y-6">
                                 {/* Best DPR Recommendation */}
-                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-zinc-950/80 dark:to-zinc-950/80 border border-green-200 dark:border-green-800 rounded-xl p-6">
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-zinc-950/80 dark:to-zinc-950/80 border border-[rgba(255,255,255,0.05)] rounded-xl p-6">
                                     <div className="flex items-start gap-4">
                                         <div className="bg-green-500 p-3 rounded-full">
                                             <Trophy className="h-6 w-6 text-white" />
@@ -624,7 +624,7 @@ export default function ProjectDetailPage() {
                                                 <div key={idx} className="bg-muted/50 rounded-lg p-4">
                                                     <div className="flex items-center justify-between mb-2">
                                                         <span className="font-medium">{metric.metric}</span>
-                                                        <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full">
+                                                        <span className="text-sm bg-[#353434] text-[#ffffff] px-3 py-1 rounded-full">
                                                             Winner: {metric.winner}
                                                         </span>
                                                     </div>
@@ -652,7 +652,7 @@ export default function ProjectDetailPage() {
                                                             )}
                                                             <h4 className="font-semibold">{dpr.dprName}</h4>
                                                         </div>
-                                                        <span className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
+                                                        <span className="bg-purple-100 dark:bg-purple-900 text-[#ffffff] px-3 py-1 rounded-full text-sm font-medium">
                                                             Score: {dpr.overallScore}/10
                                                         </span>
                                                     </div>

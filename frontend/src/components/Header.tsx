@@ -1,128 +1,71 @@
-import { FileText, Moon, Sun, CheckCircle2, LogOut } from 'lucide-react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Button } from './ui/Button'
-import { useState, useEffect } from 'react'
-import { cn } from '@/lib/utils'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useLanguage } from '../contexts/LanguageContext'
 import { useRole } from '../contexts/RoleContext'
-import { Card } from './ui/Card'
 import { LanguageDropdown } from './LanguageDropdown'
+import { Network, LayoutDashboard, Gavel, ArrowLeftRight, Settings, LogOut } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export function Header() {
-  const [isDark, setIsDark] = useState(false)
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { logout } = useRole()
-
-
-
-  useEffect(() => {
-    // Check localStorage first, then check current state
-    const savedTheme = localStorage.getItem('theme')
-    const isDarkMode = savedTheme === 'dark' || (!savedTheme && document.documentElement.classList.contains('dark'))
-
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
+    const navigate = useNavigate()
+    const { logout } = useRole()
+    const location = useLocation()
+    
+    const handleLogout = () => {
+        logout()
+        navigate('/')
     }
-    setIsDark(isDarkMode)
-  }, [])
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDark
-    document.documentElement.classList.toggle('dark')
-    setIsDark(newDarkMode)
-    // Save preference to localStorage
-    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light')
-  }
+    const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/')
 
-  const isActive = (path: string) => location.pathname === path
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
-
-  return (
-    <>
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/admin" className="flex items-center gap-2.5 group">
-            <div className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center group-hover:shadow-glow transition-all duration-300">
-              <FileText className="h-5 w-5 text-white" />
+    return (
+        <header className="h-16 sticky top-0 z-40 bg-[#000000]/80 backdrop-blur-sm border-b border-[rgba(255,255,255,0.05)] flex items-center px-6 w-full gap-8">
+            <div className="flex items-center gap-3 shrink-0 cursor-pointer" onClick={() => navigate('/admin')}>
+                <div className="w-8 h-8 rounded-lg bg-[#353434] flex items-center justify-center">
+                    <Network className="text-[#ffffff] w-5 h-5" strokeWidth={1.5} />
+                </div>
+                <div className="font-semibold text-[20px] text-[#ffffff] tracking-tight">Nexus AI</div>
             </div>
-
-            <div className="hidden sm:block leading-tight">
-              <span className="block text-base font-heading font-semibold text-foreground">
-                Tender Evaluation Portal
-              </span>
-              <span className="block text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                Bid Review Console
-              </span>
+            <nav className="hidden lg:flex items-center gap-1 flex-1">
+                <button 
+                    onClick={() => navigate('/admin')} 
+                    className={cn(
+                        "transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98]",
+                        location.pathname === '/admin' ? "bg-[#353434] text-[#ffffff] font-medium" : "text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[#1c1b1b]"
+                    )}>
+                    <LayoutDashboard className="w-4 h-4" strokeWidth={1.5} />
+                    <span>Overview</span>
+                </button>
+                <button 
+                    onClick={() => navigate('/admin/projects')} 
+                    className={cn(
+                        "transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98]",
+                        location.pathname.startsWith('/admin/project') || location.pathname.startsWith('/admin/documents') ? "bg-[#353434] text-[#ffffff] font-medium" : "text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[#1c1b1b]"
+                    )}>
+                    <Gavel className="w-4 h-4" strokeWidth={1.5} />
+                    <span>Tenders</span>
+                </button>
+                <button 
+                    onClick={() => navigate('/admin/comparisons')}
+                    className={cn(
+                        "transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98]",
+                        location.pathname.startsWith('/admin/comparison') ? "bg-[#353434] text-[#ffffff] font-medium" : "text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[#1c1b1b]"
+                    )}>
+                    <ArrowLeftRight className="w-4 h-4" strokeWidth={1.5} />
+                    <span>Compare Bids</span>
+                </button>
+            </nav>
+            <div className="flex items-center gap-4 flex-1 justify-end"></div>
+            <div className="flex items-center gap-4 shrink-0">
+                <LanguageDropdown />
+                <button className="text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[#1c1b1b] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98]">
+                    <Settings className="w-4 h-4" strokeWidth={1.5} />
+                    <span>Settings</span>
+                </button>
+                <button onClick={handleLogout} className="text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98] ml-2">
+                    <LogOut className="w-4 h-4" strokeWidth={1.5} />
+                    <span>Logout</span>
+                </button>
             </div>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-1">
-            <Link
-              to="/admin"
-              className={cn(
-                'px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg',
-                isActive('/admin')
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
-            >
-              Home
-            </Link>
-            <Link
-              to="/admin/projects"
-              className={cn(
-                'px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg',
-                isActive('/admin/projects') || location.pathname.startsWith('/admin/projects/')
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
-            >
-              Tenders
-            </Link>
-            <Link
-              to="/admin/comparisons"
-              className={cn(
-                'px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg',
-                isActive('/admin/comparisons') || location.pathname.startsWith('/admin/comparison-chat/')
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
-            >
-              Compare Bids
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2.5">
-            <LanguageDropdown />
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
-              aria-label="Toggle dark mode"
-            >
-              {isDark ? (
-                <Sun className="h-4.5 w-4.5 text-muted-foreground" />
-              ) : (
-                <Moon className="h-4.5 w-4.5 text-muted-foreground" />
-              )}
-            </button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-3.5 w-3.5 mr-1.5" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-
-
-    </>
-  )
+        </header>
+    )
 }

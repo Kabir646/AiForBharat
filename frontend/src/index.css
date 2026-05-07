@@ -6,40 +6,26 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Light Mode - Modern Purple/Indigo Palette */
-    --background: 240 20% 98%;
-    --foreground: 240 15% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 15% 15%;
-    --muted: 240 10% 94%;
-    --muted-foreground: 240 8% 45%;
-    --border: 240 10% 90%;
-    --accent: 280 65% 60%;
+  :root, .dark {
+    /* Nexus AI - Pure Charcoal Palette */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 2%;
+    --card-foreground: 0 0% 100%;
+    --muted: 0 0% 11%;
+    --muted-foreground: 195 4% 77%;
+    --border: 0 0% 15%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 21%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 0 0% 21%;
     --accent-foreground: 0 0% 100%;
 
-    /* Gradient Colors */
-    --gradient-start: 262 83% 58%;
-    --gradient-mid: 272 76% 53%;
-    --gradient-end: 282 87% 51%;
-  }
-
-  .dark {
-    /* Dark Mode - Pure Black Palette */
-    --background: 0 0% 5%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 95%;
-    --muted: 0 0% 13%;
-    --muted-foreground: 0 0% 60%;
-    --border: 0 0% 18%;
-    --accent: 280 65% 60%;
-    --accent-foreground: 0 0% 100%;
-
-    /* Gradient Colors for Dark Mode */
-    --gradient-start: 262 83% 58%;
-    --gradient-mid: 272 76% 53%;
-    --gradient-end: 282 87% 51%;
+    /* Keep neutral gradients */
+    --gradient-start: 0 0% 10%;
+    --gradient-mid: 0 0% 5%;
+    --gradient-end: 0 0% 2%;
   }
 
   * {

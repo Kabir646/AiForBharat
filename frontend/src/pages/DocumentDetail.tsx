@@ -219,10 +219,10 @@ export default function DocumentDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-black text-[#e5e2e1] font-body antialiased selection:bg-white/20 selection:text-white">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <Loader2 className="h-12 w-12 animate-spin text-[#ffffff]" />
         </main>
       </div>
     )
@@ -230,7 +230,7 @@ export default function DocumentDetailPage() {
 
   if (error || !document) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-black text-[#e5e2e1] font-body antialiased selection:bg-white/20 selection:text-white">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8">
           <Card className="p-12 text-center">
@@ -251,7 +251,7 @@ export default function DocumentDetailPage() {
   const data = document.summary_json
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-black text-[#e5e2e1] font-body antialiased selection:bg-white/20 selection:text-white">
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -293,7 +293,7 @@ export default function DocumentDetailPage() {
               </Button>
               <Button
                 onClick={() => setIsPdfCollapsed(false)}
-                className="gradient-primary text-white hover:shadow-glow transition-all"
+                className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-[#ffffff] hover:bg-[rgba(255,255,255,0.1)] transition-all"
                 disabled={!isPdfCollapsed}
               >
                 <FileText className="h-4 w-4 mr-2" />
@@ -301,7 +301,7 @@ export default function DocumentDetailPage() {
               </Button>
               <Button
                 onClick={() => setIsChatCollapsed(false)}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white hover:shadow-glow transition-all"
+                className="bg-[#ffffff] text-[#000000] hover:bg-[#e5e2e1] transition-all"
                 disabled={!isChatCollapsed}
               >
                 <MessageSquare className="h-4 w-4 mr-2" />
@@ -317,10 +317,10 @@ export default function DocumentDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {/* Overall Score Card */}
             {data.overallScore && (
-              <div className="relative overflow-hidden rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-blue-100/30 dark:from-transparent dark:to-transparent opacity-100" />
+              <div className="relative overflow-hidden rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] shadow-sm group hover:shadow-md transition-all duration-300">
+                
                 <div className="relative p-5 flex flex-col h-full justify-between">
-                  <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium text-sm mb-3">
+                  <div className="flex items-center gap-2 text-[#c4c7c8] font-medium text-sm mb-3">
                     <TrendingUp className="h-4 w-4" />
                     Overall Score
                   </div>
@@ -336,10 +336,10 @@ export default function DocumentDetailPage() {
 
             {/* Recommendation Card */}
             {data.recommendation && (
-              <div className="relative overflow-hidden rounded-xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
+              <div className="relative overflow-hidden rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] shadow-sm group hover:shadow-md transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-amber-100/30 dark:from-amber-900/20 dark:to-amber-800/10 opacity-100" />
                 <div className="relative p-5 flex flex-col h-full justify-between">
-                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium text-sm mb-3">
+                  <div className="flex items-center gap-2 text-[#c4c7c8] font-medium text-sm mb-3">
                     {data.recommendation.toLowerCase().includes('select') || data.recommendation.toLowerCase().includes('shortlist') ? (
                       <CheckCircle className="h-4 w-4" />
                     ) : data.recommendation.toLowerCase().includes('reject') ? (
@@ -358,10 +358,10 @@ export default function DocumentDetailPage() {
 
             {/* Issuing Authority Card */}
             {data.tenderDetails?.issuingAuthority && (
-              <div className="relative overflow-hidden rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-transparent to-indigo-100/30 dark:from-transparent dark:to-transparent opacity-100" />
+              <div className="relative overflow-hidden rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] shadow-sm group hover:shadow-md transition-all duration-300">
+                
                 <div className="relative p-5 flex flex-col h-full justify-between">
-                  <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium text-sm mb-3">
+                  <div className="flex items-center gap-2 text-[#c4c7c8] font-medium text-sm mb-3">
                     <Users className="h-4 w-4" />
                     Issuing Authority
                   </div>
@@ -374,10 +374,10 @@ export default function DocumentDetailPage() {
 
             {/* Tender Type Card */}
             {data.tenderDetails?.tenderType && (
-              <div className="relative overflow-hidden rounded-xl border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-zinc-950 shadow-sm group hover:shadow-md transition-all duration-300">
+              <div className="relative overflow-hidden rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] shadow-sm group hover:shadow-md transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-transparent to-cyan-100/30 dark:from-cyan-900/20 dark:to-cyan-800/10 opacity-100" />
                 <div className="relative p-5 flex flex-col h-full justify-between">
-                  <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-medium text-sm mb-3">
+                  <div className="flex items-center gap-2 text-[#c4c7c8] font-medium text-sm mb-3">
                     <FileText className="h-4 w-4" />
                     Tender Type
                   </div>
@@ -419,7 +419,7 @@ export default function DocumentDetailPage() {
                       className={cn(
                         'px-4 py-3 font-medium transition-colors whitespace-nowrap',
                         activeTab === tab.id
-                          ? 'text-primary border-b-2 border-primary'
+                          ? 'text-[#ffffff] border-b-2 border-[#ffffff]'
                           : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
@@ -467,10 +467,10 @@ export default function DocumentDetailPage() {
           {!(isPdfCollapsed && isChatCollapsed) && (
             <div
               onMouseDown={startResize}
-              className={`cursor-col-resize flex items-center justify-center group ${isResizing ? 'bg-primary' : 'hover:bg-primary/20'} transition-colors`}
+              className={`cursor-col-resize flex items-center justify-center group ${isResizing ? 'bg-[#ffffff] text-[#000000]' : 'hover:bg-[#ffffff] text-[#000000]/20'} transition-colors`}
               title="Drag to resize"
             >
-              <div className="w-1 h-full bg-border group-hover:bg-primary transition-colors rounded-full"></div>
+              <div className="w-1 h-full bg-border group-hover:bg-[#ffffff] text-[#000000] transition-colors rounded-full"></div>
             </div>
           )}
 
@@ -504,7 +504,7 @@ export default function DocumentDetailPage() {
                       >
                         <X className="h-4 w-4" />
                       </Button>
-                      <MessageSquare className="h-5 w-5 text-primary" />
+                      <MessageSquare className="h-5 w-5 text-[#ffffff]" />
                       <h3 className="font-semibold">{t('documentDetail.chat')}</h3>
                     </div>
                     {chatHistory.length > 0 && (
@@ -614,20 +614,20 @@ function OverviewTab({ data, onPageClick }: { data: any; onPageClick: (page: num
 
       {/* Basic Information Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-heading font-semibold text-foreground border-l-4 border-primary pl-3">
+        <h3 className="text-lg font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3">
           Basic Information
         </h3>
 
         <div className="grid md:grid-cols-2 gap-4">
           {tenderDetails?.bidderName && (
-            <div className="bg-muted/30 rounded-lg p-4 border border-border">
+            <div className="bg-[rgba(255,255,255,0.02)] rounded-lg p-4 border border-[rgba(255,255,255,0.05)]">
               <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2">Bidder Name</div>
               <div className="text-lg font-semibold text-foreground">{tenderDetails.bidderName}</div>
             </div>
           )}
 
           {tenderDetails?.projectLocation && (
-            <div className="bg-muted/30 rounded-lg p-4 border border-border">
+            <div className="bg-[rgba(255,255,255,0.02)] rounded-lg p-4 border border-[rgba(255,255,255,0.05)]">
               <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 Project Location
@@ -643,10 +643,10 @@ function OverviewTab({ data, onPageClick }: { data: any; onPageClick: (page: num
       {/* Executive Summary Section */}
       {data.executiveSummary && (
         <div className="space-y-4">
-          <h3 className="text-lg font-heading font-semibold text-foreground border-l-4 border-primary pl-3">
+          <h3 className="text-lg font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3">
             Executive Summary
           </h3>
-          <div className="bg-muted/20 rounded-lg p-5 border border-border">
+          <div className="bg-[rgba(255,255,255,0.02)] rounded-lg p-5 border border-[rgba(255,255,255,0.05)]">
             <p className="text-base text-foreground leading-relaxed">
               {createClickablePageLinks(data.executiveSummary, onPageClick)}
             </p>
@@ -657,21 +657,21 @@ function OverviewTab({ data, onPageClick }: { data: any; onPageClick: (page: num
       {/* Methodology Assessment Section */}
       {data.technicalEvaluation?.methodologyAndApproach && (
         <div className="space-y-4">
-          <h3 className="text-lg font-heading font-semibold text-foreground border-l-4 border-primary pl-3">
+          <h3 className="text-lg font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3">
             Methodology Assessment
           </h3>
 
           <div className="space-y-4">
             {data.technicalEvaluation.methodologyAndApproach.strengths?.length > 0 && (
-              <div className="bg-green-50/50 dark:bg-green-950/20 rounded-lg p-5 border border-green-200 dark:border-green-800">
+              <div className="bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] rounded-lg p-5 border border-[rgba(255,255,255,0.05)]">
                 <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  <h4 className="text-lg font-semibold text-green-700 dark:text-green-300">Strengths</h4>
+                  <CheckCircle className="h-5 w-5 text-[#c4c7c8]" />
+                  <h4 className="text-lg font-semibold text-[#ffffff]">Strengths</h4>
                 </div>
                 <ul className="space-y-2">
                   {data.technicalEvaluation.methodologyAndApproach.strengths.map((s: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                      <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                      <span className="text-[#c4c7c8] mt-1">•</span>
                       <span>{s}</span>
                     </li>
                   ))}
@@ -680,15 +680,15 @@ function OverviewTab({ data, onPageClick }: { data: any; onPageClick: (page: num
             )}
 
             {data.technicalEvaluation.methodologyAndApproach.weaknesses?.length > 0 && (
-              <div className="bg-red-50/50 dark:bg-red-950/20 rounded-lg p-5 border border-red-200 dark:border-red-800">
+              <div className="bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] rounded-lg p-5 border border-[rgba(255,255,255,0.05)]">
                 <div className="flex items-center gap-2 mb-3">
-                  <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                  <h4 className="text-lg font-semibold text-red-700 dark:text-red-300">Weaknesses</h4>
+                  <XCircle className="h-5 w-5 text-[#c4c7c8]" />
+                  <h4 className="text-lg font-semibold text-[#ffffff]">Weaknesses</h4>
                 </div>
                 <ul className="space-y-2">
                   {data.technicalEvaluation.methodologyAndApproach.weaknesses.map((w: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
-                      <span className="text-red-600 dark:text-red-400 mt-1">•</span>
+                      <span className="text-[#c4c7c8] mt-1">•</span>
                       <span>{w}</span>
                     </li>
                   ))}
@@ -702,20 +702,20 @@ function OverviewTab({ data, onPageClick }: { data: any; onPageClick: (page: num
       {/* Key Personnel Section */}
       {bidderQualifications?.teamComposition?.keyPersonnel?.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-primary pl-3 flex items-center gap-2">
+          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3 flex items-center gap-2">
             <Users className="h-5 w-5" />
             Key Personnel
           </h3>
 
           <div className="space-y-3">
             {bidderQualifications.teamComposition.keyPersonnel.map((person: any, idx: number) => (
-              <div key={idx} className="bg-muted/20 rounded-lg p-4 border border-border hover:border-primary/50 transition-colors">
+              <div key={idx} className="bg-[rgba(255,255,255,0.02)] rounded-lg p-4 border border-[rgba(255,255,255,0.05)] hover:border-[#ffffff]/50 transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="text-lg font-semibold text-foreground mb-1">{person.name}</h4>
                     <p className="text-base text-muted-foreground mb-2">{person.role}</p>
                     <div className="flex flex-wrap gap-3 text-sm">
-                      <span className="bg-primary/10 text-primary px-3 py-1 rounded">
+                      <span className="bg-[#353434] text-[#ffffff] px-3 py-1 rounded">
                         {person.experienceYears} years experience
                       </span>
                       <span className="bg-muted text-muted-foreground px-3 py-1 rounded">
@@ -764,7 +764,7 @@ function TimelineTab({ data }: { data: any }) {
       {/* Key Milestones Section */}
       {timeline.milestones && timeline.milestones.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-primary pl-3 flex items-center gap-2">
+          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3 flex items-center gap-2">
             <Calendar className="h-5 w-5" />
             Key Milestones
           </h3>
@@ -773,7 +773,7 @@ function TimelineTab({ data }: { data: any }) {
             {timeline.milestones.map((milestone: string, idx: number) => (
               <div key={idx} className="flex gap-4 group">
                 <div className="flex flex-col items-center">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white flex items-center justify-center font-heading font-bold text-base shadow-lg">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[rgba(255,255,255,0.1)] text-white flex items-center justify-center font-heading font-bold text-base shadow-lg">
                     {idx + 1}
                   </div>
                   {idx < timeline.milestones.length - 1 && (
@@ -781,7 +781,7 @@ function TimelineTab({ data }: { data: any }) {
                   )}
                 </div>
                 <div className="flex-1 pb-6">
-                  <div className="bg-muted/20 rounded-lg p-4 border border-border group-hover:border-primary/50 transition-colors">
+                  <div className="bg-[rgba(255,255,255,0.02)] rounded-lg p-4 border border-[rgba(255,255,255,0.05)] group-hover:border-[#ffffff]/50 transition-colors">
                     <p className="text-lg text-foreground leading-relaxed">{milestone}</p>
                   </div>
                 </div>
@@ -794,28 +794,28 @@ function TimelineTab({ data }: { data: any }) {
       {/* Timeline Assessment */}
       {timeline.isTimelineRealistic !== undefined && (
         <div className="space-y-4">
-          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-primary pl-3">
+          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3">
             Timeline Assessment
           </h3>
 
           <div className={cn(
             'rounded-lg p-5 border-2',
             timeline.isTimelineRealistic
-              ? 'bg-green-50/50 dark:bg-green-950/20 border-green-300 dark:border-green-700'
-              : 'bg-red-50/50 dark:bg-red-950/20 border-red-300 dark:border-red-700'
+              ? 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] border-green-300 dark:border-green-700'
+              : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] border-red-300 dark:border-red-700'
           )}>
             <div className="flex items-start gap-3">
               {timeline.isTimelineRealistic ? (
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-6 w-6 text-[#c4c7c8] flex-shrink-0 mt-0.5" />
               ) : (
-                <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-6 w-6 text-[#c4c7c8] flex-shrink-0 mt-0.5" />
               )}
               <div>
                 <h4 className={cn(
                   'text-lg font-semibold mb-1',
                   timeline.isTimelineRealistic
-                    ? 'text-green-700 dark:text-green-300'
-                    : 'text-red-700 dark:text-red-300'
+                    ? 'text-[#ffffff]'
+                    : 'text-[#ffffff]'
                 )}>
                   Timeline is {timeline.isTimelineRealistic ? 'Realistic' : 'Not Realistic'}
                 </h4>
@@ -865,7 +865,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
       {/* Risk Assessment Section */}
       {data.riskAssessment && data.riskAssessment.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-primary pl-3 flex items-center gap-2">
+          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3 flex items-center gap-2">
             <Shield className="h-5 w-5" />
             Risk Assessment
           </h3>
@@ -877,10 +877,10 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                 className={cn(
                   'rounded-lg border-2 p-5',
                   risk.severity === 'High'
-                    ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-950/20'
+                    ? 'border-red-300 dark:border-red-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
                     : risk.severity === 'Medium'
-                      ? 'border-orange-300 dark:border-orange-700 bg-orange-50/50 dark:bg-orange-950/20'
-                      : 'border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-950/20'
+                      ? 'border-orange-300 dark:border-orange-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
+                      : 'border-green-300 dark:border-green-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
                 )}
               >
                 {/* Risk Header */}
@@ -909,7 +909,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Evidence Section */}
                 {risk.evidence && Array.isArray(risk.evidence) && risk.evidence.length > 0 && (
-                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-[rgba(255,255,255,0.05)]">
                     <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
                       Evidence
@@ -918,7 +918,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                       {risk.evidence.map((ev: any, evidx: number) => (
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
-                            <blockquote className="text-base italic text-gray-700 dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
+                            <blockquote className="text-base italic text-[#c4c7c8] dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
                               &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
@@ -941,7 +941,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
           {/* Environmental Impact Section */}
           {data.environmentalImpact && (
             <div className="space-y-4">
-              <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-primary pl-3">
+              <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3">
                 Environmental Impact
               </h3>
               <EnvironmentalImpact data={data.environmentalImpact} />
@@ -998,12 +998,12 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                 className={cn(
                   'rounded-lg border-2 p-5',
                   issue.severity === 'Critical'
-                    ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-950/20'
+                    ? 'border-red-300 dark:border-red-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
                     : issue.severity === 'High'
-                      ? 'border-orange-300 dark:border-orange-700 bg-orange-50/50 dark:bg-orange-950/20'
+                      ? 'border-orange-300 dark:border-orange-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
                       : issue.severity === 'Medium'
-                        ? 'border-yellow-300 dark:border-yellow-700 bg-yellow-50/50 dark:bg-yellow-950/20'
-                        : 'border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/20'
+                        ? 'border-yellow-300 dark:border-yellow-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
+                        : 'border-blue-300 dark:border-blue-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
                 )}
               >
                 {/* Issue Header */}
@@ -1034,7 +1034,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Impact Section */}
                 {issue.impact && (
-                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-800">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-[rgba(255,255,255,0.05)]">
                     <p className="text-sm font-semibold text-foreground mb-2">Impact Assessment</p>
                     <p className="text-base text-foreground italic leading-relaxed">
                       {createClickablePageLinks(issue.impact, onPageClick)}
@@ -1044,7 +1044,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Evidence Section */}
                 {issue.evidence && Array.isArray(issue.evidence) && issue.evidence.length > 0 && (
-                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-[rgba(255,255,255,0.05)]">
                     <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
                       Evidence
@@ -1053,7 +1053,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                       {issue.evidence.map((ev: any, evidx: number) => (
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
-                            <blockquote className="text-base italic text-gray-700 dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
+                            <blockquote className="text-base italic text-[#c4c7c8] dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
                               &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
@@ -1117,12 +1117,12 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
       <div className="space-y-8">
         {/* Overall Score Section */}
         <div className="space-y-4">
-          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-primary pl-3 flex items-center gap-2">
+          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3 flex items-center gap-2">
             <CheckCircle className="h-5 w-5" />
             Overall Evaluation Score
           </h3>
 
-          <div className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+          <div className="relative overflow-hidden rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] shadow-sm">
             {/* Subtle gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
 
@@ -1140,16 +1140,16 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                   </div>
                   <div className="mt-3 flex items-center gap-2">
                     {evaluation.overallComplianceScore >= 80 ? (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm font-medium">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-[#ffffff] text-sm font-medium">
                         <CheckCircle className="h-4 w-4" />
                         Excellent
                       </span>
                     ) : evaluation.overallComplianceScore >= 60 ? (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-sm font-medium">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-[#ffffff] text-sm font-medium">
                         Good
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm font-medium">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-[#ffffff] text-sm font-medium">
                         Needs Improvement
                       </span>
                     )}
@@ -1169,7 +1169,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
         {/* Criteria Breakdown */}
         <div className="space-y-4">
-          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-primary pl-3">
+          <h3 className="text-xl font-heading font-semibold text-foreground border-l-4 border-[#ffffff] pl-3">
             Criteria Breakdown
           </h3>
 
@@ -1183,8 +1183,8 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                 className={cn(
                   'rounded-lg border-2 p-5',
                   item.met
-                    ? 'border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-950/20'
-                    : 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-950/20'
+                    ? 'border-green-300 dark:border-green-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
+                    : 'border-red-300 dark:border-red-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)]'
                 )}
               >
                 {/* Criterion Header */}
@@ -1230,7 +1230,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
 
                 {/* Evidence */}
                 {item.evidence && Array.isArray(item.evidence) && item.evidence.length > 0 && (
-                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                  <div className="mt-4 bg-white/50 dark:bg-zinc-950/50 rounded-lg p-4 border border-[rgba(255,255,255,0.05)]">
                     <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
                       Evidence
@@ -1239,7 +1239,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
                       {item.evidence.map((ev: any, evidx: number) => (
                         <div key={evidx} className="space-y-1.5">
                           {ev.quote && (
-                            <blockquote className="text-base italic text-gray-700 dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
+                            <blockquote className="text-base italic text-[#c4c7c8] dark:text-zinc-300 border-l-4 border-amber-400 pl-4 py-2">
                               &quot;{ev.quote}&quot;
                             </blockquote>
                           )}
@@ -1288,7 +1288,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
               {recommendations.criticalActions.map((action: string, idx: number) => (
                 <div
                   key={idx}
-                  className="rounded-lg border-2 border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-950/20 p-5"
+                  className="rounded-lg border-2 border-red-300 dark:border-red-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] p-5"
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm">
@@ -1314,7 +1314,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
               {recommendations.improvementSuggestions.map((suggestion: string, idx: number) => (
                 <div
                   key={idx}
-                  className="rounded-lg border-2 border-yellow-300 dark:border-yellow-700 bg-yellow-50/50 dark:bg-yellow-950/20 p-5"
+                  className="rounded-lg border-2 border-yellow-300 dark:border-yellow-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] p-5"
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold text-sm">
@@ -1340,7 +1340,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
               {recommendations.negotiationPoints.map((point: string, idx: number) => (
                 <div
                   key={idx}
-                  className="rounded-lg border-2 border-purple-300 dark:border-purple-700 bg-purple-50/50 dark:bg-purple-950/20 p-5"
+                  className="rounded-lg border-2 border-purple-300 dark:border-purple-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] p-5"
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold text-sm">
@@ -1366,7 +1366,7 @@ function RiskAssessmentTab({ data, onPageClick }: { data: any; onPageClick: (pag
               {recommendations.nextSteps.map((step: string, idx: number) => (
                 <div
                   key={idx}
-                  className="rounded-lg border-2 border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-950/20 p-5"
+                  className="rounded-lg border-2 border-green-300 dark:border-green-700 bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] p-5"
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-sm">

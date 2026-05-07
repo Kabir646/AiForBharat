@@ -69,10 +69,10 @@ export default function DocumentsPage() {
   const processingCount = documents.length - completedCount
 
   const stats = [
-    { label: 'Total Documents', value: documents.length.toString(), color: 'text-primary' },
+    { label: 'Total Documents', value: documents.length.toString(), color: 'text-[#ffffff]' },
     { label: 'Completed', value: completedCount.toString(), color: 'text-green-600' },
-    { label: 'Processing', value: processingCount.toString(), color: 'text-gray-500' },
-    { label: 'Total Files', value: documents.length.toString(), color: 'text-primary' },
+    { label: 'Processing', value: processingCount.toString(), color: 'text-[#c4c7c8]/70' },
+    { label: 'Total Files', value: documents.length.toString(), color: 'text-[#ffffff]' },
   ]
 
   const filteredDocuments = documents.filter(doc =>
@@ -80,7 +80,7 @@ export default function DocumentsPage() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-black text-[#e5e2e1] font-body antialiased selection:bg-white/20 selection:text-white">
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -128,7 +128,7 @@ export default function DocumentsPage() {
 
         {loading && (
           <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#ffffff]" />
           </div>
         )}
 
@@ -156,10 +156,10 @@ export default function DocumentsPage() {
           {filteredDocuments.map((doc, index) => {
             const status = getDocumentStatus(doc)
             return (
-              <Card key={doc.id} className="p-6 hover:border-primary/40 transition-all animate-slide-up" style={{ animationDelay: `${(index % 6) * 100}ms` }}>
+              <Card key={doc.id} className="p-6 hover:border-[#ffffff]/40 transition-all animate-slide-up" style={{ animationDelay: `${(index % 6) * 100}ms` }}>
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="p-3 rounded-lg bg-primary/10">
-                    <FileText className="h-6 w-6 text-primary" />
+                  <div className="p-3 rounded-lg bg-[#353434]">
+                    <FileText className="h-6 w-6 text-[#ffffff]" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold mb-1 line-clamp-2">{doc.original_filename}</h3>
