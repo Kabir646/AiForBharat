@@ -1,10 +1,9 @@
-import { FileText, Moon, Sun, CheckCircle2, LogOut } from 'lucide-react'
+import { FileText, Moon, Sun, LogOut } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from './ui/Button'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useRole } from '../contexts/RoleContext'
-import { Card } from './ui/Card'
 import { LanguageDropdown } from './LanguageDropdown'
 
 export function Header() {
@@ -44,13 +43,16 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-md shadow-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/admin" className="flex items-center gap-2.5 group">
             <div className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center group-hover:shadow-glow transition-all duration-300">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-heading font-semibold text-foreground">NexusAI</span>
+            <div className="hidden sm:block leading-tight">
+              <span className="block text-base font-heading font-semibold text-foreground">Tender Evaluation Portal</span>
+              <span className="block text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Bid Review Console</span>
+            </div>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
