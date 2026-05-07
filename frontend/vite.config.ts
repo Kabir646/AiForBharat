@@ -15,7 +15,7 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       "/api": {
-        target: "https://tender-evaluation-backend.onrender.com",
+        target: 'https://aiforbharat-kxus.onrender.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
