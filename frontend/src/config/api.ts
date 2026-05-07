@@ -4,7 +4,7 @@
  */
 
 // Hardcoded production backend URL (env vars weren't working in Vercel)
-export const API_BASE_URL = "https://aiforbharat-kxus.onrender.com";
+export const API_BASE_URL = "http://127.0.0.1:8000";
 
 // Helper function to build full API URLs
 export const getApiUrl = (path: string): string => {
