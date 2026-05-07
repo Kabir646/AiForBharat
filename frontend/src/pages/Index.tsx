@@ -1,82 +1,109 @@
-import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { ArrowRight, FileText, Layers, Upload, Brain, CheckCircle, BarChart3, Clock } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { useLanguage } from '@/contexts/LanguageContext'
-import { useEffect, useState } from 'react'
-import { api } from '@/lib/api'
+import { Header } from "@/components/Header";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import {
+  ArrowRight,
+  FileText,
+  Layers,
+  Upload,
+  Brain,
+  CheckCircle,
+  BarChart3,
+  Clock,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 export default function IndexPage() {
-  const navigate = useNavigate()
-  const { t } = useLanguage()
+  const navigate = useNavigate();
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     totalProjects: 0,
     totalDPRs: 0,
     pending: 0,
     approved: 0,
-    loading: true
-  })
+    loading: true,
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const [projects, dprs] = await Promise.all([
           api.getProjects(),
-          api.getDPRs()
-        ])
+          api.getDPRs(),
+        ]);
 
-        const totalProjects = projects.length
-        const totalDPRs = dprs.length
-        const pending = dprs.filter(dpr => !(dpr as any).status || (dpr as any).status === 'pending' || (dpr as any).status === 'analyzing').length
-        const approved = dprs.filter(dpr => (dpr as any).status === 'accepted').length
+        const totalProjects = projects.length;
+        const totalDPRs = dprs.length;
+        const pending = dprs.filter(
+          (dpr) =>
+            !(dpr as any).status ||
+            (dpr as any).status === "pending" ||
+            (dpr as any).status === "analyzing",
+        ).length;
+        const approved = dprs.filter(
+          (dpr) => (dpr as any).status === "accepted",
+        ).length;
 
-        setStats({ totalProjects, totalDPRs, pending, approved, loading: false })
+        setStats({
+          totalProjects,
+          totalDPRs,
+          pending,
+          approved,
+          loading: false,
+        });
       } catch (error) {
-        console.error('Failed to fetch stats:', error)
-        setStats(prev => ({ ...prev, loading: false }))
+        console.error("Failed to fetch stats:", error);
+        setStats((prev) => ({ ...prev, loading: false }));
       }
-    }
+    };
 
-    fetchStats()
+    fetchStats();
 
     // Auto-refresh stats when user returns to the dashboard
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        fetchStats()
+        fetchStats();
       }
-    }
+    };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
-  }, [])
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   const workflowSteps = [
     {
       icon: Upload,
-      title: 'Upload Bid Proposal',
-      description: 'Bidders submit their bid proposals and supporting certificates',
-      color: 'from-blue-500 to-cyan-500'
+      title: "Upload Bid Proposal",
+      description:
+        "Bidders submit their bid proposals and supporting certificates",
+      color: "from-blue-500 to-cyan-500",
     },
     {
       icon: Brain,
-      title: 'AI Analysis',
-      description: 'Advanced AI processes and analyzes project compliance, financials, and feasibility',
-      color: 'from-purple-500 to-pink-500'
+      title: "AI Analysis",
+      description:
+        "Advanced AI processes and analyzes project compliance, financials, and feasibility",
+      color: "from-purple-500 to-pink-500",
     },
     {
       icon: CheckCircle,
-      title: 'Review & Approve',
-      description: 'Admins review AI insights and make informed decisions on project approval',
-      color: 'from-green-500 to-emerald-500'
+      title: "Review & Approve",
+      description:
+        "Admins review AI insights and make informed decisions on project approval",
+      color: "from-green-500 to-emerald-500",
     },
     {
       icon: BarChart3,
-      title: 'Track Progress',
-      description: 'Monitor tender status and compare multiple bids for better evaluation',
-      color: 'from-orange-500 to-red-500'
-    }
-  ]
+      title: "Track Progress",
+      description:
+        "Monitor tender status and compare multiple bids for better evaluation",
+      color: "from-orange-500 to-red-500",
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -99,19 +126,20 @@ export default function IndexPage() {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight animate-slide-up animate-delay-100">
-                Streamline Tender Evaluation with{' '}
+                Streamline Tender Evaluation with{" "}
                 <span className="gradient-text">Intelligent Automation</span>
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto animate-slide-up animate-delay-200">
-                Transform how you evaluate Tender Bid Proposals. Our AI-powered platform analyzes compliance,
-                financials, and feasibility in minutes—not days.
+                Transform how you evaluate Tender Bid Proposals. Our AI-powered
+                platform analyzes compliance, financials, and feasibility in
+                minutes—not days.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-slide-up animate-delay-300">
                 <Button
                   size="lg"
-                  onClick={() => navigate('/admin/projects')}
+                  onClick={() => navigate("/admin/projects")}
                   className="gradient-primary hover:shadow-glow transition-all duration-300 text-white border-0 hover:scale-105"
                 >
                   View Tenders
@@ -136,9 +164,11 @@ export default function IndexPage() {
                     <Layers className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Active Tenders</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">
+                      Active Tenders
+                    </p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
-                      {stats.loading ? '--' : stats.totalProjects}
+                      {stats.loading ? "--" : stats.totalProjects}
                     </h3>
                   </div>
                 </div>
@@ -151,9 +181,11 @@ export default function IndexPage() {
                     <FileText className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Bids Submitted</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">
+                      Bids Submitted
+                    </p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
-                      {stats.loading ? '--' : stats.totalDPRs}
+                      {stats.loading ? "--" : stats.totalDPRs}
                     </h3>
                   </div>
                 </div>
@@ -166,9 +198,11 @@ export default function IndexPage() {
                     <Clock className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Bids Pending Evaluation</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">
+                      Bids Pending Evaluation
+                    </p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
-                      {stats.loading ? '--' : stats.pending}
+                      {stats.loading ? "--" : stats.pending}
                     </h3>
                   </div>
                 </div>
@@ -181,9 +215,11 @@ export default function IndexPage() {
                     <CheckCircle className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Bids Approved</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">
+                      Bids Approved
+                    </p>
                     <h3 className="text-2xl font-heading font-bold text-foreground">
-                      {stats.loading ? '--' : stats.approved}
+                      {stats.loading ? "--" : stats.approved}
                     </h3>
                   </div>
                 </div>
@@ -211,14 +247,20 @@ export default function IndexPage() {
                   className="p-5 hover:shadow-lg transition-all duration-300 border-border/50"
                 >
                   <div className="space-y-3">
-                    <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center`}>
+                    <div
+                      className={`h-12 w-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center`}
+                    >
                       <step.icon className="h-6 w-6 text-white" />
                     </div>
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-primary">STEP {index + 1}</span>
+                        <span className="text-xs font-semibold text-primary">
+                          STEP {index + 1}
+                        </span>
                       </div>
-                      <h3 className="text-lg font-heading font-semibold">{step.title}</h3>
+                      <h3 className="text-lg font-heading font-semibold">
+                        {step.title}
+                      </h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {step.description}
                       </p>
@@ -230,97 +272,42 @@ export default function IndexPage() {
           </div>
         </section>
 
-        {/* Quick Access Cards */}
-        <section className="container mx-auto px-4 py-16">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold mb-2">
-                Quick <span className="gradient-text">Access</span>
-              </h2>
-              <p className="text-base text-muted-foreground">
-                Navigate to key sections of the admin dashboard
-              </p>
-            </div>
 
-            <div className="grid md:grid-cols-3 gap-5">
-              <Card
-                className="group p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border-border/50 hover:border-primary/30"
-                onClick={() => navigate('/admin/projects')}
-              >
-                <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="h-14 w-14 rounded-xl gradient-primary flex items-center justify-center group-hover:shadow-glow transition-all">
-                    <FileText className="h-7 w-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-heading font-semibold mb-1.5">Manage Tenders</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      View, organize, and evaluate all submitted bids by tender
-                    </p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Card>
-
-              <Card
-                className="group p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border-border/50 hover:border-accent/30"
-                onClick={() => navigate('/admin/comparisons')}
-              >
-                <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center group-hover:shadow-glow transition-all">
-                    <Layers className="h-7 w-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-heading font-semibold mb-1.5">Compare Bids</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Side-by-side analysis of multiple bids for better decisions
-                    </p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-accent group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Card>
-
-              <Card
-                className="group p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border-border/50 hover:border-indigo/30"
-              >
-                <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-indigo to-indigo-dark flex items-center justify-center group-hover:shadow-glow transition-all">
-                    <Brain className="h-7 w-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-heading font-semibold mb-1.5">AI Insights</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Leverage intelligent analysis for comprehensive evaluation
-                    </p>
-                  </div>
-                  <Brain className="h-4 w-4 text-indigo group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="border-t border-border/50 py-6 bg-muted/20">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3">
             <p className="text-sm text-muted-foreground">
-              © 2025{' '}
-              <span className="font-heading font-semibold text-foreground">NexusAI</span> - {t('landing.footer')}
+              © 2025{" "}
+              <span className="font-heading font-semibold text-foreground">
+                NexusAI
+              </span>{" "}
+              - {t("landing.footer")}
             </p>
             <div className="flex gap-6 text-sm">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                {t('landing.privacy')}
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                {t("landing.privacy")}
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                {t('landing.terms')}
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                {t("landing.terms")}
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                {t('landing.contact')}
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                {t("landing.contact")}
               </a>
             </div>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

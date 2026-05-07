@@ -1,17 +1,27 @@
-import { Card, CardContent } from './ui/Card'
-import { LucideIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Card, CardContent } from "./ui/Card";
+import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FeatureCardProps {
-  icon: LucideIcon
-  title: string
-  description: string
-  className?: string
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  className?: string;
 }
 
-export function FeatureCard({ icon: Icon, title, description, className }: FeatureCardProps) {
+export function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  className,
+}: FeatureCardProps) {
   return (
-    <Card className={cn('border-primary/20 hover:border-primary/40 hover:-translate-y-1', className)}>
+    <Card
+      className={cn(
+        "border-primary/20 hover:border-primary/40 hover:-translate-y-1",
+        className,
+      )}
+    >
       <CardContent className="p-6">
         <div className="flex flex-col gap-4">
           <div className="rounded-lg bg-primary/10 p-3 w-fit">
@@ -24,5 +34,5 @@ export function FeatureCard({ icon: Icon, title, description, className }: Featu
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

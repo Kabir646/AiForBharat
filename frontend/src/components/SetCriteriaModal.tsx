@@ -1,20 +1,29 @@
-import React, { useState, useRef } from 'react'
-import { X, Plus, Trash2, Loader2, Save, FileText, CheckCircle, Upload } from 'lucide-react'
-import { Card } from './ui/Card'
-import { Button } from './ui/Button'
-import { api } from '@/lib/api'
+import React, { useState, useRef } from "react";
+import {
+  X,
+  Plus,
+  Trash2,
+  Loader2,
+  Save,
+  FileText,
+  CheckCircle,
+  Upload,
+} from "lucide-react";
+import { Card } from "./ui/Card";
+import { Button } from "./ui/Button";
+import { api } from "@/lib/api";
 
 interface CriteriaItem {
-  heading: string
-  description: string
+  heading: string;
+  description: string;
 }
 
 interface SetCriteriaModalProps {
-  projectId: number
-  existingCriteria: any | null
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
+  projectId: number;
+  existingCriteria: any | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
 export default function SetCriteriaModal({
@@ -22,105 +31,113 @@ export default function SetCriteriaModal({
   existingCriteria,
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
 }: SetCriteriaModalProps) {
   // If we already have custom_criteria, it means it's set and should be read-only.
-  const isReadOnly = !!existingCriteria
+  const isReadOnly = !!existingCriteria;
   const [criteria, setCriteria] = useState<CriteriaItem[]>(() => {
     if (isReadOnly && existingCriteria?.criteriaBreakdown) {
       // Map the backend structure back to our list of items
-      const breakdown = existingCriteria.criteriaBreakdown
-      return Object.keys(breakdown).map(key => {
+      const breakdown = existingCriteria.criteriaBreakdown;
+      return Object.keys(breakdown).map((key) => {
         // Extract the original description by removing the "string - " prefix if present
-        let desc = breakdown[key].detailedReasoning || ''
-        if (desc.startsWith('string - ')) {
-          desc = desc.substring(9)
+        let desc = breakdown[key].detailedReasoning || "";
+        if (desc.startsWith("string - ")) {
+          desc = desc.substring(9);
         }
-        
+
         // Convert camelCase key back to a readable heading, or just use the key
-        const heading = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
+        const heading = key
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase());
         return {
           heading: heading,
-          description: desc
-        }
-      })
+          description: desc,
+        };
+      });
     }
-    return [{ heading: '', description: '' }]
-  })
+    return [{ heading: "", description: "" }];
+  });
 
-  const [saving, setSaving] = useState(false)
-  const [isExtracting, setIsExtracting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [saving, setSaving] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleAddCriteria = () => {
-    setCriteria([...criteria, { heading: '', description: '' }])
-  }
+    setCriteria([...criteria, { heading: "", description: "" }]);
+  };
 
   const handleRemoveCriteria = (index: number) => {
-    if (criteria.length <= 1) return // Must have at least one
-    const newCriteria = [...criteria]
-    newCriteria.splice(index, 1)
-    setCriteria(newCriteria)
-  }
+    if (criteria.length <= 1) return; // Must have at least one
+    const newCriteria = [...criteria];
+    newCriteria.splice(index, 1);
+    setCriteria(newCriteria);
+  };
 
-  const handleChange = (index: number, field: keyof CriteriaItem, value: string) => {
-    const newCriteria = [...criteria]
-    newCriteria[index][field] = value
-    setCriteria(newCriteria)
-  }
+  const handleChange = (
+    index: number,
+    field: keyof CriteriaItem,
+    value: string,
+  ) => {
+    const newCriteria = [...criteria];
+    newCriteria[index][field] = value;
+    setCriteria(newCriteria);
+  };
 
   const handleSave = async () => {
     // Validate
-    const invalid = criteria.some(c => !c.heading.trim() || !c.description.trim())
+    const invalid = criteria.some(
+      (c) => !c.heading.trim() || !c.description.trim(),
+    );
     if (invalid) {
-      setError('Please fill out all headings and descriptions before saving.')
-      return
+      setError("Please fill out all headings and descriptions before saving.");
+      return;
     }
 
     try {
-      setSaving(true)
-      setError(null)
-      await api.updateProjectCustomCriteria(projectId, criteria)
-      onSuccess()
+      setSaving(true);
+      setError(null);
+      await api.updateProjectCustomCriteria(projectId, criteria);
+      onSuccess();
     } catch (err: any) {
-      setError(err.message || 'Failed to save custom criteria')
+      setError(err.message || "Failed to save custom criteria");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
-      setError('Please upload a valid PDF file.')
-      return
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      setError("Please upload a valid PDF file.");
+      return;
     }
 
     try {
-      setIsExtracting(true)
-      setError(null)
-      const extractedCriteria = await api.extractCriteriaFromPdf(file)
+      setIsExtracting(true);
+      setError(null);
+      const extractedCriteria = await api.extractCriteriaFromPdf(file);
       if (extractedCriteria && extractedCriteria.length > 0) {
         // Replace current criteria with the extracted ones
-        setCriteria(extractedCriteria)
+        setCriteria(extractedCriteria);
       } else {
-        setError('No criteria could be extracted from the PDF.')
+        setError("No criteria could be extracted from the PDF.");
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to extract criteria from PDF')
+      setError(err.message || "Failed to extract criteria from PDF");
     } finally {
-      setIsExtracting(false)
+      setIsExtracting(false);
       // Reset input so the same file can be selected again if needed
       if (fileInputRef.current) {
-        fileInputRef.current.value = ''
+        fileInputRef.current.value = "";
       }
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -129,15 +146,18 @@ export default function SetCriteriaModal({
           <div>
             <h2 className="text-xl font-bold flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
-              {isReadOnly ? 'Project Criteria' : 'Set Custom Criteria'}
+              {isReadOnly ? "Project Criteria" : "Set Custom Criteria"}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
               {isReadOnly
-                ? 'These are the evaluation criteria set for this project.'
-                : 'Define the compliances you want to check for this project.'}
+                ? "These are the evaluation criteria set for this project."
+                : "Define the compliances you want to check for this project."}
             </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -152,7 +172,8 @@ export default function SetCriteriaModal({
           {!isReadOnly && (
             <div className="mb-6 space-y-3">
               <div className="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-200">
-                <strong>Note:</strong> Once saved, these criteria are permanently attached to this project and cannot be changed.
+                <strong>Note:</strong> Once saved, these criteria are
+                permanently attached to this project and cannot be changed.
               </div>
               <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                 <h3 className="font-medium flex items-center gap-2 mb-2 text-primary">
@@ -160,7 +181,9 @@ export default function SetCriteriaModal({
                   Auto-fill from PDF
                 </h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Upload a PDF containing your evaluation criteria. The document should clearly structure the criteria into headings and detailed descriptions.
+                  Upload a PDF containing your evaluation criteria. The document
+                  should clearly structure the criteria into headings and
+                  detailed descriptions.
                 </p>
                 <input
                   type="file"
@@ -169,8 +192,8 @@ export default function SetCriteriaModal({
                   ref={fileInputRef}
                   onChange={handleFileUpload}
                 />
-                <Button 
-                  variant="secondary" 
+                <Button
+                  variant="secondary"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isExtracting || saving}
                   className="w-full sm:w-auto"
@@ -193,7 +216,10 @@ export default function SetCriteriaModal({
 
           <div className="space-y-6">
             {criteria.map((item, index) => (
-              <div key={index} className="p-4 bg-muted/30 border rounded-lg relative group">
+              <div
+                key={index}
+                className="p-4 bg-muted/30 border rounded-lg relative group"
+              >
                 {!isReadOnly && criteria.length > 1 && (
                   <button
                     onClick={() => handleRemoveCriteria(index)}
@@ -203,24 +229,32 @@ export default function SetCriteriaModal({
                     <Trash2 className="h-4 w-4" />
                   </button>
                 )}
-                
+
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Heading (Compliance Name)</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Heading (Compliance Name)
+                    </label>
                     <input
                       type="text"
                       value={item.heading}
-                      onChange={(e) => handleChange(index, 'heading', e.target.value)}
+                      onChange={(e) =>
+                        handleChange(index, "heading", e.target.value)
+                      }
                       placeholder="e.g., Technical Feasibility"
                       className="w-full px-3 py-2 bg-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                       disabled={isReadOnly}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Description (Detailed Reasoning)</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Description (Detailed Reasoning)
+                    </label>
                     <textarea
                       value={item.description}
-                      onChange={(e) => handleChange(index, 'description', e.target.value)}
+                      onChange={(e) =>
+                        handleChange(index, "description", e.target.value)
+                      }
                       placeholder="e.g., Does the proposed engineering solution or technology match the specific requirements..."
                       className="w-full px-3 py-2 bg-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary min-h-[80px] resize-y"
                       disabled={isReadOnly}
@@ -245,7 +279,7 @@ export default function SetCriteriaModal({
 
         <div className="p-6 border-t bg-muted/10 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose} disabled={saving}>
-            {isReadOnly ? 'Close' : 'Cancel'}
+            {isReadOnly ? "Close" : "Cancel"}
           </Button>
           {!isReadOnly && (
             <Button onClick={handleSave} disabled={saving}>
@@ -265,5 +299,5 @@ export default function SetCriteriaModal({
         </div>
       </Card>
     </div>
-  )
+  );
 }

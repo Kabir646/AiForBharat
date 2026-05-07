@@ -1,57 +1,71 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { FileText, Plus, Calendar, ArrowRight, Loader2, Search, Trash2 } from 'lucide-react'
-import { api, Comparison, DPR } from '../lib/api'
-import { Header } from '../components/Header'
-import { Button } from '../components/ui/Button'
-import { Card } from '../components/ui/Card'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  FileText,
+  Plus,
+  Calendar,
+  ArrowRight,
+  Loader2,
+  Search,
+  Trash2,
+} from "lucide-react";
+import { api, Comparison, DPR } from "../lib/api";
+import { Header } from "../components/Header";
+import { Button } from "../components/ui/Button";
+import { Card } from "../components/ui/Card";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function ComparisonsPage() {
-  const navigate = useNavigate()
-  const { t } = useLanguage()
-  const [comparisons, setComparisons] = useState<Comparison[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showCreateModal, setShowCreateModal] = useState(false)
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const [comparisons, setComparisons] = useState<Comparison[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    loadComparisons()
-  }, [])
+    loadComparisons();
+  }, []);
 
   const loadComparisons = async () => {
     try {
-      setLoading(true)
-      const data = await api.getComparisons()
-      setComparisons(data)
+      setLoading(true);
+      const data = await api.getComparisons();
+      setComparisons(data);
     } catch (error) {
-      console.error('Failed to load comparisons:', error)
+      console.error("Failed to load comparisons:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async (e: React.MouseEvent, id: number) => {
-    e.stopPropagation() // Prevent navigation
-    if (!confirm(t('comparisons.deleteConfirm') || 'Are you sure you want to delete this comparison?')) return
+    e.stopPropagation(); // Prevent navigation
+    if (
+      !confirm(
+        t("comparisons.deleteConfirm") ||
+          "Are you sure you want to delete this comparison?",
+      )
+    )
+      return;
 
     try {
-      await api.deleteComparison(id)
-      setComparisons(prev => prev.filter(c => c.id !== id))
+      await api.deleteComparison(id);
+      setComparisons((prev) => prev.filter((c) => c.id !== id));
     } catch (error) {
-      console.error('Failed to delete comparison:', error)
-      alert('Failed to delete comparison')
+      console.error("Failed to delete comparison:", error);
+      alert("Failed to delete comparison");
     }
-  }
+  };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 transition-colors">
@@ -60,15 +74,19 @@ export default function ComparisonsPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('comparisons.title')}</h1>
-            <p className="text-gray-600 dark:text-zinc-400 mt-2">{t('comparisons.subtitle')}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {t("comparisons.title")}
+            </h1>
+            <p className="text-gray-600 dark:text-zinc-400 mt-2">
+              {t("comparisons.subtitle")}
+            </p>
           </div>
           <Button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
-            {t('comparisons.newComparison')}
+            {t("comparisons.newComparison")}
           </Button>
         </div>
 
@@ -82,9 +100,12 @@ export default function ComparisonsPage() {
               <div className="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8 text-cyan-600 dark:text-cyan-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No comparisons yet</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                No comparisons yet
+              </h3>
               <p className="text-gray-600 dark:text-zinc-400 mb-6">
-                Create your first comparison to analyze multiple DPRs together and get comparative insights
+                Create your first comparison to analyze multiple DPRs together
+                and get comparative insights
               </p>
               <Button onClick={() => setShowCreateModal(true)}>
                 <Plus className="w-5 h-5 mr-2" />
@@ -98,7 +119,9 @@ export default function ComparisonsPage() {
               <Card
                 key={comparison.id}
                 className="p-6 hover:shadow-lg transition-all cursor-pointer border-l-4 border-cyan-500 group"
-                onClick={() => navigate(`/admin/comparison-chat/${comparison.id}/detail`)}
+                onClick={() =>
+                  navigate(`/admin/comparison-chat/${comparison.id}/detail`)
+                }
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -138,70 +161,83 @@ export default function ComparisonsPage() {
         <CreateComparisonModal
           onClose={() => setShowCreateModal(false)}
           onSuccess={(id) => {
-            setShowCreateModal(false)
-            navigate(`/admin/comparison-chat/${id}/detail`)
+            setShowCreateModal(false);
+            navigate(`/admin/comparison-chat/${id}/detail`);
           }}
         />
       )}
     </div>
-  )
+  );
 }
 
-function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (id: number) => void }) {
-  const [dprs, setDprs] = useState<DPR[]>([])
-  const [selectedIds, setSelectedIds] = useState<number[]>([])
-  const [name, setName] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+function CreateComparisonModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess: (id: number) => void;
+}) {
+  const [dprs, setDprs] = useState<DPR[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    loadDPRs()
-  }, [])
+    loadDPRs();
+  }, []);
 
   const loadDPRs = async () => {
     try {
-      const data = await api.getDPRs()
-      setDprs(data)
+      const data = await api.getDPRs();
+      setDprs(data);
     } catch (error) {
-      console.error('Failed to load DPRs:', error)
+      console.error("Failed to load DPRs:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const toggleSelection = (id: number) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
-  }
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+    );
+  };
 
   const handleCreate = async () => {
-    if (!name.trim() || selectedIds.length < 2) return
+    if (!name.trim() || selectedIds.length < 2) return;
 
     try {
-      setCreating(true)
-      const result = await api.createComparison(name, selectedIds)
-      onSuccess(result.comparison_id)
+      setCreating(true);
+      const result = await api.createComparison(name, selectedIds);
+      onSuccess(result.comparison_id);
     } catch (error) {
-      console.error('Failed to create comparison:', error)
-      alert('Failed to create comparison. Please try again.')
+      console.error("Failed to create comparison:", error);
+      alert("Failed to create comparison. Please try again.");
     } finally {
-      setCreating(false)
+      setCreating(false);
     }
-  }
+  };
 
-  const filteredDprs = dprs.filter(dpr =>
-    dpr.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dpr.summary_json?.projectName?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredDprs = dprs.filter(
+    (dpr) =>
+      dpr.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dpr.summary_json?.projectName
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col border dark:border-zinc-800">
         <div className="p-6 border-b dark:border-zinc-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Comparison</h2>
-          <p className="text-gray-600 dark:text-zinc-400 mt-1">Select at least 2 documents to compare</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Create New Comparison
+          </h2>
+          <p className="text-gray-600 dark:text-zinc-400 mt-1">
+            Select at least 2 documents to compare
+          </p>
         </div>
 
         <div className="p-6 border-b dark:border-zinc-800">
@@ -242,16 +278,19 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
               <Loader2 className="w-6 h-6 animate-spin text-cyan-500" />
             </div>
           ) : filteredDprs.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-zinc-400 py-8">No documents found</p>
+            <p className="text-center text-gray-500 dark:text-zinc-400 py-8">
+              No documents found
+            </p>
           ) : (
             <div className="space-y-2">
               {filteredDprs.map((dpr) => (
                 <label
                   key={dpr.id}
-                  className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${selectedIds.includes(dpr.id)
-                    ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
-                    : 'border-gray-200 dark:border-zinc-800 hover:border-cyan-300 dark:hover:border-cyan-700'
-                    }`}
+                  className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${
+                    selectedIds.includes(dpr.id)
+                      ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20"
+                      : "border-gray-200 dark:border-zinc-800 hover:border-cyan-300 dark:hover:border-cyan-700"
+                  }`}
                 >
                   <input
                     type="checkbox"
@@ -263,7 +302,9 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
                     <p className="font-medium text-gray-900 dark:text-white truncate">
                       {dpr.summary_json?.projectName || dpr.original_filename}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-zinc-400 truncate">{dpr.original_filename}</p>
+                    <p className="text-sm text-gray-500 dark:text-zinc-400 truncate">
+                      {dpr.original_filename}
+                    </p>
                   </div>
                 </label>
               ))}
@@ -285,11 +326,11 @@ function CreateComparisonModal({ onClose, onSuccess }: { onClose: () => void; on
                 Creating...
               </>
             ) : (
-              'Create Comparison'
+              "Create Comparison"
             )}
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }

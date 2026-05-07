@@ -1,46 +1,46 @@
-import { FileText, Moon, Sun, CheckCircle2, LogOut } from 'lucide-react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Button } from './ui/Button'
-import { useState, useEffect } from 'react'
-import { cn } from '@/lib/utils'
-import { useRole } from '../contexts/RoleContext'
-import { Card } from './ui/Card'
-import { LanguageDropdown } from './LanguageDropdown'
+import { FileText, Moon, Sun, CheckCircle2, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "./ui/Button";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { useRole } from "../contexts/RoleContext";
+import { Card } from "./ui/Card";
+import { LanguageDropdown } from "./LanguageDropdown";
 
 export function Header() {
-  const [isDark, setIsDark] = useState(false)
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { logout } = useRole()
-
-
+  const [isDark, setIsDark] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useRole();
 
   useEffect(() => {
     // Check localStorage first, then check current state
-    const savedTheme = localStorage.getItem('theme')
-    const isDarkMode = savedTheme === 'dark' || (!savedTheme && document.documentElement.classList.contains('dark'))
+    const savedTheme = localStorage.getItem("theme");
+    const isDarkMode =
+      savedTheme === "dark" ||
+      (!savedTheme && document.documentElement.classList.contains("dark"));
 
     if (isDarkMode) {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.remove("dark");
     }
-    setIsDark(isDarkMode)
-  }, [])
+    setIsDark(isDarkMode);
+  }, []);
 
   const toggleDarkMode = () => {
-    const newDarkMode = !isDark
-    document.documentElement.classList.toggle('dark')
-    setIsDark(newDarkMode)
+    const newDarkMode = !isDark;
+    document.documentElement.classList.toggle("dark");
+    setIsDark(newDarkMode);
     // Save preference to localStorage
-    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light')
-  }
+    localStorage.setItem("theme", newDarkMode ? "dark" : "light");
+  };
 
-  const isActive = (path: string) => location.pathname === path
+  const isActive = (path: string) => location.pathname === path;
   const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
+    logout();
+    navigate("/");
+  };
 
   return (
     <>
@@ -50,17 +50,19 @@ export function Header() {
             <div className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center group-hover:shadow-glow transition-all duration-300">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-heading font-semibold text-foreground">NexusAI</span>
+            <span className="text-xl font-heading font-semibold text-foreground">
+              NexusAI
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
             <Link
               to="/admin"
               className={cn(
-                'px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg',
-                isActive('/admin')
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                "px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg",
+                isActive("/admin")
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
               )}
             >
               Home
@@ -68,10 +70,11 @@ export function Header() {
             <Link
               to="/admin/projects"
               className={cn(
-                'px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg',
-                isActive('/admin/projects') || location.pathname.startsWith('/admin/projects/')
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                "px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg",
+                isActive("/admin/projects") ||
+                  location.pathname.startsWith("/admin/projects/")
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
               )}
             >
               Tenders
@@ -79,10 +82,11 @@ export function Header() {
             <Link
               to="/admin/comparisons"
               className={cn(
-                'px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg',
-                isActive('/admin/comparisons') || location.pathname.startsWith('/admin/comparison-chat/')
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                "px-3.5 py-2 text-sm font-medium transition-all duration-200 rounded-lg",
+                isActive("/admin/comparisons") ||
+                  location.pathname.startsWith("/admin/comparison-chat/")
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
               )}
             >
               Compare Bids
@@ -102,19 +106,13 @@ export function Header() {
                 <Moon className="h-4.5 w-4.5 text-muted-foreground" />
               )}
             </button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-            >
+            <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="h-3.5 w-3.5 mr-1.5" />
               Logout
             </Button>
           </div>
         </div>
       </header>
-
-
     </>
-  )
+  );
 }

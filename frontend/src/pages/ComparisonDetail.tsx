@@ -1,156 +1,174 @@
-import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { FileText, Send, Loader2, ArrowLeft, Calendar, Trash2, X, Plus, Search, MessageSquare } from 'lucide-react'
-import { api, Comparison, ComparisonMessage, DPR } from '../lib/api'
-import { Header } from '../components/Header'
-import { Button } from '../components/ui/Button'
-import { Card } from '../components/ui/Card'
-import { useLanguage } from '../contexts/LanguageContext'
-import { ChatMessageFormatter } from '../components/ChatMessageFormatter'
-import { formatIndianCurrency } from '../lib/currency'
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  FileText,
+  Send,
+  Loader2,
+  ArrowLeft,
+  Calendar,
+  Trash2,
+  X,
+  Plus,
+  Search,
+  MessageSquare,
+} from "lucide-react";
+import { api, Comparison, ComparisonMessage, DPR } from "../lib/api";
+import { Header } from "../components/Header";
+import { Button } from "../components/ui/Button";
+import { Card } from "../components/ui/Card";
+import { useLanguage } from "../contexts/LanguageContext";
+import { ChatMessageFormatter } from "../components/ChatMessageFormatter";
+import { formatIndianCurrency } from "../lib/currency";
 
 export default function ComparisonDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const { t } = useLanguage()
-  const [comparison, setComparison] = useState<Comparison | null>(null)
-  const [messages, setMessages] = useState<ComparisonMessage[]>([])
-  const [inputMessage, setInputMessage] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [sending, setSending] = useState(false)
-  const [showClearChatConfirm, setShowClearChatConfirm] = useState(false)
-  const [availableDPRs, setAvailableDPRs] = useState<DPR[]>([])
-  const [removingDPRId, setRemovingDPRId] = useState<number | null>(null)
-  const [showRemoveConfirm, setShowRemoveConfirm] = useState<number | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [showManageDocsModal, setShowManageDocsModal] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const [comparison, setComparison] = useState<Comparison | null>(null);
+  const [messages, setMessages] = useState<ComparisonMessage[]>([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [showClearChatConfirm, setShowClearChatConfirm] = useState(false);
+  const [availableDPRs, setAvailableDPRs] = useState<DPR[]>([]);
+  const [removingDPRId, setRemovingDPRId] = useState<number | null>(null);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState<number | null>(
+    null,
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [showManageDocsModal, setShowManageDocsModal] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (id) {
-      loadComparison()
-      loadChatHistory()
+      loadComparison();
+      loadChatHistory();
     }
-  }, [id])
+  }, [id]);
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   const loadComparison = async () => {
     try {
-      const data = await api.getComparison(Number(id))
-      setComparison(data)
+      const data = await api.getComparison(Number(id));
+      setComparison(data);
     } catch (error) {
-      console.error('Failed to load comparison:', error)
+      console.error("Failed to load comparison:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadChatHistory = async () => {
     try {
-      const history = await api.getComparisonChatHistory(Number(id))
-      setMessages(history)
+      const history = await api.getComparisonChatHistory(Number(id));
+      setMessages(history);
     } catch (error) {
-      console.error('Failed to load chat history:', error)
+      console.error("Failed to load chat history:", error);
     }
-  }
+  };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleClearChat = () => {
-    setShowClearChatConfirm(true)
-  }
+    setShowClearChatConfirm(true);
+  };
 
   const confirmClearChat = async () => {
-    if (!id) return
+    if (!id) return;
 
     try {
-      await api.clearComparisonChatHistory(Number(id))
-      setMessages([])
-      setShowClearChatConfirm(false)
+      await api.clearComparisonChatHistory(Number(id));
+      setMessages([]);
+      setShowClearChatConfirm(false);
     } catch (error) {
-      console.error('Failed to clear chat:', error)
-      alert('Failed to clear chat history')
+      console.error("Failed to clear chat:", error);
+      alert("Failed to clear chat history");
     }
-  }
+  };
 
   const loadAvailableDPRs = async () => {
     try {
-      const allDPRs = await api.getDPRs()
-      const currentDPRIds = comparison?.dprs?.map(d => d.id) || []
-      setAvailableDPRs(allDPRs.filter(dpr => !currentDPRIds.includes(dpr.id)))
+      const allDPRs = await api.getDPRs();
+      const currentDPRIds = comparison?.dprs?.map((d) => d.id) || [];
+      setAvailableDPRs(
+        allDPRs.filter((dpr) => !currentDPRIds.includes(dpr.id)),
+      );
     } catch (error) {
-      console.error('Failed to load available DPRs:', error)
+      console.error("Failed to load available DPRs:", error);
     }
-  }
+  };
 
   const handleRemoveDPR = async (dprId: number) => {
-    if (!id) return
+    if (!id) return;
 
     try {
-      setRemovingDPRId(dprId)
-      await api.removeDPRFromComparison(Number(id), dprId)
-      await loadComparison()
-      setShowRemoveConfirm(null)
+      setRemovingDPRId(dprId);
+      await api.removeDPRFromComparison(Number(id), dprId);
+      await loadComparison();
+      setShowRemoveConfirm(null);
     } catch (error) {
-      console.error('Failed to remove DPR:', error)
-      alert('Failed to remove PDF from comparison')
+      console.error("Failed to remove DPR:", error);
+      alert("Failed to remove PDF from comparison");
     } finally {
-      setRemovingDPRId(null)
+      setRemovingDPRId(null);
     }
-  }
+  };
 
   const handleAddDPR = async (dprId: number) => {
-    if (!id) return
+    if (!id) return;
 
     try {
-      await api.addDPRToComparison(Number(id), dprId)
-      await loadComparison()
+      await api.addDPRToComparison(Number(id), dprId);
+      await loadComparison();
       // Reload available DPRs to update the list (allow adding multiple)
-      await loadAvailableDPRs()
+      await loadAvailableDPRs();
     } catch (error) {
-      console.error('Failed to add DPR:', error)
-      alert('Failed to add PDF to comparison')
+      console.error("Failed to add DPR:", error);
+      alert("Failed to add PDF to comparison");
     }
-  }
+  };
 
   const handleSend = async () => {
-    if (!inputMessage.trim() || sending) return
+    if (!inputMessage.trim() || sending) return;
 
     const userMessage: ComparisonMessage = {
       id: Date.now(),
       comparison_id: Number(id),
-      role: 'user',
+      role: "user",
       text: inputMessage,
       timestamp: new Date().toISOString(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInputMessage('')
-    setSending(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage("");
+    setSending(true);
 
     try {
-      const response = await api.sendComparisonMessage(Number(id), inputMessage)
-      setMessages((prev) => [...prev, response])
+      const response = await api.sendComparisonMessage(
+        Number(id),
+        inputMessage,
+      );
+      setMessages((prev) => [...prev, response]);
     } catch (error) {
-      console.error('Failed to send message:', error)
-      alert('Failed to send message. Please try again.')
+      console.error("Failed to send message:", error);
+      alert("Failed to send message. Please try again.");
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -160,7 +178,7 @@ export default function ComparisonDetailPage() {
           <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
         </div>
       </div>
-    )
+    );
   }
 
   if (!comparison) {
@@ -169,8 +187,12 @@ export default function ComparisonDetailPage() {
         <Header />
         <div className="max-w-7xl mx-auto px-6 py-8">
           <Card className="p-12 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Comparison not found</h2>
-            <p className="text-gray-600 mb-6">The comparison you&apos;re looking for doesn&apos;t exist.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Comparison not found
+            </h2>
+            <p className="text-gray-600 mb-6">
+              The comparison you&apos;re looking for doesn&apos;t exist.
+            </p>
             <Button onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Comparisons
@@ -178,7 +200,7 @@ export default function ComparisonDetailPage() {
           </Card>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -193,12 +215,14 @@ export default function ComparisonDetailPage() {
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('comparisons.backToComparisons')}
+            {t("comparisons.backToComparisons")}
           </Button>
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{comparison.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {comparison.name}
+              </h1>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-zinc-400">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
@@ -206,15 +230,17 @@ export default function ComparisonDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  <span>{new Date(comparison.created_ts).toLocaleDateString()}</span>
+                  <span>
+                    {new Date(comparison.created_ts).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             </div>
             <Button
               variant="outline"
               onClick={() => {
-                loadAvailableDPRs()
-                setShowManageDocsModal(true)
+                loadAvailableDPRs();
+                setShowManageDocsModal(true);
               }}
               className="flex items-center gap-2"
             >
@@ -227,10 +253,14 @@ export default function ComparisonDetailPage() {
         {/* Two-column layout: Table | Chat */}
         <div className="grid grid-cols-12 gap-6">
           {/* Main - Comparison Table */}
-          <div className={`transition-all duration-300 ${isChatOpen ? 'col-span-7' : 'col-span-12'}`}>
+          <div
+            className={`transition-all duration-300 ${isChatOpen ? "col-span-7" : "col-span-12"}`}
+          >
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">DPR Comparison</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  DPR Comparison
+                </h3>
                 <Button
                   variant="outline"
                   size="sm"
@@ -238,7 +268,7 @@ export default function ComparisonDetailPage() {
                   className="flex items-center gap-2"
                 >
                   <MessageSquare className="h-4 w-4" />
-                  {isChatOpen ? 'Hide Chat' : 'Show Chat'}
+                  {isChatOpen ? "Hide Chat" : "Show Chat"}
                 </Button>
               </div>
 
@@ -246,64 +276,95 @@ export default function ComparisonDetailPage() {
                 <table className="w-full border-collapse min-w-[500px]">
                   <thead>
                     <tr className="border-b-2 border-gray-200 dark:border-zinc-800">
-                      <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">DPR Name</th>
-                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Quality Score</th>
-                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Compliance</th>
-                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Timeline</th>
-                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Cost</th>
+                      <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">
+                        DPR Name
+                      </th>
+                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">
+                        Quality Score
+                      </th>
+                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">
+                        Compliance
+                      </th>
+                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">
+                        Timeline
+                      </th>
+                      <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">
+                        Cost
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {comparison.dprs?.map((dpr, index) => {
-                      const data = dpr.summary_json
-                      const qualityScore = data?.overallScore ?? null
-                      const complianceScore = data?.evaluationCriteria?.overallComplianceScore ?? null
-                      const timeline = data?.timelineAnalysis?.implementationDurationMonths ?? null
-                      const cost = data?.financialAnalysis?.projectCost?.totalInitialInvestmentLakhINR ?? null
+                      const data = dpr.summary_json;
+                      const qualityScore = data?.overallScore ?? null;
+                      const complianceScore =
+                        data?.evaluationCriteria?.overallComplianceScore ??
+                        null;
+                      const timeline =
+                        data?.timelineAnalysis?.implementationDurationMonths ??
+                        null;
+                      const cost =
+                        data?.financialAnalysis?.projectCost
+                          ?.totalInitialInvestmentLakhINR ?? null;
 
                       const getScoreColor = (score: number | null) => {
-                        if (score === null) return 'text-gray-400'
-                        if (score >= 80) return 'text-green-600 dark:text-green-400'
-                        if (score >= 60) return 'text-yellow-600 dark:text-yellow-400'
-                        return 'text-red-600 dark:text-red-400'
-                      }
+                        if (score === null) return "text-gray-400";
+                        if (score >= 80)
+                          return "text-green-600 dark:text-green-400";
+                        if (score >= 60)
+                          return "text-yellow-600 dark:text-yellow-400";
+                        return "text-red-600 dark:text-red-400";
+                      };
 
                       return (
                         <tr
                           key={dpr.id}
-                          className={`border-b border-gray-100 dark:border-zinc-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-zinc-950' : 'bg-gray-50/50 dark:bg-zinc-900/50'
-                            }`}
+                          className={`border-b border-gray-100 dark:border-zinc-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+                            index % 2 === 0
+                              ? "bg-white dark:bg-zinc-950"
+                              : "bg-gray-50/50 dark:bg-zinc-900/50"
+                          }`}
                         >
                           <td className="p-3">
                             <div>
                               <p className="font-medium text-gray-900 dark:text-white text-sm">
                                 {data?.projectName || dpr.original_filename}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{dpr.original_filename}</p>
+                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                                {dpr.original_filename}
+                              </p>
                             </div>
                           </td>
                           <td className="p-3 text-center">
-                            <span className={`font-semibold ${getScoreColor(qualityScore)}`}>
-                              {qualityScore !== null ? `${qualityScore}/100` : '-'}
+                            <span
+                              className={`font-semibold ${getScoreColor(qualityScore)}`}
+                            >
+                              {qualityScore !== null
+                                ? `${qualityScore}/100`
+                                : "-"}
                             </span>
                           </td>
                           <td className="p-3 text-center">
-                            <span className={`font-semibold ${getScoreColor(complianceScore)}`}>
-                              {complianceScore !== null ? `${complianceScore}/100` : '-'}
+                            <span
+                              className={`font-semibold ${getScoreColor(complianceScore)}`}
+                            >
+                              {complianceScore !== null
+                                ? `${complianceScore}/100`
+                                : "-"}
                             </span>
                           </td>
                           <td className="p-3 text-center">
                             <span className="text-gray-900 dark:text-white font-medium">
-                              {timeline !== null ? `${timeline} months` : '-'}
+                              {timeline !== null ? `${timeline} months` : "-"}
                             </span>
                           </td>
                           <td className="p-3 text-center">
                             <span className="text-gray-900 dark:text-white font-medium">
-                              {cost !== null ? formatIndianCurrency(cost) : '-'}
+                              {cost !== null ? formatIndianCurrency(cost) : "-"}
                             </span>
                           </td>
                         </tr>
-                      )
+                      );
                     })}
                   </tbody>
                 </table>
@@ -311,13 +372,15 @@ export default function ComparisonDetailPage() {
                 {(!comparison.dprs || comparison.dprs.length === 0) && (
                   <div className="text-center py-12">
                     <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-600 dark:text-zinc-400">No DPRs in this comparison yet</p>
+                    <p className="text-gray-600 dark:text-zinc-400">
+                      No DPRs in this comparison yet
+                    </p>
                     <Button
                       variant="outline"
                       className="mt-4"
                       onClick={() => {
-                        loadAvailableDPRs()
-                        setShowManageDocsModal(true)
+                        loadAvailableDPRs();
+                        setShowManageDocsModal(true);
                       }}
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -336,7 +399,9 @@ export default function ComparisonDetailPage() {
                 <div className="p-4 border-b dark:border-zinc-800 flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{t('comparisons.aiChat')}</h3>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {t("comparisons.aiChat")}
+                    </h3>
                   </div>
                   <div className="flex items-center gap-2">
                     {messages.length > 0 && (
@@ -345,7 +410,7 @@ export default function ComparisonDetailPage() {
                         size="sm"
                         onClick={handleClearChat}
                         className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
-                        title={t('common.clearChat')}
+                        title={t("common.clearChat")}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -368,14 +433,21 @@ export default function ComparisonDetailPage() {
                       <div className="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                         <FileText className="w-8 h-8 text-cyan-600 dark:text-cyan-400" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Start comparing documents</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        Start comparing documents
+                      </h3>
                       <p className="text-gray-600 dark:text-zinc-400 max-w-md mx-auto text-sm">
-                        Ask questions to compare these documents, find differences, or get insights across all of them.
+                        Ask questions to compare these documents, find
+                        differences, or get insights across all of them.
                       </p>
                     </div>
                   ) : (
                     messages.map((message, index) => (
-                      <ChatMessageFormatter key={index} text={message.text} isUser={message.role === 'user'} />
+                      <ChatMessageFormatter
+                        key={index}
+                        text={message.text}
+                        isUser={message.role === "user"}
+                      />
                     ))
                   )}
                   <div ref={messagesEndRef} />
@@ -388,11 +460,14 @@ export default function ComparisonDetailPage() {
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder={t('documentDetail.askQuestion')}
+                      placeholder={t("documentDetail.askQuestion")}
                       disabled={sending}
                       className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 disabled:bg-gray-100 dark:disabled:bg-gray-800 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     />
-                    <Button onClick={handleSend} disabled={!inputMessage.trim() || sending}>
+                    <Button
+                      onClick={handleSend}
+                      disabled={!inputMessage.trim() || sending}
+                    >
                       {sending ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
@@ -410,12 +485,18 @@ export default function ComparisonDetailPage() {
         {showClearChatConfirm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
-              <h3 className="text-lg font-semibold mb-2">Clear Chat History?</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Clear Chat History?
+              </h3>
               <p className="text-muted-foreground mb-6">
-                This will permanently delete all messages in this comparison chat. This action cannot be undone.
+                This will permanently delete all messages in this comparison
+                chat. This action cannot be undone.
               </p>
               <div className="flex justify-end gap-3">
-                <Button variant="outline" onClick={() => setShowClearChatConfirm(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowClearChatConfirm(false)}
+                >
                   Cancel
                 </Button>
                 <Button
@@ -433,12 +514,18 @@ export default function ComparisonDetailPage() {
         {showRemoveConfirm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
-              <h3 className="text-lg font-semibold mb-2">Remove PDF from Comparison?</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Remove PDF from Comparison?
+              </h3>
               <p className="text-muted-foreground mb-6">
-                This will remove the PDF from this comparison. The PDF itself will not be deleted.
+                This will remove the PDF from this comparison. The PDF itself
+                will not be deleted.
               </p>
               <div className="flex justify-end gap-3">
-                <Button variant="outline" onClick={() => setShowRemoveConfirm(null)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowRemoveConfirm(null)}
+                >
                   Cancel
                 </Button>
                 <Button
@@ -446,7 +533,11 @@ export default function ComparisonDetailPage() {
                   onClick={() => handleRemoveDPR(showRemoveConfirm)}
                   disabled={removingDPRId === showRemoveConfirm}
                 >
-                  {removingDPRId === showRemoveConfirm ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Remove PDF'}
+                  {removingDPRId === showRemoveConfirm ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Remove PDF"
+                  )}
                 </Button>
               </div>
             </Card>
@@ -458,11 +549,13 @@ export default function ComparisonDetailPage() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-lg p-6 animate-in fade-in zoom-in duration-200 max-h-[85vh] flex flex-col">
               <div className="flex justify-between items-center mb-4 shrink-0">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Manage Documents</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Manage Documents
+                </h2>
                 <button
                   onClick={() => {
-                    setShowManageDocsModal(false)
-                    setSearchQuery('')
+                    setShowManageDocsModal(false);
+                    setSearchQuery("");
                   }}
                   className="text-muted-foreground hover:text-foreground"
                 >
@@ -484,9 +577,12 @@ export default function ComparisonDetailPage() {
                     >
                       <div className="flex-1 min-w-0 mr-3">
                         <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
-                          {dpr.summary_json?.projectName || dpr.original_filename}
+                          {dpr.summary_json?.projectName ||
+                            dpr.original_filename}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-zinc-400 truncate">{dpr.original_filename}</p>
+                        <p className="text-xs text-gray-500 dark:text-zinc-400 truncate">
+                          {dpr.original_filename}
+                        </p>
                       </div>
                       {comparison.dprs && comparison.dprs.length >= 3 && (
                         <button
@@ -530,20 +626,28 @@ export default function ComparisonDetailPage() {
 
                 <div className="flex-1 overflow-y-auto space-y-2">
                   {availableDPRs
-                    .filter(dpr =>
-                      dpr.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      dpr.summary_json?.projectName?.toLowerCase().includes(searchQuery.toLowerCase())
+                    .filter(
+                      (dpr) =>
+                        dpr.original_filename
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase()) ||
+                        dpr.summary_json?.projectName
+                          ?.toLowerCase()
+                          .includes(searchQuery.toLowerCase()),
                     )
-                    .map(dpr => (
+                    .map((dpr) => (
                       <div
                         key={dpr.id}
                         onClick={() => handleAddDPR(dpr.id)}
                         className="p-3 rounded-lg border border-gray-200 dark:border-zinc-800 cursor-pointer hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all"
                       >
                         <p className="font-medium text-sm text-gray-900 dark:text-white truncate">
-                          {dpr.summary_json?.projectName || dpr.original_filename}
+                          {dpr.summary_json?.projectName ||
+                            dpr.original_filename}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-zinc-400 truncate">{dpr.original_filename}</p>
+                        <p className="text-xs text-gray-500 dark:text-zinc-400 truncate">
+                          {dpr.original_filename}
+                        </p>
                       </div>
                     ))}
                   {availableDPRs.length === 0 && (
@@ -551,10 +655,16 @@ export default function ComparisonDetailPage() {
                       No more PDFs available to add
                     </div>
                   )}
-                  {availableDPRs.length > 0 && availableDPRs.filter(dpr =>
-                    dpr.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    dpr.summary_json?.projectName?.toLowerCase().includes(searchQuery.toLowerCase())
-                  ).length === 0 && (
+                  {availableDPRs.length > 0 &&
+                    availableDPRs.filter(
+                      (dpr) =>
+                        dpr.original_filename
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase()) ||
+                        dpr.summary_json?.projectName
+                          ?.toLowerCase()
+                          .includes(searchQuery.toLowerCase()),
+                    ).length === 0 && (
                       <div className="text-center py-6 text-gray-500 dark:text-zinc-400 text-sm">
                         No PDFs match your search
                       </div>
@@ -566,8 +676,8 @@ export default function ComparisonDetailPage() {
                 variant="outline"
                 className="w-full mt-4 shrink-0"
                 onClick={() => {
-                  setShowManageDocsModal(false)
-                  setSearchQuery('')
+                  setShowManageDocsModal(false);
+                  setSearchQuery("");
                 }}
               >
                 Done
@@ -577,5 +687,5 @@ export default function ComparisonDetailPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
