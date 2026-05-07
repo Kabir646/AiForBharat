@@ -1,503 +1,272 @@
-import React, { useState, useEffect } from 'react';
-import {
-    Moon, Sun, FileText, ShieldAlert, CheckCircle2,
-    WifiOff, MessageSquare, Globe, Map as MapIcon,
-    Layers, BarChart3, Clock,
-    Menu, X, Send
-} from 'lucide-react';
-import { AuthModal } from '@/components/AuthModal';
-import { LanguageDropdown } from '@/components/LanguageDropdown';
+import React from 'react'
+import { Shield, Brain, Languages, Map, Activity, ShieldCheck, FileCode, ChevronDown } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
-
-
-const DPRAnalyzerLanding: React.FC = () => {
-
-    // Initialize theme from localStorage or default to dark
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        const savedTheme = localStorage.getItem('theme')
-        return savedTheme === 'dark' || savedTheme === null // Default to dark if no preference
-    })
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [chatMessage, setChatMessage] = useState("");
-    const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'bot', text: string }[]>([
-        { role: 'bot', text: 'Hello! I am your AI assistant for NexusAI project analysis. How can I help you today?' }
-    ]);
-
-    // Toggle Dark Mode
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }, [isDarkMode]);
-
-    const toggleTheme = () => {
-        const newDarkMode = !isDarkMode
-        setIsDarkMode(newDarkMode)
-        localStorage.setItem('theme', newDarkMode ? 'dark' : 'light')
-    }
-    const toggleChat = () => setIsChatOpen(!isChatOpen);
-
-    const handleChatSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!chatMessage.trim()) return;
-        setChatHistory([...chatHistory, { role: 'user', text: chatMessage }]);
-        setTimeout(() => {
-            setChatHistory(prev => [...prev, { role: 'bot', text: "I'm analyzing that request based on the latest DPR guidelines..." }]);
-        }, 1000);
-        setChatMessage("");
-    };
+export default function DPRLandingPage() {
+    const navigate = useNavigate()
 
     return (
-        <div className={`min-h-screen font-sans transition-colors duration-300 ${isDarkMode ? 'bg-zinc-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
-
-            {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-          1. HEADER
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-            <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isDarkMode ? 'bg-zinc-950/80 border-b border-zinc-800' : 'bg-white/60 border-b border-slate-200'} backdrop-blur-md`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        {/* Logo Area */}
-                        <div className="flex items-center space-x-2">
-                            <div>
-                                <h1 className="text-xl font-bold tracking-tight">NexusAI</h1>
-                            </div>
-                            <LanguageDropdown />
-                        </div>
-
-                        {/* Desktop Nav & Actions */}
-                        <div className="hidden md:flex items-center space-x-6">
-                            <nav className="flex space-x-4 text-sm font-medium opacity-80">
-                                <a href="#features" className="hover:text-blue-500 transition-colors">Features</a>
-                                <a href="#comparison" className="hover:text-blue-500 transition-colors">Compare</a>
-                                <a href="#states" className="hover:text-blue-500 transition-colors">Benefits</a>
-                            </nav>
-
-                            <div className="flex items-center space-x-3 pl-6 border-l border-slate-700/30">
-                                {/* Theme Toggle */}
-                                <button
-                                    onClick={toggleTheme}
-                                    className="p-2 rounded-full hover:bg-slate-200/20 transition-colors"
-                                    aria-label="Toggle Theme"
-                                >
-                                    {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-                                </button>
-
-                                {/* Login Button */}
-                                <button
-                                    onClick={() => setIsAuthModalOpen(true)}
-                                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105 transition-all duration-300"
-                                >
-                                    Login
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Mobile Menu Button */}
-                        <div className="md:hidden flex items-center">
-                            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2">
-                                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                            </button>
-                        </div>
+        <div className="min-h-screen bg-black text-white font-sans selection:bg-white/20">
+            {/* Header */}
+            <header className="flex justify-between items-center px-6 py-4 border-b border-white/5 backdrop-blur-sm sticky top-0 z-50 bg-black/80">
+                <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center">
+                        <div className="w-3 h-3 bg-black rounded-full" />
                     </div>
+                    <span className="text-xl font-semibold tracking-wide ml-2">NEXUS AI</span>
+                    <span className="text-white/20 mx-2">|</span>
+                    <span className="text-white/60">DPR Analyzer</span>
                 </div>
-
-                {/* Mobile Menu */}
-                {mobileMenuOpen && (
-                    <div className={`md:hidden absolute w-full border-b ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-slate-200'}`}>
-                        <div className="px-4 pt-2 pb-6 space-y-4">
-                            <a href="#features" className="block py-2 font-medium">Features</a>
-                            <a href="#comparison" className="block py-2 font-medium">Compare</a>
-                            <a href="#states" className="block py-2 font-medium">Benefits</a>
-                            <div className="flex items-center justify-between pt-4 border-t border-slate-700/30">
-                                <span className="text-sm opacity-70">Theme</span>
-                                <button onClick={toggleTheme} className="p-2 bg-slate-200/20 rounded-full">
-                                    {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-                                </button>
-                            </div>
-                            <button onClick={() => setIsAuthModalOpen(true)} className="block w-full text-center py-3 rounded-lg bg-blue-600 text-white font-bold">
-                                Login Portal
-                            </button>
-                        </div>
+                <div className="flex items-center gap-4">
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse"></div>
+                        <span className="text-green-500 text-xs font-medium tracking-wide">System: Operational</span>
                     </div>
-                )}
+                    <button 
+                        onClick={() => navigate('/role-selection')}
+                        className="px-6 py-2 rounded-full bg-white text-black hover:bg-white/90 transition-colors text-sm font-medium shadow-lg shadow-white/10"
+                    >
+                        Login
+                    </button>
+                </div>
             </header>
 
-            <main>
-                {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-            2. HERO SECTION
-        ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-                <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
-                    {/* Background Gradient */}
-                    <div className="absolute inset-0 z-0">
-                        {/* Base background */}
-                        <div className={`absolute inset-0 ${isDarkMode ? 'bg-zinc-950' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'}`}></div>
-                        {/* Purple glow - top right */}
-                        <div className={`absolute top-0 right-0 w-[600px] h-[600px] ${isDarkMode ? 'bg-purple-700/20' : 'bg-purple-400/30'} rounded-full blur-3xl`}></div>
-                        {/* Violet glow - bottom left */}
-                        <div className={`absolute bottom-0 left-0 w-[700px] h-[700px] ${isDarkMode ? 'bg-violet-800/15' : 'bg-blue-400/20'} rounded-full blur-3xl`}></div>
-                        {/* Faint center glow */}
-                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] ${isDarkMode ? 'bg-purple-900/20' : 'bg-pink-300/20'} rounded-full blur-3xl`}></div>
+            <main className="flex flex-col items-center">
+                {/* Hero Section */}
+                <section className="w-full flex flex-col items-center pt-24 pb-20 px-6 text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 mb-8">
+                        <Shield className="w-4 h-4 text-amber-400" />
+                        <span className="text-xs font-medium text-white/70 uppercase tracking-wider">Built for CRPF</span>
                     </div>
 
-                    <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-600/15 border-blue-600/30 text-blue-700'} border text-xs font-medium mb-6 animate-fade-in-up`}>
-                            <span className="relative flex h-2 w-2">
-                                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'} opacity-75`}></span>
-                                <span className={`relative inline-flex rounded-full h-2 w-2 ${isDarkMode ? 'bg-blue-500' : 'bg-blue-600'}`}></span>
-                            </span>
-                            <span>AI-Powered Governance</span>
-                        </div>
+                    <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight max-w-4xl leading-[1.1]">
+                        Mission Control for Infrastructure Analysis with tight tracking
+                    </h1>
+                    
+                    <p className="text-lg text-white/50 mb-12 max-w-2xl leading-relaxed">
+                        AI-powered DPR evaluation for operational-grade project intelligence.<br className="hidden sm:block" />
+                        Secure, fast, and analytical.
+                    </p>
 
-                        <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight animate-slide-up animate-delay-100">
-                            Tender Evaluator <br />
-                            <span className="gradient-text">NexusAI</span>
-                        </h1>
-
-                        <p className={`text-lg md:text-xl max-w-3xl mx-auto mb-10 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'} animate-slide-up animate-delay-200`}>
-                            AI-powered project evaluation for infrastructure excellence. <br className="hidden md:block" />
-                            Accelerating development through intelligent automation.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row items-center justify-center animate-slide-up animate-delay-300">
-                            <button
-                                onClick={() => setIsAuthModalOpen(true)}
-                                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg shadow-lg shadow-blue-500/25 hover:scale-105 hover:shadow-blue-500/40 transition-all duration-300"
-                            >
-                                Start Analyzing Now
-                            </button>
-                        </div>
-
-                        <p className={`mt-8 text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Intelligent Infrastructure Analysis Platform</p>
-                    </div>
-                </section>
-
-                {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-                {/* INTELLIGENT FEATURES SECTION */}
-                <section id="features" className="py-24 bg-muted/30 border-y border-border/50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-12 text-center">Intelligent Features</h2>
-                            <p className={`text-lg font-semibold max-w-2xl mx-auto ${isDarkMode ? 'text-white' : 'text-black'}`}>Comprehensive tools designed to streamline the project review lifecycle.</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <FeatureCard
-                                icon={<FileText className="text-blue-400" />}
-                                title="Fast PDF Parsing"
-                                desc="Extracts data from complex DPRs in seconds with high fidelity."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<ShieldAlert className="text-amber-400" />}
-                                title="Risk Prediction"
-                                desc="AI identifies potential bottlenecks and compliance risks early."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<CheckCircle2 className="text-indigo-400" />}
-                                title="Compliance Check"
-                                desc="Automated validation against latest government guidelines."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<BarChart3 className="text-blue-400" />}
-                                title="Recommendations"
-                                desc="Smart suggestions for admins to improve project viability."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<WifiOff className="text-slate-400" />}
-                                title="Offline Mode"
-                                desc="Continue working without internet. Syncs when back online."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<MessageSquare className="text-pink-400" />}
-                                title="AI Chat Assist"
-                                desc="Ask questions about any DPR in natural language."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<Globe className="text-cyan-400" />}
-                                title="Multilingual"
-                                desc="Support for multiple Indian languages nationwide."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<Layers className="text-orange-400" />}
-                                title="Multi-DPR Compare"
-                                desc="Side-by-side comparison of multiple project proposals."
-                                isDarkMode={isDarkMode}
-                            />
-                            <FeatureCard
-                                icon={<MapIcon className="text-green-400" />}
-                                title="Geospatial View"
-                                desc="Visualize project locations and impact areas on the map."
-                                isDarkMode={isDarkMode}
-                            />
-                        </div>
-                    </div>
-                </section>
-
-                {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-            4 & 5. DEMO SECTION (Comparison + Map)
-        ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-                <section id="comparison" className={`py-24 ${isDarkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-                            {/* DPR Comparison Mini-Demo */}
-                            <div className={`p-8 rounded-3xl border ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-slate-50 border-slate-200'} shadow-2xl`}>
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xl font-bold flex items-center gap-2">
-                                        <Layers size={20} className="text-indigo-500" /> DPR Comparison
-                                    </h3>
-                                    <span className="text-xs px-2 py-1 rounded bg-indigo-500/10 text-indigo-500">Live Demo</span>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
-                                            <div className="h-2 w-12 bg-slate-500/20 rounded mb-2"></div>
-                                            <div className="text-sm font-medium">Road Project A</div>
-                                            <div className="text-xs text-blue-500 mt-1">Score: 92/100</div>
-                                        </div>
-                                        <div className={`p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
-                                            <div className="h-2 w-12 bg-slate-500/20 rounded mb-2"></div>
-                                            <div className="text-sm font-medium">Bridge Project B</div>
-                                            <div className="text-xs text-amber-500 mt-1">Score: 78/100</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="relative h-32 w-full bg-slate-500/10 rounded-xl overflow-hidden flex items-end justify-center gap-4 p-4">
-                                        {/* Mock Chart */}
-                                        <div className="w-8 bg-blue-500/80 rounded-t-md h-[80%]"></div>
-                                        <div className="w-8 bg-indigo-500/80 rounded-t-md h-[60%]"></div>
-                                        <div className="w-8 bg-cyan-500/80 rounded-t-md h-[90%]"></div>
-                                        <div className="absolute top-2 right-2 text-[10px] opacity-50">Cost vs Impact</div>
-                                    </div>
-
-                                    <button className="w-full py-2 rounded-lg bg-slate-500/10 hover:bg-slate-500/20 transition-colors text-sm font-medium">
-                                        Run Detailed Comparison
-                                    </button>
-                                </div>
+                    {/* Dashboard Mockup Visual */}
+                    <div className="relative w-full max-w-5xl aspect-[16/9] md:aspect-[21/9] rounded-xl border border-white/10 bg-[#0A0A0A] p-2 shadow-2xl mb-12 overflow-hidden group">
+                        {/* Glow effect */}
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 blur-2xl opacity-50 group-hover:opacity-70 transition duration-1000"></div>
+                        
+                        <div className="relative w-full h-full rounded-lg border border-white/5 bg-[#111] overflow-hidden flex flex-col">
+                            {/* Mockup Header */}
+                            <div className="h-10 border-b border-white/5 flex items-center px-4 gap-2 bg-[#1a1a1a]">
+                                <div className="w-3 h-3 rounded-full bg-red-500/30 border border-red-500/50"></div>
+                                <div className="w-3 h-3 rounded-full bg-amber-500/30 border border-amber-500/50"></div>
+                                <div className="w-3 h-3 rounded-full bg-green-500/30 border border-green-500/50"></div>
                             </div>
-
-                            {/* Map Preview Card */}
-                            <div className={`p-8 rounded-3xl border ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-slate-50 border-slate-200'} shadow-2xl relative overflow-hidden group`}>
-                                <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/92.9376,26.2006,6,0/600x400?access_token=PLACEHOLDER')] bg-cover bg-center opacity-50 group-hover:scale-105 transition-transform duration-700"></div>
-                                <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-zinc-950 via-zinc-950/50' : 'from-white via-white/50'} to-transparent`}></div>
-
-                                <div className="relative z-10">
-                                    <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
-                                        <MapIcon size={20} className="text-blue-500" /> Geospatial Intelligence
-                                    </h3>
-                                    <p className="text-sm opacity-70 mb-6">Visualize project distribution and regional impact.</p>
-
-                                    <div className="flex gap-3">
-                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/20 text-red-400 text-xs border border-red-500/30 backdrop-blur-sm">
-                                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div> High Risk Areas
+                            {/* Mockup Content Grid */}
+                            <div className="flex-1 flex p-4 gap-4">
+                                {/* Sidebar mock */}
+                                <div className="hidden md:flex flex-col w-48 border-r border-white/5 pr-4 space-y-4">
+                                    <div className="h-6 w-3/4 bg-white/10 rounded"></div>
+                                    <div className="h-4 w-1/2 bg-white/5 rounded"></div>
+                                    <div className="h-4 w-2/3 bg-white/5 rounded"></div>
+                                    <div className="h-4 w-1/2 bg-white/5 rounded"></div>
+                                    <div className="h-4 w-3/4 bg-white/5 rounded"></div>
+                                </div>
+                                {/* Main content mock */}
+                                <div className="flex-1 flex flex-col gap-4">
+                                    <div className="flex-1 bg-white/[0.02] rounded border border-white/5 relative overflow-hidden flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent"></div>
+                                        {/* Mock map outline or graph */}
+                                        <div className="grid grid-cols-6 grid-rows-4 gap-2 w-full h-full p-4 opacity-20">
+                                            {[...Array(24)].map((_, i) => (
+                                                <div key={i} className="border border-white/20 rounded-sm"></div>
+                                            ))}
                                         </div>
-                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30 backdrop-blur-sm">
-                                            <div className="w-2 h-2 rounded-full bg-blue-500"></div> Completed
+                                    </div>
+                                    <div className="h-1/3 flex gap-4">
+                                        <div className="flex-1 bg-white/[0.02] rounded border border-white/5 p-3 flex items-end">
+                                            <div className="w-full h-1/2 bg-gradient-to-t from-blue-500/20 to-transparent border-t border-blue-500/50"></div>
+                                        </div>
+                                        <div className="hidden sm:flex flex-1 bg-white/[0.02] rounded border border-white/5 p-3 items-end">
+                                            <div className="w-full flex items-end gap-1 h-full">
+                                                {[...Array(8)].map((_, i) => (
+                                                    <div key={i} className="flex-1 bg-purple-500/30 rounded-t" style={{ height: `${Math.random() * 80 + 20}%`}}></div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Mock Marker Popup */}
-                                <div className={`absolute bottom-8 right-8 p-4 rounded-xl ${isDarkMode ? 'bg-zinc-900/90' : 'bg-white/90'} backdrop-blur-md shadow-lg border border-zinc-700/20 max-w-[200px] transform translate-y-2 group-hover:translate-y-0 transition-transform`}>
-                                    <div className="text-xs font-bold mb-1">Assam Highway Project</div>
-                                    <div className="text-[10px] opacity-70 mb-2">Risk Score: Low</div>
-                                    <div className="h-1 w-full bg-slate-500/20 rounded-full overflow-hidden">
-                                        <div className="h-full bg-blue-500 w-[85%]"></div>
-                                    </div>
-                                </div>
                             </div>
-
                         </div>
                     </div>
+
+                    <button 
+                        onClick={() => navigate('/role-selection')}
+                        className="px-8 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-all text-sm font-medium backdrop-blur-sm shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+                    >
+                        Analyze Report
+                    </button>
                 </section>
 
-                {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-            6. PLATFORM BENEFITS
-        ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-                <section id="states" className={`py-24 ${isDarkMode ? 'bg-zinc-950' : 'bg-slate-50'}`}>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-3">
-                                Why Choose <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-600">NexusAI</span>
-                            </h2>
-                            <p className="text-lg opacity-60 max-w-2xl mx-auto">
-                                Empowering smarter decisions with cutting-edge AI technology
-                            </p>
-                        </div>
-
-                        <div className="grid md:grid-cols-3 gap-6">
-                            {/* Benefit Card 1 */}
-                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up`}>
-                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4 animate-bounce-slow">
-                                    <BarChart3 className="text-white" size={24} />
+                {/* Core Capabilities */}
+                <section className="w-full max-w-6xl px-6 py-20 border-t border-white/10">
+                    <h2 className="text-3xl font-semibold mb-12 text-center tracking-tight">Core Capabilities</h2>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[
+                            {
+                                icon: Brain,
+                                title: "AI-Powered Analysis",
+                                desc: "AI-powered DPR evaluation for operational-grade project intelligence."
+                            },
+                            {
+                                icon: Languages,
+                                title: "Multi-Language Support",
+                                desc: "High-fidelity execution, professional glyphs and language support."
+                            },
+                            {
+                                icon: Map,
+                                title: "Pan-India Evaluation",
+                                desc: "Evaluations fine-tuned, professional insights and Pan-India analysis."
+                            },
+                            {
+                                icon: Activity,
+                                title: "Real-time Metrics",
+                                desc: "Live tracking of project feasibility, cost overrides, and timeline risks."
+                            },
+                            {
+                                icon: ShieldCheck,
+                                title: "Risk Mitigation",
+                                desc: "Identify structural and financial risks before they impact the timeline."
+                            },
+                            {
+                                icon: FileCode,
+                                title: "Automated Reporting",
+                                desc: "Generate comprehensive reports ready for final executive review."
+                            }
+                        ].map((capability, i) => (
+                            <div key={i} className="p-8 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300">
+                                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 border border-white/5">
+                                    <capability.icon className="w-6 h-6 text-white/70" strokeWidth={1.5} />
                                 </div>
-                                <h3 className="text-xl font-bold mb-2">Unmatched Precision</h3>
-                                <p className="text-lg opacity-60 leading-relaxed">
-                                    Industry-leading accuracy in compliance validation, cost analysis, and risk detection across all infrastructure project types.
-                                </p>
-                            </div>
-
-                            {/* Benefit Card 2 */}
-                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up animate-delay-100`}>
-                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 animate-bounce-slow">
-                                    <Clock className="text-white" size={24} />
-                                </div>
-                                <h3 className="text-xl font-bold mb-2">Lightning Fast Results</h3>
-                                <p className="text-lg opacity-60 leading-relaxed">
-                                    Transform weeks of manual review into minutes. Our AI processes complex tender documents with intelligent automation.
-                                </p>
-                            </div>
-
-                            {/* Benefit Card 3 */}
-                            <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800' : 'bg-white border-slate-200 hover:shadow-lg'} transition-all duration-300 hover:-translate-y-1 animate-slide-up animate-delay-200`}>
-                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-4 animate-bounce-slow">
-                                    <FileText className="text-white" size={24} />
-                                </div>
-                                <h3 className="text-xl font-bold mb-2">Battle-Tested Platform</h3>
-                                <p className="text-lg opacity-60 leading-relaxed">
-                                    Trusted by government agencies processing thousands of infrastructure projects with comprehensive AI-powered evaluation.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-            </main>
-
-            {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-          9. FOOTER
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-            <footer className={`py-16 border-t ${isDarkMode ? 'bg-black border-zinc-800' : 'bg-slate-100 border-slate-200'}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-
-                        {/* Column A: MoDoNER Contact */}
-                        <div className="space-y-4">
-                            <div className="mb-4">
-                                <span className="font-bold text-lg opacity-90">NexusAI</span>
-                            </div>
-                            <p className="text-sm opacity-60 leading-relaxed">
-                                AI-Powered Infrastructure Evaluation Platform.<br />
-                                Transforming project analysis through intelligent automation.
-                            </p>
-                            <div className="text-sm opacity-60 space-y-1">
-                                <p>Intelligent Project Analysis Solutions</p>
-                                <p>Email: support@nexusai.ai</p>
-                                <p>Available 24/7</p>
-                            </div>
-                        </div>
-
-                        {/* Column B: Platform */}
-                        <div>
-                            <h4 className="font-bold mb-6">Platform</h4>
-                            <ul className="space-y-3 text-sm opacity-60">
-                                <li><a href="#features" className="hover:text-blue-500 transition-colors">Features</a></li>
-                                <li><a href="#comparison" className="hover:text-blue-500 transition-colors">Comparison Tool</a></li>
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">Documentation</a></li>
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">API Access</a></li>
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">Support</a></li>
-                            </ul>
-                        </div>
-
-                        {/* Column C: Company */}
-                        <div>
-                            <h4 className="font-bold mb-6">Company</h4>
-                            <ul className="space-y-3 text-sm opacity-60">
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">About Us</a></li>
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">Privacy Policy</a></li>
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">Terms of Service</a></li>
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">Contact</a></li>
-                                <li><a href="#" className="hover:text-blue-500 transition-colors">Careers</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="mt-16 pt-8 border-t border-slate-500/10 text-center text-xs opacity-40">
-                        &copy; {new Date().getFullYear()} NexusAI - Intelligent Project Evaluation Platform. All rights reserved.
-                    </div>
-                </div>
-            </footer>
-
-            {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-          7. AI CHAT LAUNCHER
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-            <div className="fixed bottom-6 right-6 z-40">
-                <button
-                    onClick={toggleChat}
-                    className="h-14 w-14 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-500/30 flex items-center justify-center hover:scale-110 transition-transform duration-300"
-                >
-                    {isChatOpen ? <X size={24} /> : <MessageSquare size={24} />}
-                </button>
-            </div>
-
-            {/* Chat Panel */}
-            <div className={`fixed top-0 right-0 h-full w-full sm:w-96 z-30 transform transition-transform duration-300 ease-in-out ${isChatOpen ? 'translate-x-0' : 'translate-x-full'} ${isDarkMode ? 'bg-zinc-950 border-l border-zinc-800' : 'bg-white border-l border-slate-200'} shadow-2xl`}>
-                <div className="flex flex-col h-full">
-                    <div className={`p-4 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-100'} flex justify-between items-center`}>
-                        <h3 className="font-bold flex items-center gap-2"><MessageSquare size={18} className="text-blue-500" /> AI Chat</h3>
-                        <button
-                            onClick={toggleChat}
-                            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                            aria-label="Close chat"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {chatHistory.map((msg, i) => (
-                            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-200/20 rounded-tl-none'}`}>
-                                    {msg.text}
-                                </div>
+                                <h3 className="text-lg font-semibold mb-3 tracking-wide">{capability.title}</h3>
+                                <p className="text-white/40 text-sm leading-relaxed">{capability.desc}</p>
                             </div>
                         ))}
                     </div>
+                </section>
 
-                    <form onSubmit={handleChatSubmit} className={`p-4 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={chatMessage}
-                                onChange={(e) => setChatMessage(e.target.value)}
-                                placeholder="Ask about project analysis..."
-                                className={`w-full pl-4 pr-10 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'}`}
-                            />
-                            <button type="submit" className="absolute right-2 top-2 p-1.5 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors">
-                                <Send size={16} />
-                            </button>
+                {/* Advanced Metrics / Analysis Sections */}
+                <section className="w-full max-w-6xl px-6 py-20 border-t border-white/10">
+                    <div className="grid lg:grid-cols-3 gap-6 mb-6">
+                        {/* Left Info Panel */}
+                        <div className="p-8 rounded-2xl border border-white/5 bg-white/[0.02]">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2 bg-white/5 rounded-lg border border-white/5">
+                                    <Brain className="w-5 h-5 text-white/70" strokeWidth={1.5} />
+                                </div>
+                                <span className="font-semibold text-sm">AI-Powered Analysis</span>
+                            </div>
+                            
+                            <div className="space-y-8">
+                                <div className="border-t border-white/5 pt-6">
+                                    <h4 className="font-semibold mb-3 tracking-wide">Multi-Language Support</h4>
+                                    <ul className="space-y-3 text-sm text-white/40">
+                                        <li className="flex gap-3 before:content-['•'] before:text-white/20">Provide unparalleled infrastructure analysis.</li>
+                                        <li className="flex gap-3 before:content-['•'] before:text-white/20">Multi-line professional glyph support.</li>
+                                    </ul>
+                                </div>
+                                <div className="border-t border-white/5 pt-6">
+                                    <h4 className="font-semibold mb-3 tracking-wide">Pan-India Evaluation</h4>
+                                    <ul className="space-y-3 text-sm text-white/40">
+                                        <li className="flex gap-3 before:content-['•'] before:text-white/20">Execution and terminal utilization analysis.</li>
+                                        <li className="flex gap-3 before:content-['•'] before:text-white/20">Comprehensive cross-regional infrastructure support.</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                    </form>
+
+                        {/* Radar Chart Panel */}
+                        <div className="lg:col-span-2 p-8 rounded-2xl border border-white/5 bg-white/[0.02] flex flex-col">
+                            <h3 className="text-xl font-semibold mb-8 tracking-wide">Feasibility Metrics</h3>
+                            <div className="flex-1 flex items-center justify-center min-h-[300px] relative">
+                                {/* Synthetic Radar Chart via CSS SVG */}
+                                <svg viewBox="0 0 200 200" className="w-full h-full max-w-[300px] opacity-70">
+                                    {/* Web rings */}
+                                    <polygon points="100,20 180,60 180,140 100,180 20,140 20,60" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
+                                    <polygon points="100,40 160,75 160,125 100,160 40,125 40,75" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                                    <polygon points="100,60 140,90 140,110 100,140 60,110 60,90" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
+                                    {/* Axes */}
+                                    <line x1="100" y1="100" x2="100" y2="20" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                                    <line x1="100" y1="100" x2="180" y2="60" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                                    <line x1="100" y1="100" x2="180" y2="140" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                                    <line x1="100" y1="100" x2="100" y2="180" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                                    <line x1="100" y1="100" x2="20" y2="140" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                                    <line x1="100" y1="100" x2="20" y2="60" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                                    
+                                    {/* Labels */}
+                                    <text x="100" y="10" fill="rgba(255,255,255,0.3)" fontSize="6" textAnchor="middle">Feasibility Metrics</text>
+                                    <text x="190" y="55" fill="rgba(255,255,255,0.3)" fontSize="6" textAnchor="start">Relationships</text>
+                                    <text x="190" y="145" fill="rgba(255,255,255,0.3)" fontSize="6" textAnchor="start">Milestone Status</text>
+                                    <text x="100" y="190" fill="rgba(255,255,255,0.3)" fontSize="6" textAnchor="middle">Radar Chart</text>
+                                    <text x="10" y="145" fill="rgba(255,255,255,0.3)" fontSize="6" textAnchor="end"></text>
+                                    <text x="10" y="55" fill="rgba(255,255,255,0.3)" fontSize="6" textAnchor="end">Feasibility Metrics</text>
+
+                                    {/* Data Polygon */}
+                                    <polygon points="100,30 160,80 140,150 100,150 50,110 40,70" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.6)" strokeWidth="1"/>
+                                    
+                                    {/* Data Points */}
+                                    <circle cx="100" cy="30" r="2" fill="white" />
+                                    <circle cx="160" cy="80" r="2" fill="white" />
+                                    <circle cx="140" cy="150" r="2" fill="white" />
+                                    <circle cx="100" cy="150" r="2" fill="white" />
+                                    <circle cx="50" cy="110" r="2" fill="white" />
+                                    <circle cx="40" cy="70" r="2" fill="white" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Technical Feasibility Bottom Section */}
+                    <div className="w-full p-8 rounded-2xl border border-white/5 bg-white/[0.02]">
+                        <h3 className="text-xl font-semibold mb-8 tracking-wide">Technical Feasibility & Risk Mitigation</h3>
+                        <div className="grid md:grid-cols-3 gap-6 min-h-[240px]">
+                            <div className="bg-[#0A0A0A] border border-white/5 rounded-lg p-4 relative min-h-[200px]">
+                                <span className="text-sm font-medium text-white/70 absolute top-4 left-4">Risk Mitigation Dashboard</span>
+                            </div>
+                            <div className="md:col-span-2 bg-[#0A0A0A] border border-white/5 rounded-lg p-4 relative flex flex-col gap-2">
+                                <span className="text-sm font-medium text-white/70 mb-4 block">Risk Mitigation Dashboard</span>
+                                {/* Mock treemap/heatmap grid */}
+                                <div className="flex-1 grid grid-cols-4 grid-rows-3 gap-1.5">
+                                    <div className="col-span-2 row-span-2 bg-white/10 rounded-sm p-2 flex text-[10px] text-white/50">Feasibility</div>
+                                    <div className="bg-white/5 rounded-sm p-2 flex text-[10px] text-white/50">Evaluations</div>
+                                    <div className="bg-white/5 rounded-sm p-2 flex text-[10px] text-white/50">Continuity</div>
+                                    <div className="row-span-2 bg-white/5 rounded-sm p-2 flex text-[10px] text-white/50">Facilitation</div>
+                                    <div className="bg-white/5 rounded-sm p-2 flex text-[10px] text-white/50">Asterisks</div>
+                                    <div className="col-span-2 bg-white/5 rounded-sm p-2 flex items-end text-[10px] text-white/50">Discovery</div>
+                                    <div className="bg-white/5 rounded-sm p-2 flex text-[10px] text-white/50">Patterns</div>
+                                    <div className="bg-white/5 rounded-sm p-2 flex text-[10px] text-white/50">Connect</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            {/* Footer */}
+            <footer className="w-full border-t border-white/5 bg-[#0A0A0A] py-16 flex flex-col items-center gap-8 text-sm text-white/40">
+                <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-lg justify-center">
+                    <button className="flex items-center justify-between w-48 hover:text-white/70 transition-colors pb-3 border-b border-white/5">
+                        <span className="font-medium">Platform</span> <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button className="flex items-center justify-between w-48 hover:text-white/70 transition-colors pb-3 border-b border-white/5">
+                        <span className="font-medium">Security</span> <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button className="flex items-center justify-between w-48 hover:text-white/70 transition-colors pb-3 border-b border-white/5">
+                        <span className="font-medium">Company</span> <ChevronDown className="w-4 h-4" />
+                    </button>
                 </div>
-            </div>
-
-            {/* Auth Modal */}
-            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-
+                <div className="mt-8 text-xs tracking-wider">
+                    Copyright © NEXUS AI. All rights reserved.
+                </div>
+            </footer>
         </div>
-    );
-};
-
-// Helper Component for Features
-const FeatureCard = ({ icon, title, desc, isDarkMode }: { icon: React.ReactNode, title: string, desc: string, isDarkMode: boolean }) => (
-    <div className={`p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800 hover:shadow-black/30' : 'bg-gradient-to-br from-white to-slate-50 border-blue-100/50 shadow-sm hover:shadow-blue-200/40 hover:border-blue-200'}`}>
-        <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-zinc-950' : 'bg-slate-50'}`}>
-            {icon}
-        </div>
-        <h3 className="text-lg font-bold mb-2">{title}</h3>
-        <p className="text-base opacity-60 leading-relaxed">{desc}</p>
-    </div>
-);
-
-export default DPRAnalyzerLanding;
+    )
+}
