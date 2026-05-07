@@ -1,28 +1,14 @@
-import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import {
-    Search,
-    Filter,
-    ChevronDown,
-    Folder,
-    Plus,
-    Calendar,
-    Loader2,
-    MapPin,
-    Briefcase,
-    Layers,
-    X,
-    FileText,
-    ClipboardList,
-    ShieldCheck
-} from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, type Project } from '@/lib/api'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useRole } from '@/contexts/RoleContext'
+import { LanguageDropdown } from '@/components/LanguageDropdown'
+import { Network, LayoutDashboard, Gavel, ArrowLeftRight, Settings, LogOut, X, Loader2 } from 'lucide-react'
+import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
 
-// Dropdown Options - All Indian States/UTs and Pan-India Schemes
+// Dropdown Options
 const STATE_OPTIONS = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
     'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
@@ -43,67 +29,45 @@ const SCHEME_OPTIONS = [
 ]
 
 const SECTOR_OPTIONS: Record<string, string[]> = {
-    'Force Modernisation Plan': [
-        'Weapons & Ammunition', 'Vehicles & Mobility', 'Surveillance & Security Systems', 'Training Equipment & Simulators', 'Uniform & Clothing & Gear'
-    ],
-    'CAPF Infrastructure Development': [
-        'Infrastructure & Construction', 'Barracks & Accommodation', 'Border Outposts', 'Road Connectivity', 'Helipads & Airstrips'
-    ],
-    'Smart Camp Initiative': [
-        'IT & Communication Equipment', 'Surveillance Systems', 'Access Control', 'Smart Lighting', 'CCTV & Monitoring'
-    ],
-    'Make in India (Defence)': [
-        'Weapons & Ammunition', 'Vehicles & Mobility', 'IT & Communication Equipment', 'Uniform & Clothing & Gear', 'Training Equipment & Simulators'
-    ],
-    'CAPF Welfare & Housing': [
-        'Welfare & Sports Equipment', 'Medical & Healthcare Supplies', 'Canteen Stores', 'Recreation Facilities', 'Education & Schools'
-    ],
-    'Digital Police / e-Office': [
-        'IT & Communication Equipment', 'Software & Licenses', 'Data Centers', 'e-Governance Systems', 'Networking'
-    ],
-    'Swachh Bharat (Barracks)': [
-        'Sanitation Equipment', 'Water Supply', 'Solid Waste Management', 'Hygiene Supplies', 'Green Infrastructure'
-    ]
+    'Force Modernisation Plan': ['Weapons & Ammunition', 'Vehicles & Mobility', 'Surveillance & Security Systems', 'Training Equipment & Simulators', 'Uniform & Clothing & Gear'],
+    'CAPF Infrastructure Development': ['Infrastructure & Construction', 'Barracks & Accommodation', 'Border Outposts', 'Road Connectivity', 'Helipads & Airstrips'],
+    'Smart Camp Initiative': ['IT & Communication Equipment', 'Surveillance Systems', 'Access Control', 'Smart Lighting', 'CCTV & Monitoring'],
+    'Make in India (Defence)': ['Weapons & Ammunition', 'Vehicles & Mobility', 'IT & Communication Equipment', 'Uniform & Clothing & Gear', 'Training Equipment & Simulators'],
+    'CAPF Welfare & Housing': ['Welfare & Sports Equipment', 'Medical & Healthcare Supplies', 'Canteen Stores', 'Recreation Facilities', 'Education & Schools'],
+    'Digital Police / e-Office': ['IT & Communication Equipment', 'Software & Licenses', 'Data Centers', 'e-Governance Systems', 'Networking'],
+    'Swachh Bharat (Barracks)': ['Sanitation Equipment', 'Water Supply', 'Solid Waste Management', 'Hygiene Supplies', 'Green Infrastructure']
 }
 
-// Combined list of all sectors for filtering
 const ALL_SECTORS = Array.from(new Set(Object.values(SECTOR_OPTIONS).flat())).sort()
 
 export default function ProjectsPage() {
     const navigate = useNavigate()
     const { t } = useLanguage()
+    const { logout } = useRole()
+    
+    const handleLogout = () => {
+        logout()
+        navigate('/')
+    }
+    
     const [searchQuery, setSearchQuery] = useState('')
     const [projects, setProjects] = useState<Project[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    // Filter State
     const [showFilters, setShowFilters] = useState(false)
-    const [filters, setFilters] = useState({
-        state: 'ALL',
-        scheme: 'ALL',
-        sector: 'ALL'
-    })
+    const [filters, setFilters] = useState({ state: 'ALL', scheme: 'ALL', sector: 'ALL' })
 
-    // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [newProject, setNewProject] = useState({
-        name: '',
-        state: STATE_OPTIONS[0],
-        scheme: SCHEME_OPTIONS[0],
-        sector: SECTOR_OPTIONS[SCHEME_OPTIONS[0]][0]
+        name: '', state: STATE_OPTIONS[0], scheme: SCHEME_OPTIONS[0], sector: SECTOR_OPTIONS[SCHEME_OPTIONS[0]][0]
     })
     const [creating, setCreating] = useState(false)
     const [validationError, setValidationError] = useState<string | null>(null)
-
-    // Delete Modal State
     const [projectToDelete, setProjectToDelete] = useState<number | null>(null)
 
-    useEffect(() => {
-        loadProjects()
-    }, [])
+    useEffect(() => { loadProjects() }, [])
 
-    // Update sector when scheme changes (Forward Dependency)
     useEffect(() => {
         if (newProject.scheme) {
             const validSectors = SECTOR_OPTIONS[newProject.scheme] || []
@@ -111,11 +75,7 @@ export default function ProjectsPage() {
                 setNewProject(prev => ({ ...prev, sector: validSectors[0] }))
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [newProject.scheme])
-
-    // Update scheme when sector changes (Reverse Dependency)
-    // We don't automatically change scheme, but we filter the options in the render
+    }, [newProject.scheme, newProject.sector])
 
     const loadProjects = async () => {
         try {
@@ -124,7 +84,6 @@ export default function ProjectsPage() {
             setProjects(data)
         } catch (err) {
             setError('Failed to load projects')
-            console.error('Error loading projects:', err)
         } finally {
             setLoading(false)
         }
@@ -132,46 +91,21 @@ export default function ProjectsPage() {
 
     const handleCreateProject = async (e: React.FormEvent) => {
         e.preventDefault()
-
-        // Validation
-        if (!newProject.name.trim()) {
-            setValidationError(t('projects.validationName'))
-            return
-        }
-        if (!newProject.state) {
-            setValidationError(t('projects.validationState'))
-            return
-        }
-        if (!newProject.scheme) {
-            setValidationError(t('projects.validationScheme'))
-            return
-        }
-        if (!newProject.sector) {
-            setValidationError(t('projects.validationSector'))
-            return
-        }
+        if (!newProject.name.trim()) return setValidationError(t('projects.validationName'))
+        if (!newProject.state) return setValidationError(t('projects.validationState'))
+        if (!newProject.scheme) return setValidationError(t('projects.validationScheme'))
+        if (!newProject.sector) return setValidationError(t('projects.validationSector'))
 
         try {
-            setCreating(true)
-            setValidationError(null)
+            setCreating(true); setValidationError(null)
             await api.createProject({
-                name: newProject.name,
-                state: newProject.state,
-                scheme: newProject.scheme,
-                sector: newProject.sector
+                name: newProject.name, state: newProject.state, scheme: newProject.scheme, sector: newProject.sector
             })
             setIsModalOpen(false)
-            setNewProject({
-                name: '',
-                state: STATE_OPTIONS[1],
-                scheme: SCHEME_OPTIONS[1],
-                sector: SECTOR_OPTIONS[SCHEME_OPTIONS[1]][0]
-            })
-            setValidationError(null)
+            setNewProject({ name: '', state: STATE_OPTIONS[1], scheme: SCHEME_OPTIONS[1], sector: SECTOR_OPTIONS[SCHEME_OPTIONS[1]][0] })
             loadProjects()
         } catch (err) {
             setValidationError(t('projects.creatingFailed'))
-            console.error('Error creating project:', err)
         } finally {
             setCreating(false)
         }
@@ -179,16 +113,12 @@ export default function ProjectsPage() {
 
     const confirmDelete = async () => {
         if (!projectToDelete) return
-
         try {
-            console.log('Calling deleteProject API for:', projectToDelete)
             await api.deleteProject(projectToDelete)
-            console.log('Delete successful, updating state')
             setProjects(projects.filter(p => p.id !== projectToDelete))
             setProjectToDelete(null)
         } catch (err) {
             alert('Failed to delete project')
-            console.error('Error deleting project:', err)
         }
     }
 
@@ -197,12 +127,7 @@ export default function ProjectsPage() {
         setProjectToDelete(projectId)
     }
 
-
-
-    // Get valid sectors based on selected scheme
-    const getValidSectors = () => {
-        return SECTOR_OPTIONS[newProject.scheme] || []
-    }
+    const getValidSectors = () => SECTOR_OPTIONS[newProject.scheme] || []
 
     const filteredProjects = projects.filter(p => {
         const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -213,494 +138,398 @@ export default function ProjectsPage() {
     })
 
     const totalBidDocuments = projects.reduce((sum, project) => sum + (project.dpr_count || 0), 0)
-
-    const projectsWithDocuments = projects.filter(
-        project => (project.dpr_count || 0) > 0
-    ).length
-
-    const readyForComparison = projects.filter(
-        project => project.has_comparison || (project.dpr_count || 0) > 1
-    ).length
-
-    const activeFilterCount = [filters.state, filters.scheme, filters.sector].filter(
-        value => value !== 'ALL'
-    ).length
-
-    const getReviewStatus = (project: Project) => {
-        if (project.has_comparison) {
-            return {
-                label: 'Comparison Ready',
-                className:
-                    'bg-green-50 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-200 dark:border-green-800/70'
-            }
-        }
-
-        if ((project.dpr_count || 0) > 0) {
-            return {
-                label: 'Documents Added',
-                className:
-                    'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/30 dark:text-blue-200 dark:border-blue-800/70'
-            }
-        }
-
-        return {
-            label: 'Awaiting Bids',
-            className:
-                'bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/60 dark:text-stone-200 dark:border-stone-700'
-        }
-    }
+    const projectsWithDocuments = projects.filter(project => (project.dpr_count || 0) > 0).length
+    const readyForComparison = projects.filter(project => project.has_comparison || (project.dpr_count || 0) > 1).length
+    
+    // Status metrics for Review Readiness
+    const totalProjects = projects.length || 1
+    const readyPercentage = Math.round((readyForComparison / totalProjects) * 100)
+    const pendingPercentage = Math.round(((totalProjects - readyForComparison) / totalProjects) * 100)
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <Header />
-
-<main className="flex-1">
-    <div className="container mx-auto px-4 py-8">
-        <section className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-sm animate-slide-up">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="max-w-3xl">
-                    <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                        <ShieldCheck className="h-3.5 w-3.5" />
-                        Procurement Workspace
+        <div className="bg-black text-[#e5e2e1] min-h-screen flex flex-col font-body antialiased selection:bg-white/20 selection:text-white">
+            {/* Top Navigation Bar */}
+            <header className="h-16 sticky top-0 z-40 bg-[#000000]/80 backdrop-blur-sm border-b border-[rgba(255,255,255,0.05)] flex items-center px-6 w-full gap-8">
+                <div className="flex items-center gap-3 shrink-0 cursor-pointer" onClick={() => navigate('/admin')}>
+                    <div className="w-8 h-8 rounded-lg bg-[#353434] flex items-center justify-center">
+                        <Network className="text-[#ffffff] w-5 h-5" strokeWidth={1.5} />
                     </div>
-
-                    <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-                        {t('projects.title')}
-                    </h1>
-
-                    <p className="mt-2 max-w-2xl text-muted-foreground">
-                        {t('projects.subtitle')} Manage tender files, bid documents, and comparison readiness from one structured review console.
-                    </p>
+                    <div className="font-semibold text-[20px] text-[#ffffff] tracking-tight">Nexus AI</div>
                 </div>
-
-                <Button
-                    size="lg"
-                    onClick={() => setIsModalOpen(true)}
-                    className="w-full sm:w-auto"
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('projects.addProject')}
-                </Button>
-            </div>
-        </section>
-
-        <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 animate-slide-up animate-delay-100">
-            <Card className="border-l-4 border-l-primary p-5 shadow-sm">
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Total tenders
-                        </p>
-                        <p className="mt-2 text-3xl font-bold">
-                            {projects.length}
-                        </p>
-                    </div>
-
-                    <div className="rounded-lg bg-primary/10 p-3 text-primary">
-                        <ClipboardList className="h-5 w-5" />
-                    </div>
+                <nav className="hidden lg:flex items-center gap-1 flex-1">
+                    <button onClick={() => navigate('/admin')} className="text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[#1c1b1b] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98]">
+                        <LayoutDashboard className="w-4 h-4" strokeWidth={1.5} />
+                        <span>Overview</span>
+                    </button>
+                    <button className="bg-[#353434] text-[#ffffff] font-medium flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98] transition-transform">
+                        <Gavel className="w-4 h-4" strokeWidth={1.5} />
+                        <span>Tenders</span>
+                    </button>
+                    <button onClick={() => navigate('/admin/comparisons')} className="text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[#1c1b1b] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98]">
+                        <ArrowLeftRight className="w-4 h-4" strokeWidth={1.5} />
+                        <span>Compare Bids</span>
+                    </button>
+                </nav>
+                <div className="flex items-center gap-4 flex-1 justify-end">
                 </div>
-            </Card>
-
-            <Card className="border-l-4 border-l-accent p-5 shadow-sm">
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Bid documents
-                        </p>
-                        <p className="mt-2 text-3xl font-bold">
-                            {totalBidDocuments}
-                        </p>
-                    </div>
-
-                    <div className="rounded-lg bg-accent/10 p-3 text-accent">
-                        <FileText className="h-5 w-5" />
-                    </div>
+                <div className="flex items-center gap-4 shrink-0">
+                    <LanguageDropdown />
+                    <button className="text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[#1c1b1b] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98]">
+                        <Settings className="w-4 h-4" strokeWidth={1.5} />
+                        <span>Settings</span>
+                    </button>
+                    <button onClick={handleLogout} className="text-[#c4c7c8] hover:text-[#e5e2e1] hover:bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-lg text-sm active:scale-[0.98] ml-2">
+                        <LogOut className="w-4 h-4" strokeWidth={1.5} />
+                        <span>Logout</span>
+                    </button>
                 </div>
-            </Card>
+            </header>
 
-            <Card className="border-l-4 border-l-indigo p-5 shadow-sm">
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                            With documents
-                        </p>
-                        <p className="mt-2 text-3xl font-bold">
-                            {projectsWithDocuments}
-                        </p>
-                    </div>
-
-                    <div className="rounded-lg bg-indigo/10 p-3 text-indigo">
-                        <Folder className="h-5 w-5" />
-                    </div>
-                </div>
-            </Card>
-
-            <Card className="border-l-4 border-l-green-700 p-5 shadow-sm dark:border-l-green-500">
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Ready to compare
-                        </p>
-                        <p className="mt-2 text-3xl font-bold">
-                            {readyForComparison}
+            <main className="flex-grow w-full max-w-[120rem] mx-auto px-6 pt-12 pb-24 flex flex-col gap-12">
+                {/* Page Header */}
+                <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="flex flex-col gap-3">
+                        <span className="text-[12px] font-medium text-[#c4c7c8] uppercase tracking-widest flex items-center gap-2">
+                            <span className="w-1 h-1 bg-white rounded-full"></span>
+                            PROCUREMENT WORKSPACE
+                        </span>
+                        <h1 className="text-[60px] font-bold leading-[1.1] tracking-[-0.025em] text-white">Tenders</h1>
+                        <p className="text-[#c4c7c8] max-w-2xl text-[16px] leading-[1.6]">
+                            Manage and evaluate all active procurement dossiers. Upload bid documents, monitor readiness, and initiate AI-assisted comparative reviews.
                         </p>
                     </div>
-
-                    <div className="rounded-lg bg-green-700/10 p-3 text-green-800 dark:text-green-300">
-                        <ShieldCheck className="h-5 w-5" />
+                    <div className="flex items-center gap-3">
+                        <button className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-full border border-white/20 backdrop-blur-sm transition-all flex items-center gap-2 text-[14px]">
+                            <span className="material-symbols-outlined text-[18px]">upload_file</span>
+                            Upload Documents
+                        </button>
+                        <button 
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-white text-black px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all flex items-center gap-2 font-medium text-[14px]"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">add</span>
+                            Create Tender
+                        </button>
                     </div>
-                </div>
-            </Card>
-        </section>
+                </header>
 
-        <section className="mb-8 rounded-2xl border border-border bg-card p-4 shadow-sm animate-slide-up animate-delay-200">
-            <div className="flex flex-col gap-4">
-                <div className="flex flex-col md:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-
-                        <input
-                            type="text"
-                            placeholder={t('projects.searchPlaceholder')}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                        />
+                {/* KPI Strip */}
+                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-white/5 border border-white/5 rounded-xl p-5 flex flex-col gap-2 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span className="material-symbols-outlined text-[48px]">folder_open</span>
+                        </div>
+                        <span className="text-[12px] font-medium text-[#c4c7c8] uppercase tracking-widest">Total Tenders</span>
+                        <span className="text-[30px] font-semibold text-white tracking-[-0.025em]">{projects.length}</span>
                     </div>
+                    <div className="bg-white/5 border border-white/5 rounded-xl p-5 flex flex-col gap-2 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span className="material-symbols-outlined text-[48px]">description</span>
+                        </div>
+                        <span className="text-[12px] font-medium text-[#c4c7c8] uppercase tracking-widest">Bid Documents</span>
+                        <span className="text-[30px] font-semibold text-white tracking-[-0.025em]">{totalBidDocuments}</span>
+                    </div>
+                    <div className="bg-white/5 border border-white/5 rounded-xl p-5 flex flex-col gap-2 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span className="material-symbols-outlined text-[48px]">check_circle</span>
+                        </div>
+                        <span className="text-[12px] font-medium text-[#c4c7c8] uppercase tracking-widest">With Documents</span>
+                        <span className="text-[30px] font-semibold text-white tracking-[-0.025em]">{projectsWithDocuments}</span>
+                    </div>
+                    <div className="bg-white/5 border border-white/20 rounded-xl p-5 flex flex-col gap-2 relative overflow-hidden group shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                        <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-30 transition-opacity">
+                            <span className="material-symbols-outlined text-[48px]">compare_arrows</span>
+                        </div>
+                        <span className="text-[12px] font-medium text-white uppercase tracking-widest">Ready to Compare</span>
+                        <span className="text-[30px] font-semibold text-white tracking-[-0.025em]">{readyForComparison}</span>
+                    </div>
+                </section>
 
-                    <Button
-                        variant={showFilters ? 'primary' : 'outline'}
-                        onClick={() => setShowFilters(!showFilters)}
-                        className="justify-center"
-                    >
-                        <Filter className="h-4 w-4 mr-2" />
-                        {t('projects.filter')}
+                {/* Main Workspace Area */}
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left: Toolbar & Grid */}
+                    <div className="flex-grow flex flex-col gap-6">
+                        {/* Workspace Toolbar */}
+                        <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white/5 border border-white/5 rounded-lg">
+                            <div className="flex-grow relative flex items-center">
+                                <span className="material-symbols-outlined absolute left-3 text-[#c4c7c8] text-[20px]">search</span>
+                                <input 
+                                    className="w-full bg-transparent border-none text-[14px] text-white placeholder:text-[#c4c7c8] focus:ring-0 pl-10 outline-none" 
+                                    placeholder="Search tender name, ID, or scheme..." 
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <div className="h-8 w-px bg-white/10 hidden sm:block self-center"></div>
+                            <div className="flex items-center gap-2 px-2">
+                                <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors text-[14px] ${showFilters ? 'bg-white/10 text-white' : 'text-[#c4c7c8] hover:text-white'}`}>
+                                    <span className="material-symbols-outlined text-[18px]">filter_list</span>
+                                    Filter
+                                </button>
+                            </div>
+                        </div>
 
-                        {activeFilterCount > 0 && (
-                            <span className="ml-1 rounded-full bg-background/20 px-2 py-0.5 text-xs">
-                                {activeFilterCount}
-                            </span>
+                        {/* Filters Panel */}
+                        {showFilters && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-xl border border-white/5 bg-white/5 p-4 animate-in slide-in-from-top-2">
+                                <div>
+                                    <label className="block text-[12px] font-medium mb-1.5 text-[#c4c7c8] uppercase tracking-widest">State</label>
+                                    <select
+                                        value={filters.state}
+                                        onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+                                        className="w-full rounded-md border border-white/10 bg-black text-white px-3 py-2 text-[14px] focus:outline-none focus:border-white/30"
+                                    >
+                                        <option value="ALL">ALL STATES</option>
+                                        {STATE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[12px] font-medium mb-1.5 text-[#c4c7c8] uppercase tracking-widest">Scheme</label>
+                                    <select
+                                        value={filters.scheme}
+                                        onChange={(e) => setFilters({ ...filters, scheme: e.target.value })}
+                                        className="w-full rounded-md border border-white/10 bg-black text-white px-3 py-2 text-[14px] focus:outline-none focus:border-white/30"
+                                    >
+                                        <option value="ALL">ALL SCHEMES</option>
+                                        {SCHEME_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[12px] font-medium mb-1.5 text-[#c4c7c8] uppercase tracking-widest">Sector</label>
+                                    <select
+                                        value={filters.sector}
+                                        onChange={(e) => setFilters({ ...filters, sector: e.target.value })}
+                                        className="w-full rounded-md border border-white/10 bg-black text-white px-3 py-2 text-[14px] focus:outline-none focus:border-white/30"
+                                    >
+                                        <option value="ALL">ALL SECTORS</option>
+                                        {ALL_SECTORS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </div>
+                            </div>
                         )}
 
-                        <ChevronDown
-                            className={`h-4 w-4 ml-2 transition-transform ${
-                                showFilters ? 'rotate-180' : ''
-                            }`}
-                        />
-                    </Button>
-                </div>
+                        {loading && (
+                            <div className="flex justify-center items-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-white" />
+                            </div>
+                        )}
 
-                {showFilters && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-xl border border-border bg-muted/35 p-4 animate-in slide-in-from-top-2">
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5">
-                                {t('projects.state')}
-                            </label>
+                        {/* Tender Dossier Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {!loading && filteredProjects.map(project => {
+                                const isReady = project.has_comparison || (project.dpr_count || 0) > 1;
+                                const isAdded = !isReady && (project.dpr_count || 0) > 0;
+                                const statusClass = isReady ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20' : isAdded ? 'text-[#FBBF24] bg-[#FBBF24]/10 border-[#FBBF24]/20' : 'text-[#c4c7c8] bg-white/5 border-white/10';
+                                const statusText = isReady ? 'Ready to Compare' : isAdded ? 'Documents Added' : 'Awaiting Docs';
+                                const readiness = isReady ? '100%' : isAdded ? '66%' : '33%';
 
-                            <select
-                                value={filters.state}
-                                onChange={(e) =>
-                                    setFilters({ ...filters, state: e.target.value })
-                                }
-                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                            >
-                                <option value="ALL">ALL</option>
-                                {STATE_OPTIONS.map(opt => (
-                                    <option key={opt} value={opt}>
-                                        {opt}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                                return (
+                                    <article 
+                                        key={project.id}
+                                        onClick={() => navigate(`/admin/projects/${project.id}`)}
+                                        className="bg-white/5 border border-white/5 rounded-xl p-5 flex flex-col gap-4 hover:bg-white/[0.08] hover:border-white/10 transition-all group cursor-pointer relative"
+                                    >
+                                        <button
+                                            onClick={(e) => handleDeleteClick(e, project.id)}
+                                            className="absolute top-4 right-4 z-10 p-1.5 rounded bg-black/40 border border-white/10 text-[#c4c7c8] hover:text-[#ffb4ab] hover:border-[#ffb4ab]/30 opacity-0 group-hover:opacity-100 transition-all"
+                                            title="Delete Tender"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
 
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5">
-                                {t('projects.scheme')}
-                            </label>
-
-                            <select
-                                value={filters.scheme}
-                                onChange={(e) =>
-                                    setFilters({ ...filters, scheme: e.target.value })
-                                }
-                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                            >
-                                <option value="ALL">ALL</option>
-                                {SCHEME_OPTIONS.map(opt => (
-                                    <option key={opt} value={opt}>
-                                        {opt}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold mb-1.5">
-                                {t('projects.sector')}
-                            </label>
-
-                            <select
-                                value={filters.sector}
-                                onChange={(e) =>
-                                    setFilters({ ...filters, sector: e.target.value })
-                                }
-                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                            >
-                                <option value="ALL">ALL</option>
-                                {ALL_SECTORS.map(opt => (
-                                    <option key={opt} value={opt}>
-                                        {opt}
-                                    </option>
-                                ))}
-                            </select>
+                                        <div className="flex items-start justify-between pr-8">
+                                            <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                                                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>folder</span>
+                                            </div>
+                                            <span className={`text-[12px] font-medium px-2.5 py-1 rounded-sm border ${statusClass}`}>{statusText}</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[20px] font-semibold tracking-[0.025em] text-white mb-1 line-clamp-1">{project.name}</h3>
+                                            <p className="text-[14px] text-[#c4c7c8]">TEN-{(project.created_at || "").substring(0, 4)}-{project.id.toString().padStart(3, '0')}</p>
+                                        </div>
+                                        <div className="bg-white/[0.03] border border-white/5 rounded-lg p-3 flex flex-col gap-2 mt-2">
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-[#c4c7c8] text-[12px] font-medium uppercase tracking-widest">Sector</span>
+                                                <span className="text-white text-[12px] max-w-[150px] truncate" title={project.sector}>{project.sector}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-[#c4c7c8] text-[12px] font-medium uppercase tracking-widest">State</span>
+                                                <span className="text-white text-[12px]">{project.state}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-2 mt-2">
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-[#c4c7c8] text-[12px]">Document Readiness</span>
+                                                <span className="text-white text-[12px]">{readiness}</span>
+                                            </div>
+                                            <div className="flex gap-1 h-1.5 w-full">
+                                                <div className={`h-full flex-1 rounded-l-full ${isReady ? 'bg-[#22C55E] shadow-[0_0_5px_rgba(34,197,94,0.3)]' : 'bg-white shadow-[0_0_5px_rgba(255,255,255,0.2)]'}`}></div>
+                                                <div className={`h-full flex-1 ${isReady ? 'bg-[#22C55E] shadow-[0_0_5px_rgba(34,197,94,0.3)]' : isAdded ? 'bg-white shadow-[0_0_5px_rgba(255,255,255,0.2)]' : 'bg-white/10'}`}></div>
+                                                <div className={`h-full flex-1 rounded-r-full ${isReady ? 'bg-[#22C55E] shadow-[0_0_5px_rgba(34,197,94,0.3)]' : 'bg-white/10'}`}></div>
+                                            </div>
+                                        </div>
+                                        <div className="pt-4 border-t border-white/5 flex justify-between items-center mt-auto">
+                                            <span className="text-xs text-[#c4c7c8]">{new Date(project.created_at).toLocaleDateString()}</span>
+                                            <span className="text-xs text-white bg-white/10 px-2 py-1 rounded flex items-center gap-1">
+                                                <span className="material-symbols-outlined text-[14px]">description</span>
+                                                {project.dpr_count || 0} Bids
+                                            </span>
+                                        </div>
+                                    </article>
+                                )
+                            })}
                         </div>
                     </div>
-                )}
-            </div>
-        </section>
 
-        {loading && (
-            <div className="flex justify-center items-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        )}
-
-        {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 mb-6 dark:bg-red-950/30 dark:border-red-800 dark:text-red-300">
-                {error}
-            </div>
-        )}
-
-        {!loading && !error && filteredProjects.length === 0 && (
-            <Card className="p-12 text-center shadow-sm">
-                <Folder className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-
-                <h3 className="text-lg font-semibold mb-2">
-                    {t('projects.noProjects')}
-                </h3>
-
-                <p className="text-muted-foreground mb-4">
-                    {searchQuery || showFilters
-                        ? t('projects.tryAdjusting')
-                        : t('projects.noProjectsDesc')}
-                </p>
-
-                <Button onClick={() => setIsModalOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Tender
-                </Button>
-            </Card>
-        )}
-
-        {!loading && !error && filteredProjects.length > 0 && (
-            <div className="mb-4 flex items-center justify-between text-sm text-muted-foreground">
-                <span>
-                    Showing {filteredProjects.length} of {projects.length} tenders
-                </span>
-                <span className="hidden sm:inline">
-                    Sorted by recent activity
-                </span>
-            </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {filteredProjects.map((project, index) => {
-                const reviewStatus = getReviewStatus(project)
-
-                return (
-                    <Card
-                        key={project.id}
-                        className="group relative overflow-hidden border-l-4 border-l-primary/80 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md cursor-pointer animate-slide-up"
-                        style={{ animationDelay: `${(index % 6) * 80}ms` }}
-                        onClick={() => navigate(`/admin/projects/${project.id}`)}
-                    >
-                        <div className="absolute top-4 right-4 z-10 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
-                            <button
-                                onClick={(e) => handleDeleteClick(e, project.id)}
-                                className="rounded-md border border-border bg-card p-2 text-muted-foreground shadow-sm transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:hover:border-red-800 dark:hover:bg-red-950/40 dark:hover:text-red-300"
-                                title={t('projects.deleteProject')}
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
+                    {/* Right: Workspace Insights Rail */}
+                    <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-6">
+                        <div className="rounded-xl border border-white/5 bg-[#1c1b1b] relative h-24 flex items-center px-5">
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl pointer-events-none"></div>
+                            <span className="text-[12px] font-medium text-white uppercase tracking-widest flex items-center gap-2 relative z-10">
+                                <span className="material-symbols-outlined text-[#4ae176] text-[18px]">bolt</span>
+                                AI Engine Active
+                            </span>
                         </div>
-
-                        <div className="mb-4 flex items-start gap-4 pr-10">
-                            <div className="rounded-lg border border-primary/15 bg-primary/10 p-3 text-primary transition-colors group-hover:bg-primary/15">
-                                <Folder className="h-5 w-5" />
+                        <div className="bg-white/5 border border-white/5 rounded-xl p-5 flex flex-col gap-5">
+                            <div className="flex items-center gap-2 pb-4 border-b border-white/5">
+                                <span className="material-symbols-outlined text-white">insights</span>
+                                <h3 className="text-[20px] font-semibold tracking-[0.025em] text-white">Review Readiness</h3>
                             </div>
-
-                            <div className="min-w-0 flex-1">
-                                <div className="mb-2 flex flex-wrap items-center gap-2">
-                                    <span
-                                        className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${reviewStatus.className}`}
-                                    >
-                                        {reviewStatus.label}
-                                    </span>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[14px] text-[#c4c7c8]">Ready for AI Review</span>
+                                        <span className="font-medium text-white">{readyForComparison} Dossiers</span>
+                                    </div>
+                                    <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                        <div className="h-full bg-white transition-all duration-500" style={{ width: `${readyPercentage}%` }}></div>
+                                    </div>
                                 </div>
-
-                                <h3 className="line-clamp-2 text-lg font-semibold leading-snug">
-                                    {project.name}
-                                </h3>
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[14px] text-[#c4c7c8]">Pending Documents</span>
+                                        <span className="font-medium text-white">{totalProjects - readyForComparison} Dossiers</span>
+                                    </div>
+                                    <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                        <div className="h-full bg-[#c4c7c8] transition-all duration-500" style={{ width: `${pendingPercentage}%` }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t border-white/5 flex flex-col gap-3">
+                                <span className="text-[12px] font-medium text-[#c4c7c8] uppercase tracking-widest">Quick Actions</span>
+                                <button className="flex items-center justify-between w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-colors group">
+                                    <span className="text-[14px] text-white flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-[#c4c7c8] group-hover:text-white transition-colors text-[18px]">cloud_upload</span>
+                                        Bulk Upload Bids
+                                    </span>
+                                    <span className="material-symbols-outlined text-[#c4c7c8] text-[18px]">chevron_right</span>
+                                </button>
+                                <button className="flex items-center justify-between w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-colors group">
+                                    <span className="text-[14px] text-white flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-[#c4c7c8] group-hover:text-white transition-colors text-[18px]">magic_button</span>
+                                        Start Batch Review
+                                    </span>
+                                    <span className="material-symbols-outlined text-[#c4c7c8] text-[18px]">chevron_right</span>
+                                </button>
                             </div>
                         </div>
+                    </aside>
+                </div>
+            </main>
 
-                        <dl className="space-y-3 rounded-xl border border-border bg-muted/25 p-4 text-sm">
-                            <div className="flex items-start justify-between gap-3">
-                                <dt className="flex items-center gap-2 text-muted-foreground">
-                                    <MapPin className="h-4 w-4" />
-                                    State
-                                </dt>
-                                <dd className="text-right font-medium text-foreground">
-                                    {project.state}
-                                </dd>
-                            </div>
-
-                            <div className="flex items-start justify-between gap-3">
-                                <dt className="flex items-center gap-2 text-muted-foreground">
-                                    <Layers className="h-4 w-4" />
-                                    Scheme
-                                </dt>
-                                <dd className="text-right font-medium text-foreground">
-                                    {project.scheme}
-                                </dd>
-                            </div>
-
-                            <div className="flex items-start justify-between gap-3">
-                                <dt className="flex items-center gap-2 text-muted-foreground">
-                                    <Briefcase className="h-4 w-4" />
-                                    Sector
-                                </dt>
-                                <dd className="text-right font-medium text-foreground">
-                                    {project.sector}
-                                </dd>
-                            </div>
-                        </dl>
-
-                        <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <Calendar className="h-4 w-4" />
-                                {new Date(project.created_at).toLocaleDateString()}
-                            </div>
-
-                            <div className="rounded-md bg-primary/10 px-2.5 py-1 font-semibold text-primary">
-                                {project.dpr_count || 0} Bid Documents
-                            </div>
-                        </div>
-                    </Card>
-                )
-            })}
-        </div>
-    </div>
-</main>
-
-            {/* Add Project Modal */}
+            {/* Modals */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="w-full max-w-md p-6 bg-[#141313] border border-white/10 rounded-xl shadow-2xl animate-in fade-in zoom-in duration-200">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold">{t('projects.addNewProject')}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                            <h2 className="text-xl font-bold text-white">{t('projects.addNewProject')}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="text-[#c4c7c8] hover:text-white">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
-
                         <form onSubmit={handleCreateProject} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">{t('projects.projectName')} <span className="text-red-500">*</span></label>
+                                <label className="block text-[14px] font-medium mb-1.5 text-[#c4c7c8]">{t('projects.projectName')} <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     required
                                     value={newProject.name}
                                     onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className="w-full px-3 py-2 rounded-md border border-white/10 bg-black text-white focus:outline-none focus:border-white/30"
                                     placeholder={t('projects.projectNamePlaceholder')}
                                 />
                             </div>
-
                             <div>
-                                <label className="block text-sm font-medium mb-1">{t('projects.state')} <span className="text-red-500">*</span></label>
+                                <label className="block text-[14px] font-medium mb-1.5 text-[#c4c7c8]">{t('projects.state')} <span className="text-red-500">*</span></label>
                                 <select
                                     value={newProject.state}
                                     onChange={(e) => setNewProject({ ...newProject, state: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className="w-full px-3 py-2 rounded-md border border-white/10 bg-black text-white focus:outline-none focus:border-white/30"
                                 >
-                                    {STATE_OPTIONS.map(opt => (
-                                        <option key={opt} value={opt}>{opt}</option>
-                                    ))}
+                                    {STATE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                 </select>
                             </div>
-
                             <div>
-                                <label className="block text-sm font-medium mb-1">{t('projects.scheme')} <span className="text-red-500">*</span></label>
+                                <label className="block text-[14px] font-medium mb-1.5 text-[#c4c7c8]">{t('projects.scheme')} <span className="text-red-500">*</span></label>
                                 <select
                                     value={newProject.scheme}
                                     onChange={(e) => setNewProject({ ...newProject, scheme: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className="w-full px-3 py-2 rounded-md border border-white/10 bg-black text-white focus:outline-none focus:border-white/30"
                                 >
-                                    {SCHEME_OPTIONS.map(opt => (
-                                        <option key={opt} value={opt}>{opt}</option>
-                                    ))}
+                                    {SCHEME_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                 </select>
                             </div>
-
                             <div>
-                                <label className="block text-sm font-medium mb-1">{t('projects.sector')} <span className="text-red-500">*</span></label>
+                                <label className="block text-[14px] font-medium mb-1.5 text-[#c4c7c8]">{t('projects.sector')} <span className="text-red-500">*</span></label>
                                 <select
                                     value={newProject.sector}
                                     onChange={(e) => setNewProject({ ...newProject, sector: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className="w-full px-3 py-2 rounded-md border border-white/10 bg-black text-white focus:outline-none focus:border-white/30"
                                 >
-                                    {getValidSectors().map(opt => (
-                                        <option key={opt} value={opt}>{opt}</option>
-                                    ))}
+                                    {getValidSectors().map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                 </select>
                             </div>
-
                             {validationError && (
-                                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md text-red-600 dark:text-red-400 text-sm">
+                                <div className="p-3 bg-[#93000a]/20 border border-[#93000a] rounded-md text-[#ffb4ab] text-[14px]">
                                     {validationError}
                                 </div>
                             )}
-
                             <div className="flex gap-3 pt-4">
-                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsModalOpen(false)}>
+                                <button type="button" className="flex-1 px-4 py-2 border border-white/20 text-white rounded-md hover:bg-white/5 transition-colors" onClick={() => setIsModalOpen(false)}>
                                     Cancel
-                                </Button>
-                                <Button type="submit" className="flex-1" disabled={creating}>
-                                    {creating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                                    Create Tender
-                                </Button>
+                                </button>
+                                <button type="submit" className="flex-1 px-4 py-2 bg-white text-black font-medium rounded-md hover:bg-[#e2e2e2] transition-colors flex justify-center items-center" disabled={creating}>
+                                    {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Create Tender'}
+                                </button>
                             </div>
                         </form>
-                    </Card>
+                    </div>
                 </div>
             )}
 
-            {/* Delete Confirmation Modal */}
             {projectToDelete && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="w-full max-w-md p-6 bg-[#141313] border border-white/10 rounded-xl shadow-2xl animate-in fade-in zoom-in duration-200">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-red-600">{t('projects.deleteProject')}</h2>
-                            <button onClick={() => setProjectToDelete(null)} className="text-muted-foreground hover:text-foreground">
+                            <h2 className="text-xl font-bold text-[#ffb4ab]">{t('projects.deleteProject')}</h2>
+                            <button onClick={() => setProjectToDelete(null)} className="text-[#c4c7c8] hover:text-white">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
-
-                        <p className="text-muted-foreground mb-6">
+                        <p className="text-[#c4c7c8] mb-6 text-[14px]">
                             Are you sure you want to delete this tender? This action cannot be undone and all associated bids will be unlinked.
                         </p>
-
                         <div className="flex gap-3">
-                            <Button type="button" variant="outline" className="flex-1" onClick={() => setProjectToDelete(null)}>
+                            <button type="button" className="flex-1 px-4 py-2 border border-white/20 text-white rounded-md hover:bg-white/5 transition-colors" onClick={() => setProjectToDelete(null)}>
                                 Cancel
-                            </Button>
-                            <Button type="button" className="flex-1 bg-red-600 hover:bg-red-700" onClick={confirmDelete}>
+                            </button>
+                            <button type="button" className="flex-1 px-4 py-2 bg-[#93000a] text-white font-medium rounded-md hover:bg-[#690005] transition-colors" onClick={confirmDelete}>
                                 Delete Tender
-                            </Button>
+                            </button>
                         </div>
-                    </Card>
+                    </div>
                 </div>
             )}
         </div>
