@@ -1,13 +1,15 @@
 import { API_BASE_URL } from "../config/api";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = API_BASE_URL;
 
 // Authenticated fetch wrapper to inject auth token
 const authenticatedFetch = async (
   input: RequestInfo | URL,
   init?: RequestInit,
 ) => {
-  const token = import.meta.env.VITE_HACKATHON_ACCESS_TOKEN;
+  // Read from env var, fall back to the known demo token
+  const token =
+    import.meta.env.VITE_HACKATHON_ACCESS_TOKEN || "hackathon_demo_token_123";
   const headers = new Headers(init?.headers);
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
