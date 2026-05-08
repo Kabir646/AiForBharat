@@ -8,6 +8,66 @@ from dotenv import load_dotenv
 
 load_dotenv()  # ensure .env is loaded
 
+
+def _extract_text_from_file(file_path: str) -> Optional[str]:
+    """
+    Extract plain text from non-PDF files (docx, doc, xlsx, xls, txt).
+    Returns None if extraction is not needed (i.e. file is PDF/image).
+    """
+    ext = file_path.lower().rsplit('.', 1)[-1]
+
+    if ext in ('docx', 'doc'):
+        try:
+            from docx import Document
+            doc = Document(file_path)
+            text = '\n'.join(para.text for para in doc.paragraphs if para.text.strip())
+            # Also grab table text
+            for table in doc.tables:
+                for row in table.rows:
+                    text += '\n' + '\t'.join(cell.text for cell in row.cells)
+            return text
+        except ImportError:
+            raise RuntimeError(
+                "python-docx is required to process .docx files. "
+                "Run: pip install python-docx"
+            )
+
+    if ext in ('xlsx', 'xls'):
+        try:
+            import openpyxl
+            wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
+            lines = []
+            for sheet in wb.worksheets:
+                lines.append(f"=== Sheet: {sheet.title} ===")
+                for row in sheet.iter_rows(values_only=True):
+                    row_text = '\t'.join(str(c) if c is not None else '' for c in row)
+                    if row_text.strip():
+                        lines.append(row_text)
+            return '\n'.join(lines)
+        except ImportError:
+            # Fallback to xlrd for .xls
+            try:
+                import xlrd
+                wb = xlrd.open_workbook(file_path)
+                lines = []
+                for sheet in wb.sheets():
+                    lines.append(f"=== Sheet: {sheet.name} ===")
+                    for rx in range(sheet.nrows):
+                        lines.append('\t'.join(str(sheet.cell_value(rx, cx)) for cx in range(sheet.ncols)))
+                return '\n'.join(lines)
+            except ImportError:
+                raise RuntimeError(
+                    "openpyxl is required to process Excel files. "
+                    "Run: pip install openpyxl"
+                )
+
+    if ext == 'txt':
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            return f.read()
+
+    # PDF and images — handled as inline bytes, no conversion needed
+    return None
+
 # Some versions of the google-genai SDK expect genai.configure(...)
 try:
     import google.generativeai as genai
@@ -320,12 +380,20 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
                 import httpx, tempfile
                 resp = httpx.get(fallback_url, timeout=60)
                 resp.raise_for_status()
-                tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+                # Preserve original extension for proper handling
+                orig_ext = actual_path.rsplit('.', 1)[-1] if '.' in actual_path else 'pdf'
+                tmp_fd, tmp_path = tempfile.mkstemp(suffix=f".{orig_ext}")
                 try:
                     with os.fdopen(tmp_fd, 'wb') as tmp_file:
                         tmp_file.write(resp.content)
-                    with open(tmp_path, "rb") as pdf_file:
-                        pdf_bytes = pdf_file.read()
+                    # Try text extraction first; fall back to bytes for PDF/images
+                    extracted_text = _extract_text_from_file(tmp_path)
+                    if extracted_text:
+                        print(f"✓ Extracted {len(extracted_text)} chars of text from downloaded file")
+                        return model.generate_content([extracted_text, user_prompt])
+                    with open(tmp_path, "rb") as f:
+                        file_bytes = f.read()
+                    return model.generate_content([_make_file_part(file_bytes, tmp_path), user_prompt])
                 finally:
                     if os.path.exists(tmp_path):
                         os.remove(tmp_path)
@@ -335,9 +403,15 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
                     f"File may have been deleted. Provide a fallback_url to re-download."
                 )
             else:
-                with open(actual_path, "rb") as pdf_file:
-                    pdf_bytes = pdf_file.read()
-            return model.generate_content([_make_file_part(pdf_bytes, actual_path), user_prompt])
+                # Try text extraction for non-PDF/image files
+                extracted_text = _extract_text_from_file(actual_path)
+                if extracted_text:
+                    print(f"✓ Extracted {len(extracted_text)} chars of text from {actual_path}")
+                    return model.generate_content([extracted_text, user_prompt])
+                # PDF or image — use inline bytes
+                with open(actual_path, "rb") as f:
+                    file_bytes = f.read()
+                return model.generate_content([_make_file_part(file_bytes, actual_path), user_prompt])
         else:
             # Legacy Files API reference (files/xxxxx)
             file_obj = genai.get_file(file_ref)
@@ -361,7 +435,41 @@ Now analyze the attached file and return EXACTLY the one JSON object described a
             response_text = response_text[:-3]
             
         response_text = response_text.strip()
-        
+
+        # Sanitize invalid control characters inside JSON string values.
+        # When text is extracted from docx, Gemini may embed literal newlines/tabs
+        # inside JSON strings which breaks json.loads (control chars must be escaped).
+        def _sanitize_json_control_chars(s: str) -> str:
+            result = []
+            in_string = False
+            i = 0
+            _escape = {'\n': '\\n', '\r': '\\r', '\t': '\\t', '\b': '\\b', '\f': '\\f'}
+            while i < len(s):
+                c = s[i]
+                if not in_string:
+                    result.append(c)
+                    if c == '"':
+                        in_string = True
+                else:
+                    if c == '\\':
+                        # Escape sequence — pass both chars through unchanged
+                        result.append(c)
+                        i += 1
+                        if i < len(s):
+                            result.append(s[i])
+                    elif c == '"':
+                        result.append(c)
+                        in_string = False
+                    elif ord(c) < 32:
+                        # Control character inside a JSON string — must be escaped
+                        result.append(_escape.get(c, f'\\u{ord(c):04x}'))
+                    else:
+                        result.append(c)
+                i += 1
+            return ''.join(result)
+
+        response_text = _sanitize_json_control_chars(response_text)
+
         try:
             parsed_json = json.loads(response_text)
         except json.JSONDecodeError:

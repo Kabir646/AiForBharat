@@ -676,7 +676,7 @@ export default function ClientDashboard() {
                             Drop payload here or click to browse
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            MAX SIZE: 50MB • PDF ONLY
+                            MAX SIZE: 50MB • PDF, Word, Excel, Images, TXT
                           </p>
                         </div>
                       )}

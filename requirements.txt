@@ -47,3 +47,7 @@ Jinja2
 # Other
 beautifulsoup4
 websockets
+
+# Multi-file type support (docx, xlsx parsing for Gemini analysis)
+python-docx
+openpyxl
