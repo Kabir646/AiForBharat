@@ -1,6 +1,6 @@
 import { useRole } from "@/contexts/RoleContext";
 import { Card } from "@/components/ui/Card";
-import { FileText, Shield, User, Sparkles } from "lucide-react";
+import { FileText, Shield, User, Sparkles, KeyRound } from "lucide-react";
 
 export default function RoleSelectionPage({
   onRoleSelect,
@@ -105,6 +105,36 @@ export default function RoleSelectionPage({
           </p>
         </div>
       </footer>
+
+      {/* Demo Credentials Box — fixed bottom-left for judges */}
+      <div className="fixed bottom-5 left-5 z-50">
+        <div className="rounded-xl border border-primary/30 bg-background/90 backdrop-blur-md shadow-lg px-4 py-3 w-56">
+          <div className="flex items-center gap-2 mb-2">
+            <KeyRound className="h-4 w-4 text-primary" />
+            <span className="text-xs font-bold text-primary uppercase tracking-wide">
+              Demo Admin Credentials
+            </span>
+          </div>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Username</span>
+              <span className="font-mono font-semibold text-foreground">
+                admin123
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Password</span>
+              <span className="font-mono font-semibold text-foreground">
+                123
+              </span>
+            </div>
+          </div>
+          <p className="mt-2 text-[10px] text-muted-foreground leading-tight">
+            Click <span className="font-semibold">Admin</span> above to login.
+            Clients can self-register.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   Clock,
   Menu,
   X,
+  KeyRound,
 } from "lucide-react";
 import { AuthModal } from "@/components/AuthModal";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
@@ -434,6 +435,38 @@ const DPRAnalyzerLanding: React.FC = () => {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
       />
+
+      {/* Demo Credentials — fixed bottom-left for judges */}
+      <div className="fixed bottom-5 left-5 z-50">
+        <div
+          className={`rounded-xl border px-4 py-3 w-60 shadow-xl backdrop-blur-md ${
+            isDarkMode
+              ? "bg-zinc-900/90 border-violet-500/30"
+              : "bg-white/90 border-violet-300/50"
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <KeyRound className="h-4 w-4 text-violet-400" />
+            <span className="text-xs font-bold text-violet-400 uppercase tracking-wide">
+              Demo Admin Login
+            </span>
+          </div>
+          <div className="space-y-1.5 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="opacity-60">Username</span>
+              <span className="font-mono font-semibold">admin123</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="opacity-60">Password</span>
+              <span className="font-mono font-semibold">123</span>
+            </div>
+          </div>
+          <p className="mt-2.5 text-[10px] opacity-50 leading-tight">
+            Click <span className="font-semibold">Login</span> → select Admin.
+            Clients can self-register.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
